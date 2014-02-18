@@ -1,0 +1,12 @@
+# Latex compiled files
+*.aux
+*.bbl
+*.blg
+*.fdb_latexmk
+*.log
+*.gz
+*.toc
+
+
+# File to be deleted
+OLD_*
