@@ -1,11 +1,51 @@
-function ibma_on_real_data()
-    realDataDir = fullfile(pwd, 'real_data');
-    nSubjects = [25 25 20 20 9 9 9 12 12 12 12 13 32 24 14 14 12 12 16 16 16];
-    
-    zFiles = cellstr(spm_select('ExtFPList', pwd, 'conweighted_z_func_data.nii', 1:100));
-    conFiles = cellstr(spm_select('ExtFPList', pwd, 'conweighted_filtered_func_data.nii', 1:100));
-    varConFiles = cellstr(spm_select('ExtFPList', pwd, 'conweighted_var_filtered_func_data.nii', 1:100));
+function ibma_on_real_data(analysisDir, recomputeZ)
+    if nargin < 2
+        recomputeZ = false;
+        if nargin < 1
+            analysisDir = pwd;
+        end
+    end
 
+    realDataDir = fullfile(analysisDir, 'real_data');
+    nSubjects = [25 25 20 20 9 9 9 12 12 12 12 13 32 24 14 14 12 12 16 16 16];
+    nStudies = numel(nSubjects);
+    
+    con4dFileName = 'conweighted_filtered_func_data.nii';
+    varCon4dFileName = 'conweighted_var_filtered_func_data.nii';
+    z4dFileName = 'conweighted_z_func_data.nii';
+    
+    if recomputeZ
+        con4dFile = spm_select('FPList', analysisDir, con4dFileName);
+        varCon4dFile = spm_select('FPList', analysisDir, varCon4dFileName);
+
+        % Create z-stat
+        conData = spm_read_vols(spm_vol(con4dFile));
+        varConData = spm_read_vols(spm_vol(varCon4dFile));
+
+        %Safer with a loop
+        for v = 1:nStudies
+            currCon = conData(:,:,:,v);
+            currConVar = varConData(:,:,:,v);
+
+            clear currZ;
+            currZ = norminv(cdf('T', currCon./sqrt(currConVar), nSubjects(v)-1));
+            infPos = find(isinf(currZ(:)));          
+            currZ(infPos) = -norminv(cdf('T', -currCon(infPos)./sqrt(currConVar(infPos)), nSubjects(v)-1));
+
+            zData(:,:,:,v) = currZ;
+        end
+
+        zFile = fullfile(analysisDir, z4dFileName);
+        copy_nii_image(con4dFile, zFile);
+        zNifti = nifti(zFile);
+        zNifti.dat(:) = NaN;
+        zNifti.dat(:,:,:,:) = zData;
+    end
+    
+    zFiles = cellstr(spm_select('ExtFPList', analysisDir, ['^' string_to_regexp(z4dFileName)], 1:100));
+    conFiles = cellstr(spm_select('ExtFPList', analysisDir, ['^' string_to_regexp(con4dFileName)], 1:100));
+    varConFiles = cellstr(spm_select('ExtFPList', analysisDir, ['^' string_to_regexp(varCon4dFileName)], 1:100));
+    
     % --- Compute meta-analysis ---
     matlabbatch = {};
     % Fisher's
