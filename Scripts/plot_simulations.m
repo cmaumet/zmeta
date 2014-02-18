@@ -37,16 +37,16 @@ function found = plot_simulations(simuDir)
                     
                     methods = setdiff(fieldnames(currentMeta.simu), 'config');
                     
-                    % Set names (instead of abbv)
-                    methNames = methods;
-                    methNames = strrep(methNames, 'fishers', 'Fisher''s');
-                    methNames = strrep(methNames, 'megaFfx', 'GLM FFX');
-                    methNames = strrep(methNames, 'megaRfx', 'GLM RFX');
-                    methNames = strrep(methNames, 'permutCon', 'Contrast Perm.');
-                    methNames = strrep(methNames, 'permutZ', 'Z Perm.');
-                    methNames = strrep(methNames, 'stouffers', 'Stouffer''s');
-                    methNames = strrep(methNames, 'stouffersMFX', 'Stouffer''s MFX');
-                    methNames = strrep(methNames, 'weightedZ', 'Weighted Z');
+%                     % Set names (instead of abbv)
+%                     methNames = methods;
+%                     methNames = strrep(methNames, 'fishers', 'Fisher''s');
+%                     methNames = strrep(methNames, 'megaFfx', 'GLM FFX');
+%                     methNames = strrep(methNames, 'megaRfx', 'GLM RFX');
+%                     methNames = strrep(methNames, 'permutCon', 'Contrast Perm.');
+%                     methNames = strrep(methNames, 'permutZ', 'Z Perm.');
+%                     methNames = strrep(methNames, 'stouffers', 'Stouffer''s');
+%                     methNames = strrep(methNames, 'stouffersMFX', 'Stouffer''s MFX');
+%                     methNames = strrep(methNames, 'weightedZ', 'Weighted Z');
                     
                     nMethods = numel(methods);
 
@@ -68,7 +68,7 @@ function found = plot_simulations(simuDir)
                             
     %                         A = [nStudies, sigmaBetweenStudies, sigmaSquare, iMethod, currMean];
     %                         dlmwrite(filename, A, '-append', 'precision', '%.6f', 'delimiter', ',');
-                            fprintf(fid, '%s ,%.0f, %f, %f, %f, %f, %.0f, %f \n', methNames{iMethod}, nStudies, ...
+                            fprintf(fid, '%s ,%.0f, %f, %f, %f, %f, %.0f, %f \n', methods{iMethod}, nStudies, ...
                                 sigmaBetweenStudies, sigmaSquare, currMean, currRepeats(iRepeat), (iRepeat==1), currStdError);
                         end
                          

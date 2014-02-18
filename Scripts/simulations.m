@@ -10,7 +10,7 @@ function simulations(baseDir)
     % Number of subject per study
 %     nSubjects = [25 400 100 25]; %[10, 15, 20, 25, 30, 10, 15, 20, 25, 30, 10, 15, 20, 25, 30];
 %     nStudies = numel(nSubjects);
-    nStudiesArray = [5, 10, 25, 50];
+    nStudiesArray = [5, 10, 50, 25];
     sigmaSquareArray = [1/2, 1, 2, 4]; %How to compute z with var = 0?
     
     % Between-studies variance (RFX?)

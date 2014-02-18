@@ -1,9 +1,32 @@
 
 library('ggplot2')
 
+realdat <- read.csv('../../Real data/realdata.csv', header=T)
+#Dangerous:
+#levels(realdat$methods) <- levels(realdat$methods)[c(5,7,6,1,2,3,4)]
+head(realdat)
+
+# realdat$pValue <- realdat$pValue
+# realdat$GT <- realdat$GT
+realdat$diff <- realdat$pValue - realdat$GT
+
+p <- ggplot(subset(realdat), aes(x=factor(GT), y=diff))
+p + geom_boxplot() +    # Use hollow circles
+    geom_smooth(method="loess", aes(group = 1))   +         # Add a loess smoothed fit curve with confidence region
+    facet_wrap(~methods, scales = "free_y")
+
+validMethods = levels(factor(realdat$methods))[c(2,3,4,6)]
+validMethods = validMethods[c(4,1,2,3)]
 
 
-dat <- read.csv('simu.csv', header=T)
+
+realdat$isValid <- realdat$methods == validMethods
+p <- ggplot(subset(realdat, isValid==T), aes(x=factor(GT), y=diff))
+p + geom_boxplot() +    # Use hollow circles
+    geom_smooth(method="loess", aes(group = 1)) + # Add a loess smoothed fit curve with CI
+    facet_grid(~methods, labeller=facet_labeller) 
+
+dat <- read.csv('../../simu.csv', header=T)
 head(dat)
 # --- Boxplot ---
 methodLevels <- levels(dat$methods)
@@ -23,6 +46,17 @@ facet_labeller <- function(var, value){
         value[value=="1"] <- "Random-effects"
         value[value=="0"] <- "Fixed-effects"
     }
+    if (var=="methods") { 
+    	print(value)
+        value[value=="GLMFFX " | value=="megaFfx "] <- "GLM FFX"
+        value[value=="GLMRFX "| value=="megaRfx "] <- "GLM RFX"     
+		value[value=="PermutZ "] <- "Z Perm."
+		value[value=="PermutCon "] <- "Contrast Perm."
+		value[value=="Stouffers " | value=="stouffers "] <- "Stouffer's"
+		value[value=="StouffersMFX "| value=="stouffersMFX "] <- "Stouffer's MFX"
+		value[value=="WeightedZ " | value=="weightedZ "] <- "Weighted Z"
+    }
+
     return(value)
 }
 
