@@ -68,7 +68,7 @@ function found = plot_simulations(simuDir)
                             
     %                         A = [nStudies, sigmaBetweenStudies, sigmaSquare, iMethod, currMean];
     %                         dlmwrite(filename, A, '-append', 'precision', '%.6f', 'delimiter', ',');
-                            fprintf(fid, '%s ,%.0f, %f, %f, %f, %f, %.0f, %f \n', methods{iMethod}, nStudies, ...
+                            fprintf(fid, '%s,%.0f,%f,%f,%f,%f,%.0f,%f\n', methods{iMethod}, nStudies, ...
                                 sigmaBetweenStudies, sigmaSquare, currMean, currRepeats(iRepeat), (iRepeat==1), currStdError);
                         end
                          

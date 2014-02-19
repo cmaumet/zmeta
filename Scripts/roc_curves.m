@@ -35,11 +35,14 @@ function [auc auc10 dice] = roc_curves(analysisDir)
     fid = fopen(filename, 'w');
     
 %     methods{iMethod}, nStudies, sigmaBetweenStudies, sigmaSquare, currMean
-    fprintf(fid, 'methods, mean, GT, pValue, isFirstRepeat, stderror\n');
+    fprintf(fid, 'methods, mean, zGT, zValue, isFirstRepeat, stderror\n');
     
     factor = 1;
-    transfoGt = round(logPGt(inMaskPositions)*factor)/factor;
-    uniquePvalueGt = unique(transfoGt);
+    
+    zGt = -norminv(10.^(-logPGt(inMaskPositions)));
+    transfoZGt = round(zGt*factor)/factor;
+    
+    uniqueZvalueGt = unique(transfoZGt);
     
     for iMethod = 2:numel(methods)
         iMethod
@@ -55,26 +58,35 @@ function [auc auc10 dice] = roc_curves(analysisDir)
         title(methods{iMethod})
         
         toPrint = '';
-        for i = 1:numel(uniquePvalueGt);
+        
+        data = logPVal3d(inMaskPositions);
+        
+        
+        zData = -norminv(10.^(-data));
+        for i = 1:numel(uniqueZvalueGt);
             if mod(i, 5)==0
                 i
             end
             
-            data = logPVal3d(inMaskPositions);
-            reps = data(find(transfoGt == uniquePvalueGt(i)));
             
-            reps = 10.^(-reps);
+           reps = zData(find(transfoZGt == uniqueZvalueGt(i)));
+           
+           % Exclude proba=1 (can happen in permutation) cause a pb to compute
+           % z-stat and is clearly not that interesting...
+           reps = reps(find(~isinf(reps(:))));
             
-            meanReps = -log10(mean(reps));
-            stdReps = -log10(std(reps));
+%             reps = 10.^(-reps);
+            
+            meanReps = mean(reps);
+            stdReps = std(reps);
                       
-            randSelection = randi(numel(reps), 1, 50);
+            randSelection = randi(numel(reps), 1, 200);
             for r = randSelection
-                if reps(r)==0
+                if isnan(reps(r)) | isinf(reps(r))
                     aa=1
                 end
                 fprintf(fid, '%s ,%f, %f, %f, %.0f, %f \n', methods{iMethod}, ...
-                                    meanReps, uniquePvalueGt(i), -log10(reps(r)), (r==1), stdReps);
+                                    meanReps, uniqueZvalueGt(i), reps(r), (r==randSelection(1)), stdReps);
             end
         end
         

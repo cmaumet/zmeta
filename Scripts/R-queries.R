@@ -4,40 +4,53 @@ library('ggplot2')
 realdat <- read.csv('../../Real data/realdata.csv', header=T)
 #Dangerous:
 #levels(realdat$methods) <- levels(realdat$methods)[c(5,7,6,1,2,3,4)]
+realdat$diff <- realdat$zValue - realdat$zGT
 head(realdat)
 
-# realdat$pValue <- realdat$pValue
-# realdat$GT <- realdat$GT
-realdat$diff <- realdat$pValue - realdat$GT
+inValidMethods = levels(factor(realdat$methods))[c(1,5,7,8)]
 
-p <- ggplot(subset(realdat), aes(x=factor(GT), y=diff))
+p <- ggplot(subset(realdat, zGT>=0), aes(x=factor(zGT), y=diff))
 p + geom_boxplot() +    # Use hollow circles
     geom_smooth(method="loess", aes(group = 1))   +         # Add a loess smoothed fit curve with confidence region
     facet_wrap(~methods, scales = "free_y")
+
 
 validMethods = levels(factor(realdat$methods))[c(2,3,4,6)]
 validMethods = validMethods[c(4,1,2,3)]
 
 
-
 realdat$isValid <- realdat$methods == validMethods
-p <- ggplot(subset(realdat, isValid==T), aes(x=factor(GT), y=diff))
+p <- ggplot(subset(realdat, isValid==T & zGT>=0), aes(x=factor(zGT), y=diff))
 p + geom_boxplot() +    # Use hollow circles
     geom_smooth(method="loess", aes(group = 1)) + # Add a loess smoothed fit curve with CI
-    facet_grid(~methods, labeller=facet_labeller) 
+    facet_grid(~methods, labeller=facet_labeller_full)  + theme(strip.text.x = element_text(size = 20)) + theme(axis.text.x = element_text(size = rel(1.8))) + xlab('z-statistic estimated by MFX GLM') + ylab('Difference between estimated z-statictic and reference MFX GLM z-statistic') + theme(axis.text.y = element_text(size = rel(1.8)), axis.title=element_text(size=14)) 
 
 dat <- read.csv('../../simu.csv', header=T)
 head(dat)
 # --- Boxplot ---
 methodLevels <- levels(dat$methods)
-methodLevels <- methodLevels[c(2, 5,7,6,3,4,1,8)]
+methodLevels <- methodLevels[c(1,6,8,2,3,4,7,5)]
+
+facet_labeller_full <- function(var, value){
+    value <- as.character(value)
+    if (var=="methods") { 
+        value[value=="fishers" | value=="Fishers "] <- "Fisher"    	
+        value[value=="GLMFFX " | value=="megaFfx"] <- "GLM FFX"
+        value[value=="GLMRFX "| value=="megaRfx"] <- "GLM RFX"     
+		value[value=="PermutZ " | value=="permutZ"] <- "Z Permutation"
+		value[value=="PermutCon " | value=="permutCon"] <- "Contrast Permutation"
+		value[value=="Stouffers " | value=="stouffers"] <- "Stouffer"
+		value[value=="StouffersMFX "| value=="stouffersMFX"] <- "Stouffer MFX"
+		value[value=="WeightedZ " | value=="weightedZ"] <- "Weighted Z"
+    }
+
+    return(value)
+}
 
 facet_labeller <- function(var, value){
     value <- as.character(value)
     if (var=="nStudies") { 
-        value[value=="5"] <- "5 studies"
-        value[value=="25"]   <- "25 studies"
-        value[value=="10"]   <- "10 studies"
+    	value <- paste(value, ' studies')
     }
     if (var=="sigmasSquare") { 
         value <- paste('Within-study var. =', value)
@@ -47,14 +60,14 @@ facet_labeller <- function(var, value){
         value[value=="0"] <- "Fixed-effects"
     }
     if (var=="methods") { 
-    	print(value)
-        value[value=="GLMFFX " | value=="megaFfx "] <- "GLM FFX"
-        value[value=="GLMRFX "| value=="megaRfx "] <- "GLM RFX"     
-		value[value=="PermutZ "] <- "Z Perm."
-		value[value=="PermutCon "] <- "Contrast Perm."
-		value[value=="Stouffers " | value=="stouffers "] <- "Stouffer's"
-		value[value=="StouffersMFX "| value=="stouffersMFX "] <- "Stouffer's MFX"
-		value[value=="WeightedZ " | value=="weightedZ "] <- "Weighted Z"
+        value[value=="fishers" | value=="Fishers "] <- "Fisher"    	
+        value[value=="GLMFFX " | value=="megaFfx"] <- "GLM \nFFX"
+        value[value=="GLMRFX "| value=="megaRfx"] <- "GLM \nRFX"     
+		value[value=="PermutZ " | value=="permutZ"] <- "Z \nPermutation"
+		value[value=="PermutCon " | value=="permutCon"] <- "Contrast \nPermutation"
+		value[value=="Stouffers " | value=="stouffers"] <- "Stouffer"
+		value[value=="StouffersMFX "| value=="stouffersMFX"] <- "Stouffer\n MFX"
+		value[value=="WeightedZ " | value=="weightedZ"] <- "Weighted\n Z"
     }
 
     return(value)
@@ -62,15 +75,18 @@ facet_labeller <- function(var, value){
 
 # # * Accross all nStudies and sigmasSquare, RFX as facet
 p<-ggplot(subset(dat), aes(factor(methods), rep), colour=factor(methods))
-p + geom_boxplot() + scale_y_log10(breaks=c(0.025, 0.050, 0.075, 0.100, 0.5, 1)) + ggtitle("False positive rates under H0") + theme(axis.title.y = element_blank(), axis.title.x = element_blank()) + scale_x_discrete(limits=methodLevels) + stat_summary(fun.y = "mean", geom = "point", shape= 23, size= 3, fill= "white") + facet_grid(~RFX, labeller=facet_labeller) #, scales = "free_y") 
+p + geom_boxplot() + scale_y_log10(breaks=c(0.025, 0.050, 0.075, 0.100, 0.5, 1)) + theme(axis.title.y = element_blank(), axis.title.x = element_blank()) + scale_x_discrete(limits=methodLevels, labels=facet_labeller('methods', methodLevels)) + stat_summary(fun.y = "mean", geom = "point", shape= 23, size= 3, fill= "white") + facet_grid(~RFX, labeller=facet_labeller) + theme(strip.text.x = element_text(size = 30)) + theme(axis.text.x = element_text(size = rel(1.8))) + theme(axis.text.y = element_text(size = rel(1.8))) 
 
 #  Compare the 4 valid approaches
 aa<-by(dat$rep, dat$methods, mean)
 tol <- 0.001
 validMethods = levels(dat$methods)[aa<=(0.05 + tol)]
-validMethods = validMethods[c(3,2,1,4)]
+validMethods = validMethods[c(1,2,4,3)]
 p<-ggplot(subset(dat, methods==validMethods & RFX==1), aes(factor(methods), rep), colour=factor(methods))
-p + geom_boxplot() + scale_y_log10(breaks=c(0.01, 0.03, 0.05)) + ggtitle("False positive rates under H0") + scale_x_discrete(limits=validMethods) + stat_summary(fun.y = "mean", geom = "point", shape= 23, size= 3, fill= "white") + facet_grid(sigmasSquare~nStudies, labeller=facet_labeller) + theme(axis.title.y = element_blank(), axis.title.x = element_blank()) 
+
+facetTextSize <- 20
+axisTextSize <- 1.5
+p + geom_boxplot() + scale_y_log10(breaks=c(0.01, 0.03, 0.05)) + scale_x_discrete(limits=validMethods, labels=facet_labeller('methods', validMethods)) + stat_summary(fun.y = "mean", geom = "point", shape= 23, size= 3, fill= "white") + facet_grid(sigmasSquare~nStudies, labeller=facet_labeller) + theme(axis.title.y = element_blank(), axis.title.x = element_blank()) + theme(axis.text.y = element_text(size = rel(axisTextSize)), axis.text.x = element_text(size = rel(axisTextSize))) + theme(strip.text.x = element_text(size = facetTextSize), strip.text.y = element_text(size = facetTextSize-5)) 
 
 
 
