@@ -44,7 +44,7 @@ function [auc auc10 dice] = roc_curves(analysisDir)
     
     uniqueZvalueGt = unique(transfoZGt);
     
-    for iMethod = 2:numel(methods)
+    for iMethod = 1:numel(methods)
         iMethod
         detectionunc001.(methods{iMethod}) = pVal.(methods{iMethod}) >= 10^(-0.001);
         dice.(methods{iMethod}) = 2*sum(detectionunc001.(methods{iMethod})(inMaskPositions)>0 & detectionsp0001>0)./sum((detectionunc001.(methods{iMethod})(inMaskPositions)+ detectionsp0001))
@@ -73,7 +73,7 @@ function [auc auc10 dice] = roc_curves(analysisDir)
            
            % Exclude proba=1 (can happen in permutation) cause a pb to compute
            % z-stat and is clearly not that interesting...
-           reps = reps(find(~isinf(reps(:))));
+%            reps = reps(find(~isinf(reps(:))));
             
 %             reps = 10.^(-reps);
             
@@ -85,7 +85,7 @@ function [auc auc10 dice] = roc_curves(analysisDir)
                 if isnan(reps(r)) | isinf(reps(r))
                     aa=1
                 end
-                fprintf(fid, '%s ,%f, %f, %f, %.0f, %f \n', methods{iMethod}, ...
+                fprintf(fid, '%s,%f,%f,%f,%.0f,%f\n', methods{iMethod}, ...
                                     meanReps, uniqueZvalueGt(i), reps(r), (r==randSelection(1)), stdReps);
             end
         end

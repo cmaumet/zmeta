@@ -1,29 +1,40 @@
 
 library('ggplot2')
 
+realdatvar <- read.csv('../../Real data/realdata_variances.csv', header=T)
+realdatvar$diff <- realdatvar$withinVariance - realdatvar$betweenVariance
+realdatvar$avg <- (realdatvar$withinVariance - realdatvar$betweenVariance)
+realdatvar$ratio <- (realdatvar$betweenVariance/(realdatvar$withinVariance+realdatvar$betweenVariance))
+
+head(realdatvar)
+ggplot(realdatvar, aes(x=ratio)) + 
+geom_histogram(colour="black", binwidth=0.02, fill="white") + theme(strip.text.x = element_text(size = 20)) + theme(axis.text.x = element_text(size = rel(1.8))) + xlab('Ratio of between-study variance to total variance') + ylab('Voxel count') + theme(axis.text.y = element_text(size = rel(1.8)), axis.title=element_text(size=14)) 
+
 realdat <- read.csv('../../Real data/realdata.csv', header=T)
 #Dangerous:
 #levels(realdat$methods) <- levels(realdat$methods)[c(5,7,6,1,2,3,4)]
 realdat$diff <- realdat$zValue - realdat$zGT
+# Rename factors to avoid issues when using with facet_wrap
+realdat$niceMethods <- facet_labeller_full('methods', realdat$methods)
 head(realdat)
 
-inValidMethods = levels(factor(realdat$methods))[c(1,5,7,8)]
+realdat$niceMethods <- factor(realdat$niceMethods, levels = c("Fisher", "Stouffer", "Weighted Z", "GLM FFX", "GLM RFX", "Contrast Permutation", "Stouffer MFX", "Z Permutation"))
 
-p <- ggplot(subset(realdat, zGT>=0), aes(x=factor(zGT), y=diff))
-p + geom_boxplot() +    # Use hollow circles
-    geom_smooth(method="loess", aes(group = 1))   +         # Add a loess smoothed fit curve with confidence region
-    facet_wrap(~methods, scales = "free_y")
+validMethods = levels(factor(realdat$niceMethods))[c(4,1,6,8)]
+realdat$isValid <- (realdat$niceMethods %in% validMethods)
 
-
-validMethods = levels(factor(realdat$methods))[c(2,3,4,6)]
-validMethods = validMethods[c(4,1,2,3)]
-
-
-realdat$isValid <- realdat$methods == validMethods
-p <- ggplot(subset(realdat, isValid==T & zGT>=0), aes(x=factor(zGT), y=diff))
+p <- ggplot(subset(realdat, zGT>=0 & isValid==T), aes(x=factor(zGT), y=diff))
 p + geom_boxplot() +    # Use hollow circles
     geom_smooth(method="loess", aes(group = 1)) + # Add a loess smoothed fit curve with CI
-    facet_grid(~methods, labeller=facet_labeller_full)  + theme(strip.text.x = element_text(size = 20)) + theme(axis.text.x = element_text(size = rel(1.8))) + xlab('z-statistic estimated by MFX GLM') + ylab('Difference between estimated z-statictic and reference MFX GLM z-statistic') + theme(axis.text.y = element_text(size = rel(1.8)), axis.title=element_text(size=14)) 
+    facet_wrap(~ niceMethods, ncol=4)  + theme(strip.text.x = element_text(size = 20)) + theme(axis.text.x = element_text(size = rel(1.8))) + xlab('z-statistic estimated by MFX GLM') + ylab('Difference between estimated z-statictic and\n reference MFX GLM z-statistic') + theme(axis.text.y = element_text(size = rel(1.8)), axis.title=element_text(size=14)) 
+    
+p <- ggplot(subset(realdat, zGT>=0 & isValid==F), aes(x=factor(zGT), y=diff))
+p + geom_boxplot() +    # Use hollow circles
+    geom_smooth(method="loess", aes(group = 1)) + # Add a loess smoothed fit curve with CI
+    facet_wrap(~ niceMethods, ncol=4)  + theme(strip.text.x = element_text(size = 20)) + theme(axis.text.x = element_text(size = rel(1.8))) + xlab('z-statistic estimated by MFX GLM') + ylab('Difference between estimated z-statictic and \n reference MFX GLM z-statistic') + theme(axis.text.y = element_text(size = rel(1.8)), axis.title=element_text(size=14)) 
+
+
+
 
 dat <- read.csv('../../simu.csv', header=T)
 head(dat)
@@ -35,13 +46,13 @@ facet_labeller_full <- function(var, value){
     value <- as.character(value)
     if (var=="methods") { 
         value[value=="fishers" | value=="Fishers "] <- "Fisher"    	
-        value[value=="GLMFFX " | value=="megaFfx"] <- "GLM FFX"
-        value[value=="GLMRFX "| value=="megaRfx"] <- "GLM RFX"     
-		value[value=="PermutZ " | value=="permutZ"] <- "Z Permutation"
-		value[value=="PermutCon " | value=="permutCon"] <- "Contrast Permutation"
-		value[value=="Stouffers " | value=="stouffers"] <- "Stouffer"
-		value[value=="StouffersMFX "| value=="stouffersMFX"] <- "Stouffer MFX"
-		value[value=="WeightedZ " | value=="weightedZ"] <- "Weighted Z"
+        value[value=="GLMFFX" | value=="megaFfx"] <- "GLM FFX"
+        value[value=="GLMRFX"| value=="megaRfx"] <- "GLM RFX"     
+		value[value=="PermutZ" | value=="permutZ"] <- "Z Permutation"
+		value[value=="PermutCon" | value=="permutCon"] <- "Contrast Permutation"
+		value[value=="Stouffers" | value=="stouffers"] <- "Stouffer"
+		value[value=="StouffersMFX"| value=="stouffersMFX"] <- "Stouffer MFX"
+		value[value=="WeightedZ" | value=="weightedZ"] <- "Weighted Z"
     }
 
     return(value)
