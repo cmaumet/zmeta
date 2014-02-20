@@ -35,13 +35,6 @@ p + geom_boxplot() +    # Use hollow circles
 
 
 
-
-dat <- read.csv('../../simu.csv', header=T)
-head(dat)
-# --- Boxplot ---
-methodLevels <- levels(dat$methods)
-methodLevels <- methodLevels[c(1,6,8,2,3,4,7,5)]
-
 facet_labeller_full <- function(var, value){
     value <- as.character(value)
     if (var=="methods") { 
@@ -67,8 +60,9 @@ facet_labeller <- function(var, value){
         value <- paste('Within-study var. =', value)
     }
     if (var=="RFX") { 
-        value[value=="1"] <- "Random-effects"
-        value[value=="0"] <- "Fixed-effects"
+        value[value=="1"] <- "Heterogeneous studies"
+        value[value=="0.05"] <- "Heterogeneous studies"        
+        value[value=="0"] <- "No between-study variation"
     }
     if (var=="methods") { 
         value[value=="fishers" | value=="Fishers "] <- "Fisher"    	
@@ -77,23 +71,32 @@ facet_labeller <- function(var, value){
 		value[value=="PermutZ " | value=="permutZ"] <- "Z \nPermutation"
 		value[value=="PermutCon " | value=="permutCon"] <- "Contrast \nPermutation"
 		value[value=="Stouffers " | value=="stouffers"] <- "Stouffer"
-		value[value=="StouffersMFX "| value=="stouffersMFX"] <- "Stouffer\n MFX"
-		value[value=="WeightedZ " | value=="weightedZ"] <- "Weighted\n Z"
+		value[value=="StouffersMFX "| value=="stouffersMFX"] <- "Z\n MFX"
+		value[value=="WeightedZ " | value=="weightedZ"] <- "Weighted\n Stouffer"
     }
 
     return(value)
 }
 
+
+dat <- read.csv('../../simu.csv', header=T)
+head(dat)
+# --- Boxplot ---
+methodLevels <- levels(dat$methods)
+methodLevels <- methodLevels[c(1,6,8,2,3,4,7,5)]
+
 # # * Accross all nStudies and sigmasSquare, RFX as facet
+dat$niceRFX <- factor(facet_labeller('RFX', dat$RFX))
+
 p<-ggplot(subset(dat), aes(factor(methods), rep), colour=factor(methods))
-p + geom_boxplot() + scale_y_log10(breaks=c(0.025, 0.050, 0.075, 0.100, 0.5, 1)) + theme(axis.title.y = element_blank(), axis.title.x = element_blank()) + scale_x_discrete(limits=methodLevels, labels=facet_labeller('methods', methodLevels)) + stat_summary(fun.y = "mean", geom = "point", shape= 23, size= 3, fill= "white") + facet_grid(~RFX, labeller=facet_labeller) + theme(strip.text.x = element_text(size = 30)) + theme(axis.text.x = element_text(size = rel(1.8))) + theme(axis.text.y = element_text(size = rel(1.8))) 
+p + geom_boxplot() + scale_y_log10(breaks=c(0.025, 0.050, 0.075, 0.100, 0.5, 1)) + theme(axis.title.y = element_blank(), axis.title.x = element_blank()) + scale_x_discrete(limits=methodLevels, labels=facet_labeller('methods', methodLevels)) + stat_summary(fun.y = "mean", geom = "point", shape= 23, size= 3, fill= "white") + theme(strip.text.x = element_text(size = 25)) + theme(axis.text.x = element_text(size = rel(1.8))) + theme(axis.text.y = element_text(size = rel(1.8))) + facet_wrap(~ niceRFX, ncol=1, scales="free_y") 
 
 #  Compare the 4 valid approaches
 aa<-by(dat$rep, dat$methods, mean)
 tol <- 0.001
 validMethods = levels(dat$methods)[aa<=(0.05 + tol)]
 validMethods = validMethods[c(1,2,4,3)]
-p<-ggplot(subset(dat, methods==validMethods & RFX==1), aes(factor(methods), rep), colour=factor(methods))
+p<-ggplot(subset(dat, methods==validMethods & RFX>0), aes(factor(methods), rep), colour=factor(methods))
 
 facetTextSize <- 20
 axisTextSize <- 1.5

@@ -7,7 +7,7 @@ function found = plot_simulations(simuDir)
     
     nStudiesArray = simuinfo.config.nStudies; %[5, 10, 25, 50];
     sigmaSquareArray = simuinfo.config.sigmaSquare;
-    sigmaBetweenStudiesArray = simuinfo.config.sigmaBetweenStudies;
+    sigmaBetweenStudiesArray = [0 simuinfo.config.sigmaBetweenStudies];
        
     nSimuOneDir = simuinfo.config.nSimuOneDir;
     

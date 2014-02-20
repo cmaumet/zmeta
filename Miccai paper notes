@@ -1,3 +1,7 @@
+TODO:
+- revpoir figures avec Weighted Stouffer's et Z MFX
+
+
 Miccai paper notes
 
 Probably not possible to have a look at two-sample t-tests right now... But what will we have as a conclusion??? standard z-based methods really bad at dealig with RFX. As for one-sample on BOLD fMRI GLM OLS (RFX) seems pretty robust as are permutation based approches.

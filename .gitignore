@@ -8,5 +8,11 @@
 *.toc
 
 
-# File to be deleted
-OLD_*
+.Rapp*
+
+# File to be deleted or ignored
+OLD*
+unused*
+
+# m files backups
+*.m~

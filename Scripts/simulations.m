@@ -10,11 +10,11 @@ function simulations(baseDir)
     % Number of subject per study
 %     nSubjects = [25 400 100 25]; %[10, 15, 20, 25, 30, 10, 15, 20, 25, 30, 10, 15, 20, 25, 30];
 %     nStudies = numel(nSubjects);
-    nStudiesArray = [5, 10, 50, 25];
-    sigmaSquareArray = [1/2, 1, 2, 4]; %How to compute z with var = 0?
+    nStudiesArray = [25, 50, 5, 10, 50];
+    sigmaSquareArray = [1/2, 1, 2, 4]%How to compute z with var = 0?
     
     % Between-studies variance (RFX?)
-    sigmaBetweenStudiesArray = [1 0];
+    sigmaBetweenStudiesArray = 1/20;
     
     % Size of the simulation image (in 1 direction). Each voxel of the
     % simulation image is a simulation sample.
@@ -37,7 +37,7 @@ function simulations(baseDir)
     save(fullfile(baseSimulationDir, 'simuinfo.mat'), 'simuinfo');
     
     % Number of studies in meta-analysis
-    for iStudies = numel(nStudiesArray):-1:1
+    for iStudies = 1%:numel(nStudiesArray)
         nStudies = nStudiesArray(iStudies);
         nSubjects = get_n_subjects_per_studies(nStudies);
         
@@ -45,7 +45,7 @@ function simulations(baseDir)
         for iEffects = numel(sigmaBetweenStudiesArray):-1:1
             sigmaBetweenStudies = sigmaBetweenStudiesArray(iEffects);
 
-            for iSigmaSquare = numel(sigmaSquareArray):-1:1
+            for iSigmaSquare = numel(sigmaSquareArray)%:-1:1
                 tic;
                 % Common level of (intra-studies) variance (ignoring effect of sample 
                 % size).
