@@ -1,1 +1,1 @@
-# Miccai 2014 paper and scripts
+# Image-Based Meta-Analysis based on Z-Statistic
