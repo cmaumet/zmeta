@@ -65,13 +65,16 @@ realdat$niceMethods <- factor(realdat$niceMethods, levels = c("Fisher", "Stouffe
 validMethods = levels(factor(realdat$niceMethods))[c(4,1,6,8)]
 realdat$isValid <- (realdat$niceMethods %in% validMethods)
 
-p <- ggplot(subset(realdat, zGT>=0 & isValid==T), aes(x=factor(zGT), y=diff))
+digits=0
+
+p <- ggplot(subset(realdat, zGT>=0), aes(x=factor(round(zGT, digits=digits)), y=diff))
 p + geom_boxplot() +    # Use hollow circles
-    geom_smooth(method="loess", aes(group = 1)) + # Add a loess smoothed fit curve with CI
     facet_wrap(~ niceMethods, ncol=4)  + theme(strip.text.x = element_text(size = 20)) + theme(axis.text.x = element_text(size = rel(1.8))) + xlab('z-statistic estimated by MFX GLM') + ylab('Difference between estimated z-statictic and\n reference MFX GLM z-statistic') + theme(axis.text.y = element_text(size = rel(1.8)), axis.title=element_text(size=14)) 
     
-# Number of samples per point  
-table(factor(realdat$zGT))
+        geom_smooth(method="loess", aes(group = 1)) + # Add a loess smoothed fit curve with CI
+    
+# Number of samples per point  => 200/timepoint per method
+table(factor(paste(realdat$zGT,realdat$methods)))
     
 p <- ggplot(subset(realdat, zGT>=0 & isValid==F), aes(x=factor(zGT), y=diff))
 p + geom_boxplot() +    # Use hollow circles
