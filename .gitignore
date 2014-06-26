@@ -16,3 +16,14 @@ unused*
 
 # m files backups
 *.m~
+
+# matlab data files
+*.mat
+
+# neuroimaging images
+*.nii
+*.img
+*.hdr
+
+# data
+data/*
