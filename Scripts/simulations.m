@@ -247,6 +247,7 @@ function res = get_proba_CI(values, nSimuOneDir)
     res.stderror = s;
     res.mean = m;
     res.repeats = repeats;
+    res.values = values;
     res.CI = confidenceInterval;
     res.string = ['CI = [' num2str(confidenceInterval(1)), ' ; ' num2str(confidenceInterval(2)) ']' ...
                 ' - avg=' num2str(m) ', std_est=' num2str(s)];
