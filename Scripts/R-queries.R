@@ -65,13 +65,11 @@ realdat$niceMethods <- factor(realdat$niceMethods, levels = c("Fisher", "Stouffe
 validMethods = levels(factor(realdat$niceMethods))[c(4,1,6,8)]
 realdat$isValid <- (realdat$niceMethods %in% validMethods)
 
-digits=0.5
+digits=0
 
-p <- ggplot(subset(realdat, zGT>=0), aes(x=factor(round(zGT, digits=digits)), y=diff))
-p + geom_boxplot(outlier.colour="NA") +    # Use hollow circles
-    facet_wrap(~ niceMethods, ncol=4)  + theme(strip.text.x = element_text(size = 20)) + theme(axis.text.x = element_text(size = rel(1.8))) + xlab('z-statistic estimated by MFX GLM') + ylab('Difference between estimated z-statictic and\n reference MFX GLM z-statistic') + theme(axis.text.y = element_text(size = rel(1.8)), axis.title=element_text(size=14)) 
-    
-        geom_smooth(method="loess", aes(group = 1)) + # Add a loess smoothed fit curve with CI
+
+p <- ggplot(subset(realdat, zGT>0), aes(x=factor(round(zGT, digits=digits)), y=diff))
+p + geom_boxplot(outlier.colour="NA") +   facet_wrap(~ niceMethods, ncol=4)  + theme(strip.text.x = element_text(size = 20)) + theme(axis.text.x = element_text(size = rel(1.8))) + xlab('z-statistic estimated by MFX GLM') + ylab('Difference between estimated z-statictic and\n reference MFX GLM z-statistic') + theme(axis.text.y = element_text(size = rel(1.8)), axis.title=element_text(size=14)) + geom_smooth(method="loess", aes(group = 1))  # Add a loess smoothed fit curve with CI
     
 # Number of samples per point  => 200/timepoint per method
 table(factor(paste(realdat$zGT,realdat$methods)))
@@ -81,57 +79,91 @@ p + geom_boxplot() +    # Use hollow circles
     geom_smooth(method="loess", aes(group = 1)) + # Add a loess smoothed fit curve with CI
     facet_wrap(~ niceMethods, ncol=4)  + theme(strip.text.x = element_text(size = 20)) + theme(axis.text.x = element_text(size = rel(1.8))) + xlab('z-statistic estimated by MFX GLM') + ylab('Difference between estimated z-statictic and \n reference MFX GLM z-statistic') + theme(axis.text.y = element_text(size = rel(1.8)), axis.title=element_text(size=14)) 
 
-normdata <- data.frame(x= seq(-5,5, by=0.05))
-normdata$y <- dnorm(normdata$x)
-pp <- ggplot(normdata, aes(x=x, y=y))
+
 
 pp <- ggplot()
 pp + geom_line(data=normdata, aes(x=x, y=y))
 # PB--> Since nSImu is initialise as a vector of numeric, string in simudata is converted to 1..
 
-x <- c()
-y <- c()
-nStudies <- c()
-Between <- c()
-Within <- c()
-nSimu <- c()
-methods <- c()
-for (j in seq(1,31)){
-	print(paste("Loading simu: ", j))
-	simudat <- read.csv(paste('../data/miccai-simu/simu_all_',j, '.csv',sep=""), 	header=T)
-	simudat$log10p <- simudat$p
-	simudat$p <- 10^(-simudat$p)
-	simudat$z <- qnorm(simudat$p, lower.tail=FALSE)
+# x <- c()
+# y <- c()
+# nStudies <- c()
+# Between <- c()
+# Within <- c()
+# nSimu <- c()
+# methods <- c()
+# for (j in seq(1,31)){
+	# print(paste("Loading simu: ", j))
+	# simudat <- read.csv(paste('../data/miccai-simu/simu_all_',j, '.csv',sep=""), 	header=T)
+	# simudat$log10p <- simudat$p
+	# simudat$p <- 10^(-simudat$p)
+	# simudat$z <- qnorm(simudat$p, lower.tail=FALSE)
+	# simudat$nStudies <- as.numeric(gsub("'", "", simudat$nStudies))
+	# simudat$Between <- as.numeric(gsub("'", "", simudat$Between))
+	# simudat$Within <- as.numeric(gsub("'", "", simudat$Within))
+	# simudat$nSimu <- as.numeric(gsub("'", "", simudat$nSimu))			
 
 
-	# Save as density to gain space (and memory...) for each method
+	# # Save as density to gain space (and memory...) for each method
 
-	for (i in levels(simudat$methods))
-	{
-		print(i)
+	# for (i in levels(simudat$methods))
+	# {
+		# print(i)
 	
-		currDensity <- density(simudat[simudat$methods==i,]$z, n=n)
-		n=length(currDensity$x)
-		x <- c(x, currDensity$x)
-		y <- c(y, currDensity$y)		
-		nStudies <- c(nStudies, rep(simudat$nStudies[1], n))
-		Between <- c(Between, rep(simudat$Between[1], n))
-		Within <- c(Within, rep(simudat$Within[1], n))
-		nSimu <- c(nSimu, rep(simudat$nSimu[1], n))
-		methods <- c(methods, rep(i,n))
-	}
-}
+		# currDensity <- density(simudat[simudat$methods==i,]$z)
+		# n=length(currDensity$x)
+		# x <- c(x, currDensity$x)
+		# y <- c(y, currDensity$y)		
+		# nStudies <- c(nStudies, rep(simudat$nStudies[1], n))
+		# Between <- c(Between, rep(simudat$Between[1], n))
+		# Within <- c(Within, rep(simudat$Within[1], n))
+		# nSimu <- c(nSimu, rep(simudat$nSimu[1], n))
+		# methods <- c(methods, rep(i,n))
+	# }
+# }
 # simudensity <- data.frame(range=x, density=y, nStudies=nStudies, Between=Between, Within=Within, nSimu=nSimu, methods=methods)
 
 # write.table(simudensity,file="simudensities.csv",sep=",",row.names=F)
-simudensity$idx <- rep(seq(1,31),each=1600)
 
-p <- ggplot(data= simudensity)
-o <- p + geom_line(aes(x=range, y=density, group=idx, colour=factor(idx))) + facet_wrap(~ methods, ncol=4) + scale_x_continuous(limits=c(-5, 5))
-o + geom_line(data=normdata, aes(x=x, y=y), colour="red")
 
-# expected versus given pvalue
+# # # simudensity$idx <- rep(seq(1,31),each=1600)
 
+normdata <- data.frame(x= seq(-5,5, by=0.05))
+normdata$y <- dnorm(normdata$x)
+pp <- ggplot(normdata, aes(x=x, y=y))
+pp + geom_line(data=normdata, aes(x=x, y=y))
+
+dat$allgroups <- paste(dat$nStudies, dat$Between, dat$Within, dat$nSimu)
+
+p <- ggplot(data=subset(dat))
+p + geom_line(aes(x=range, y=density, group=factor(allgroups), colour=factor(Within/Between))) + facet_wrap(~ methods, ncol=4) + scale_x_continuous(limits=c(-4, 4)) + geom_line(data=normdata, aes(x=x, y=y), colour="red")
+
+# # expected versus given pvalue
+
+
+# From here --->
+dat <- read.csv('../data/miccai-simu/simudensities_pvalues.csv', header=T)
+
+# Plot in terms on equivalent z
+dat$expectedz <- qnorm(dat$pvalue, lower.tail = FALSE)
+
+# FIXME: For now ignore -1, we will have to deal with that later on
+
+
+p + geom_line(aes(x=expectedpvalue, y=(pvalues-expectedpvalue), group=allgroups, colour=factor(allgroups))) + facet_wrap(~ methods, ncol=4) 
+
+# If there is a single inf do not plot corresponding range
+
+p<-ggplot(data=subset(dat, expectedz>0 & pvalues!=-1 & !(range %in% subset(dat, !is.finite(expectedz))$range)  & !(dat$methods %in% levels(dat$methods)[c(3,4,5,7)])))
+
+p + geom_line(aes(x=expectedz, y=(range-expectedz), group=allgroups, colour=factor(allgroups))) + facet_wrap(~ methods, ncol=4) + geom_point(aes(x=expectedz, y=(range-expectedz), group=allgroups, colour=factor(allgroups)), size=2)
+
+p + geom_line(aes(x=expectedz, y=(range), group=allgroups, colour=factor(allgroups))) + facet_wrap(~ methods, ncol=4) + geom_point(aes(x=expectedz, y=(range), group=allgroups, colour=factor(allgroups)))
+
+
+scale_y_continuous(limits=c(-0.1, 0.1)) + scale_x_continuous(limits=c(0, 1))
+
+ + geom_line(data=normdata, aes(x=x, y=y), colour="red")
 
 dat <- read.csv('../data/miccai-simu/simu.csv', header=T)
 head(dat)
