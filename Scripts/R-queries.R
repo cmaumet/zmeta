@@ -62,7 +62,7 @@ head(realdat)
 
 realdat$niceMethods <- factor(realdat$niceMethods, levels = c("Fisher", "Stouffer", "Weighted Z", "GLM FFX", "GLM RFX", "Contrast Permutation", "Stouffer MFX", "Z Permutation"))
 
-validMethods = levels(factor(realdat$niceMethods))[c(4,1,6,8)]
+validMethods = levels(factor(realdat$niceMethods))[c(5,6,7,8)]
 realdat$isValid <- (realdat$niceMethods %in% validMethods)
 
 digits=0
