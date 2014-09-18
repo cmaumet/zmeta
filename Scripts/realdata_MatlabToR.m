@@ -1,15 +1,15 @@
-function [auc auc10 dice] = roc_curves(analysisDir)
+function realdata_MatlabToR(analysisDir)
     if nargin < 1
         analysisDir = pwd;
     end
 
     baseRealDir = fullfile(analysisDir);
 
-    zStatGt = spm_select('FPList', fullfile(baseRealDir, 'MFX_with readjusting', 'stats'), '^zstat.*\.nii$');
+    zStatGt = spm_select('FPList', fullfile(baseRealDir, 'MFX_with readjusting', 'stats'), '^zstat\d\.nii$');
     mask = spm_select('FPList', fullfile(baseRealDir, 'MFX_with readjusting', 'stats'), '^mask.*\.nii$');
         
     zStatGtData = spm_read_vols(spm_vol(zStatGt));
-    logPGt = -log10(normcdf(-zStatGtData));
+    logPGt = -log10(normcdf(zStatGtData, 'upper'));
     
     maskData = spm_read_vols(spm_vol(mask));
     inMaskPositions = find(maskData(:)>0);
@@ -45,7 +45,7 @@ function [auc auc10 dice] = roc_curves(analysisDir)
     accumarray(c, ones(numel(c),1))
     
     for iMethod = 1:numel(methods)
-        iMethod
+        methods{iMethod}
 %         detectionunc001.(methods{iMethod}) = pVal.(methods{iMethod}) >= 10^(-0.001);
 %         dice.(methods{iMethod}) = 2*sum(detectionunc001.(methods{iMethod})(inMaskPositions)>0 & detectionsp0001>0)./sum((detectionunc001.(methods{iMethod})(inMaskPositions)+ detectionsp0001))
         
@@ -63,7 +63,11 @@ function [auc auc10 dice] = roc_curves(analysisDir)
         
         
         zData = -norminv(10.^(-data));
-        
+        figure(56);close()
+        figure(56);dscatter(zGt(~isinf(zData) & zGt), zData(~isinf(zData))-zGt(~isinf(zData)));
+        title(methods{iMethod})
+        ylim([-3 13])
+        hold on;dscatter(zGt(~isinf(zData)), zData(~isinf(zData))-zGt(~isinf(zData)), 'plottype','contour');
         % For each unique z-value in the GT         
         for i = 1:numel(uniqueZvalueGt);
             if mod(i, 5)==0
@@ -89,6 +93,10 @@ function [auc auc10 dice] = roc_curves(analysisDir)
                 
                 fprintf(fid, '%s,%f,%f,%.0f\n', methods{iMethod}, ...
                         zGTvalues(r), reps(r), (r==1));
+                    
+                if isinf( reps(r))
+                    aa=1
+                end
 %                                     uniqueZvalueGt(i), reps(r), (r==randSelection(1)));
             end
         end
