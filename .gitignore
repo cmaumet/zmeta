@@ -10,6 +10,10 @@
 
 .Rapp*
 
+# R
+*.Rdata
+*.Rhistory
+
 # File to be deleted or ignored
 OLD*
 unused*
