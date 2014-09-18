@@ -7,6 +7,8 @@
 *.gz
 *.toc
 
+# For now ignore csv files
+*.csv
 
 .Rapp*
 
