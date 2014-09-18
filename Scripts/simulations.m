@@ -10,15 +10,15 @@ function simulations(baseDir)
     % Number of subject per study
 %     nSubjects = [25 400 100 25]; %[10, 15, 20, 25, 30, 10, 15, 20, 25, 30, 10, 15, 20, 25, 30];
 %     nStudies = numel(nSubjects);
-    nStudiesArray = [25, 50, 5, 10, 50];
-    sigmaSquareArray = [1/2, 1, 2, 4]%How to compute z with var = 0?
+    nStudiesArray = [5, 25, 50];
+    sigmaSquareArray = [1/2, 1, 2, 4, 10];%How to compute z with var = 0?
     
     % Between-studies variance (RFX?)
-    sigmaBetweenStudiesArray = 1/20;
+    sigmaBetweenStudiesArray = [1/2, 1, 2, 4, 10]/20;
     
     % Size of the simulation image (in 1 direction). Each voxel of the
     % simulation image is a simulation sample.
-    nSimuOneDir = 71;
+    nSimuOneDir = 100;
     nSimu = nSimuOneDir^3;
     
     if nargin == 0
@@ -59,7 +59,7 @@ function simulations(baseDir)
 
                 % Directory to store the simulation data and results.
                 currSimuDirName = ['nStudy' num2str(nStudies) '_Betw' num2str(sigmaBetweenStudies) ...
-                    '_Within' num2str(sigmaSquare) '_nSimu' num2str(nSimuOneDir) 'thrice'];
+                    '_Within' num2str(sigmaSquare) '_nSimu' num2str(nSimu)];
                 simulationDir = fullfile(baseSimulationDir, currSimuDirName);
                 mkdir(simulationDir);
 
