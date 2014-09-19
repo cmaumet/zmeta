@@ -11,7 +11,8 @@ function simulations(baseDir)
 %     nSubjects = [25 400 100 25]; %[10, 15, 20, 25, 30, 10, 15, 20, 25, 30, 10, 15, 20, 25, 30];
 %     nStudies = numel(nSubjects);
     nStudiesArray = [5 10 25 50];
-    sigmaSquareArray = [0.25, 0.5, 1, 2, 4]*20;%How to compute z with var = 0?
+    AVG_NUM_SUB = 20;
+    sigmaSquareArray = [0.25, 0.5, 1, 2, 4]*AVG_NUM_SUB;%How to compute z with var = 0?
     
     % Between-studies variance (RFX?)
     sigmaBetweenStudiesArray = [0 1];
@@ -39,7 +40,7 @@ function simulations(baseDir)
     baseSimulationDir = fullfile(baseDir, 'simulations');
     save(fullfile(baseSimulationDir, 'simuinfo.mat'), 'simuinfo');
     
-    AVG_NUM_SUB = 20;
+    
     
     % Number of studies in meta-analysis
     for iStudies = 1:numel(nStudiesArray)
@@ -48,7 +49,8 @@ function simulations(baseDir)
         for iSubPerStudyScheme = 1:numel(subjectPerStudiesScheme)
         
 %             nSubjects = get_n_subjects_per_studies(nStudies);
-            switch subjectPerStudiesScheme{iSubPerStudyScheme}
+            subjectNumberScheme = subjectPerStudiesScheme{iSubPerStudyScheme};
+            switch subjectNumberScheme
                 case {'identical'}
                     nSubjects = ones(1, nStudies)*AVG_NUM_SUB;
                 case {'extreme_large'}
@@ -78,8 +80,8 @@ function simulations(baseDir)
 
 
                     % Directory to store the simulation data and results.
-                    currSimuDirName = ['nStudy' num2str(nStudies) '_Betw' num2str(sigmaBetweenStudies) ...
-                        '_Within' num2str(sigmaSquare) '_nSimu' num2str(nSimu)];
+                    currSimuDirName = ['nStudy' num2str(nStudies) '_subNum-' subjectNumberScheme '_Betw' num2str(sigmaBetweenStudies) ...
+                        '_Within' num2str(sigmaSquare/AVG_NUM_SUB) '_nSimuOneDir' num2str(nSimuOneDir)];
                     simulationDir = fullfile(baseSimulationDir, currSimuDirName);
                     mkdir(simulationDir);
 
@@ -183,7 +185,6 @@ function simulations(baseDir)
                     mkdir(megaRfxDir);
                     matlabbatch{end+1}.spm.tools.ibma.megarfx.dir = {megaRfxDir};
                     matlabbatch{end}.spm.tools.ibma.megarfx.confiles = conFiles;
-                    matlabbatch{end}.spm.tools.ibma.megarfx.nsubjects = nSubjects;
 
                     % Mega-analysis FFX
                     megaFfxDir = fullfile(simulationDir, 'megaFFX');
@@ -237,7 +238,7 @@ function simulations(baseDir)
                     probaPermutZ = spm_read_vols(spm_vol(spm_select('FPList', permutZDir, '.*lP\+\.img$')));
                     simu.permutZ = get_proba_CI(probaPermutZ(:), nSimuOneDir);
 
-                    simu.config.nSubjectsScheme = subjectPerStudiesScheme{iSubPerStudyScheme};
+                    simu.config.nSubjectsScheme = subjectNumberScheme;
                     simu.config.nSubjects = nSubjects;
                     simu.config.nStudies = nStudies;
                     simu.config.sigmaSquare = sigmaSquare;
