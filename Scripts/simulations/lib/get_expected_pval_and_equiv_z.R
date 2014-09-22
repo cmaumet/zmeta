@@ -32,23 +32,10 @@ simudat$expectedz <- NaN
 for (meth in levels(simudat$methods))
 {
 	print(meth)
-	# Empirical cumulative distribution function
-	# quantile(simudat$equivz[is.finite(simudat$equivz)], type=1)
-	# subdat <- subset(simudat, methods==meth)
-	
-	# cumempfun <- ecdf(simudat[simudat$methods==meth,]$equivz[is.finite(simudat[simudat$methods==meth,]$equivz)])
-	# cumulative on p gives directly the inverse cumulative on z moved by 1
-	# and working with p remove the pb of infinite equiv z-stat (in permutation-based methods
-	# we can have p=1 hence equivz=Inf)
-	# Faster with a rank		
-  	# cumempfun <- ecdf(simudat[simudat$methods==meth,]$p)
-	# summary(cumempfun)
-	
+		
 	simudat[simudat$methods==meth,]$rankp <- rank(simudat[simudat$methods==meth,]$p)
 	nSimu <- simudat[simudat$methods==meth,]$nSimu
 
-	# expected_p_by_1 <- 1-cumempfun(simudat[simudat$methods==meth,]$equivz)
-	# simudat[simudat$methods==meth,]$expectedp <-c(1, expected_p_by_1[1:length(expected_p_by_1)-1])
 	simudat[simudat$methods==meth,]$expectedp <- simudat[simudat$methods==meth,]$rankp/nSimu
 	simudat[simudat$methods==meth,]$expectedz <- qnorm(simudat[simudat$methods==meth,]$expectedp, lower.tail = FALSE)
 }
