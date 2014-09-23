@@ -9,3 +9,4 @@ export_full_simulations('/Users/cmaumet/Projects/Meta-analysis/Results/2014-06-2
 
 // In R
 get_expected_pval_and_equiv_z.R
+plot_simluations()
