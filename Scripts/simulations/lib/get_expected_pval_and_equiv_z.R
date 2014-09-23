@@ -1,7 +1,8 @@
 # Load first simulation
 simunum <- 1
+tot_num_simu = 84
 
-for (simunum in seq(1,31)){
+for (simunum in seq(1, tot_num_simu)){
 	print(paste('Reading ',paste('../../../simu_all_', as.character(simunum), '.csv',sep="")))
 simudat <- read.csv(paste('../../../simu_all_', as.character(simunum), '.csv',sep=""), header=T)
 
