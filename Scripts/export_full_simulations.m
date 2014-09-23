@@ -81,7 +81,14 @@ function mystr = print_pvalues(mystr, methodName, minuslog10pvalues, info)
 
     check_pvalues(methodName, minuslog10pvalues)
     pvalues = 10.^(-minuslog10pvalues);
-    [~, ~, pvalues_rank] = unique(pvalues);
+    
+    % All of this is needed instead of using just rank produced by 'order'
+    % function because we need to deal with duplicate values and take
+    % max(rank)
+    [~, ~, pValuesIdx] = unique(pvalues(:));
+    uniquePValuesRank = cumsum(accumarray(pValuesIdx, ones(size(pvalues(:)))));
+    pvalues_rank = uniquePValuesRank(pValuesIdx);
+    
     expected_p = pvalues_rank./(info.nSimuOneDir^3);
     
     % Downsampling    
