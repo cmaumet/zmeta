@@ -1,7 +1,7 @@
 library('ggplot2')
 allsimudat <- read.csv('../data/miccai-simu/allsimudat.csv', header=T, sep=" ")
 
-allsimudat$expectedz <- qnorm(allsimudat$expectedp, lower.tail=FALSE)
+# allsimudat$expectedz <- qnorm(allsimudat$expectedp, lower.tail=FALSE)
 
 # We have downsampled so can't find rank using rank function but from pvalue expected we can retreive rank
 allsimudat$k = allsimudat$expectedp*allsimudat$nSimu^3
