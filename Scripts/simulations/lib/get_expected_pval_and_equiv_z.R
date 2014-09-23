@@ -16,8 +16,6 @@ simudat$allgroups <- paste(simudat$Between, simudat$Within, simudat$nStudies, si
 # newsimudat$expectedp <- newsimudat$rankp/newsimudat$nSimu
 simudat$expectedz <- qnorm(simudat$expectedP, lower.tail = FALSE)
 
-write.table(simudat,file=paste('../../../simu_all_expected_short_', as.character(simunum), '.csv',sep=""),sep=",",row.names=F)
-
 if (simunum == 1)
 {
 	allsimudat <-simudat
@@ -26,7 +24,8 @@ if (simunum == 1)
 	allsimudat <-rbind(allsimudat,simudat)
 }
 
-write.table(allsimudat,file='../../../allsimudat.csv',row.names=F)
 }
+
+write.table(allsimudat,file='../../../allsimudat.csv',row.names=F)
 
 
