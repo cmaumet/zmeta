@@ -36,6 +36,7 @@ function simulations(baseDir)
     simuinfo.config.sigmaBetweenStudies = sigmaBetweenStudiesArray;
     simuinfo.config.nSimuOneDir = nSimuOneDir;
     simuinfo.config.timing = tic;
+    simuinfo.config.average_number_subjects = AVG_NUM_SUB;
     
     baseSimulationDir = fullfile(baseDir, 'simulations');
     save(fullfile(baseSimulationDir, 'simuinfo.mat'), 'simuinfo');
@@ -43,7 +44,8 @@ function simulations(baseDir)
     
     
     % Number of studies in meta-analysis
-    for iStudies = 1:numel(nStudiesArray)
+    % FIXME start at 1    
+    for iStudies = 2:numel(nStudiesArray)
         nStudies = nStudiesArray(iStudies);
         
         for iSubPerStudyScheme = 1:numel(subjectPerStudiesScheme)
@@ -64,10 +66,10 @@ function simulations(baseDir)
             end
 
             % Between-studies variance (RFX?)
-            for iEffects = numel(sigmaBetweenStudiesArray):-1:1
+            for iEffects = 1:numel(sigmaBetweenStudiesArray)
                 sigmaBetweenStudies = sigmaBetweenStudiesArray(iEffects);
 
-                for iSigmaSquare = numel(sigmaSquareArray)%:-1:1
+                for iSigmaSquare = 1:numel(sigmaSquareArray)
                     tic;
                     % Common level of (intra-studies) variance (ignoring effect of sample 
                     % size).
