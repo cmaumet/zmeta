@@ -4,17 +4,17 @@ allsimudat <- read.csv('../data/miccai-simu/allsimudat.csv', header=T, sep=" ")
 # allsimudat$expectedz <- qnorm(allsimudat$expectedp, lower.tail=FALSE)
 
 # We have downsampled so can't find rank using rank function but from pvalue expected we can retreive rank
-allsimudat$k = allsimudat$expectedp*allsimudat$nSimu^3
-allsimudat$p_upper <- qbeta(0.025, allsimudat$k, allsimudat$nSimu^3-allsimudat$k+1)
+# allsimudat$k = allsimudat$expectedp*allsimudat$nSimu^3
+allsimudat$p_upper <- qbeta(0.025, allsimudat$rankP, allsimudat$nSimu-allsimudat$rankP +1)
 allsimudat$z_upper <- qnorm(allsimudat$p_upper, lower.tail=FALSE)
-allsimudat$p_lower <- qbeta(0.975, allsimudat$k, allsimudat$nSimu^3-allsimudat$k+1)
+allsimudat$p_lower <- qbeta(0.975, allsimudat$rankP, allsimudat$nSimu-allsimudat$rankP +1)
 allsimudat$z_lower <- qnorm(allsimudat$p_lower, lower.tail=FALSE)
 
 
 # Bland-Altman like
 p <- ggplot(data=subset(allsimudat, expectedz>0 & !(allsimudat $methods %in% levels(allsimudat $methods)[c(3,4,5,7)])), aes(x=expectedz, y=equivz-expectedz, group=allgroups, colour=factor(paste(Within))))
 
-p + geom_ribbon(aes(x=expectedz, ymin=z_lower-expectedz, ymax=z_upper-expectedz), fill="grey", alpha=.2, colour=NA) + geom_line() + geom_point(size=1) + facet_wrap(methods~Between, ncol=2,scales = "free") + theme(strip.text.x = element_text(size = 16)) + ylab("Difference between estimated and reference z-statistic") + xlab("Reference z-statistic") + geom_line(aes(x=expectedz, y=0), colour="black") 
+p + geom_ribbon(aes(x=expectedz, ymin=z_lower-expectedz, ymax=z_upper-expectedz), fill="grey", alpha=.2, colour=NA) + geom_line() + geom_point(size=1) + facet_grid(methods ~ Between+numSubjectScheme,scales = "free") + theme(strip.text.x = element_text(size = 16)) + ylab("Difference between estimated and reference z-statistic") + xlab("Reference z-statistic") + geom_line(aes(x=expectedz, y=0), colour="black") 
 
 # estimated = f(reference) like
 p <- ggplot(data=subset(allsimudat, expectedz>0 & !(allsimudat $methods %in% levels(allsimudat $methods)[c(3,4,5,7)])), aes(x=expectedz, y=equivz, group=allgroups, colour=factor(paste(Within))))
