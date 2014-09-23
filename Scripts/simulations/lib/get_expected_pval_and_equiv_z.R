@@ -1,6 +1,6 @@
 # Load first simulation
 simunum <- 1
-tot_num_simu = 84
+tot_num_simu = 1
 
 for (simunum in seq(1, tot_num_simu)){
 	print(paste('Reading ',paste('../../../simu_all_', as.character(simunum), '.csv',sep="")))
@@ -27,21 +27,27 @@ simudat$allgroups <- paste(simudat$Between, simudat$Within, simudat$nStudies, si
 # We need to sort by z so that later on we can move by one for probas
 # simudat <- simudat[with(simudat, order(methods, allgroups, equivz)), ]
 
-simudat$rankp <- NaN
-simudat$expectedp <- NaN
-simudat$expectedz <- NaN
-for (meth in levels(simudat$methods))
-{
-	print(meth)
+print('\tRanking')
+# Add rank (by method)
+simudat <-transform(simudat, prank = ave(p, methods, FUN = function(x) rank(x, ties.method="min")))
+
+# simudat <- aggregate(cbind(colnames(simudat))  ~ allgroups + roundedlog10p + methods, data=simudat, FUN=function(x) c(m=mean(x), s=sd(x)/sqrt(length(x)), n=length(x) ))
+
+# simudat$rankp <- NaN
+# simudat$expectedp <- NaN
+# simudat$expectedz <- NaN
+# for (meth in levels(simudat$methods))
+# {
+	# print(meth)
 		
-	simudat[simudat$methods==meth,]$rankp <- rank(simudat[simudat$methods==meth,]$p)
-	nSimu <- simudat[simudat$methods==meth,]$nSimu
+	# simudat[simudat$methods==meth,]$rankp <- rank(simudat[simudat$methods==meth,]$p)
+	# nSimu <- simudat[simudat$methods==meth,]$nSimu
 
-	simudat[simudat$methods==meth,]$expectedp <- simudat[simudat$methods==meth,]$rankp/nSimu
-	simudat[simudat$methods==meth,]$expectedz <- qnorm(simudat[simudat$methods==meth,]$expectedp, lower.tail = FALSE)
-}
+	# simudat[simudat$methods==meth,]$expectedp <- simudat[simudat$methods==meth,]$rankp/nSimu
+	# simudat[simudat$methods==meth,]$expectedz <- qnorm(simudat[simudat$methods==meth,]$expectedp, lower.tail = FALSE)
+# }
 
-write.table(simudat,file=paste('../../../simu_all_expected_', as.character(simunum), '.csv',sep=""),sep=",",row.names=F)
+# write.table(simudat,file=paste('../../../simu_all_expected_', as.character(simunum), '.csv',sep=""),sep=",",row.names=F)
 
 
 # By doing this we accept a lower precison around p=1
@@ -52,8 +58,12 @@ simudat$roundedlog10p <- round(simudat$log10p, digits=2)
 # This is not the right way to add confidence interval!
 # newsimudat <- aggregate(cbind(p,original_p,log10p,lnp,equivz,expectedp,expectedz)  ~ allgroups + roundedlog10p + methods, data=simudat, FUN=function(x) c(m=mean(x), s=sd(x)/sqrt(length(x)), n=length(x) ))
 
+print('\tDown sampling')
 # Downsampling: For each multiple occurence of rounded log10p select the first one
 newsimudat <- aggregate(cbind(p,original_p,log10p,lnp,equivz,expectedp,expectedz,rankp)  ~ allgroups + roundedlog10p + methods + nStudies + Between + Within + nSimu, data=simudat, FUN=function(x){head(x,1)})
+
+newsimudat$expectedp <- newsimudat$rankp/newsimudat$nSimu
+newsimudat $expectedz <- qnorm(newsimudat$expectedp, lower.tail = FALSE)
 
 #newsimudat <- as.data.frame(as.list(newsimudat))
 
