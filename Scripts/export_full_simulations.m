@@ -6,7 +6,7 @@ function export_full_simulations(simuDir)
         filename = ['simu_all_' mat2str(i) '.csv'];
         fid = fopen(fullfile(pwd, filename), 'w');
         
-        fprintf(fid, 'methods, nStudies, Between, Within, numSubjectScheme, nSimu, p \n');
+        fprintf(fid, 'methods, nStudies, Between, Within, numSubjectScheme, nSimu, minuslog10P, P, rankP, expectedP \n');
         
 %         info = regexp(spm_file(simuDirs{i}, 'filename'), ...
 %             'nStudy(?<nStudy>\d+)_Betw(?<Betw>\d+\.?\d*)_Within(?<Within>\d+\.?\d*)_nSimu(?<nSimu>\d+)','names');
@@ -76,13 +76,31 @@ function export_full_simulations(simuDir)
     
 end
 
-function mystr = print_pvalues(mystr, methodName, pvalues, info)
-    check_pvalues(methodName, pvalues)
+function mystr = print_pvalues(mystr, methodName, minuslog10pvalues, info)
+    minuslog10pvalues = minuslog10pvalues(:);
 
-     mystr = [mystr sprintf([methodName ',' mat2str(info.nStudies) ',' ...
-         mat2str(info.sigmaBetweenStudies) ',' mat2str(info.sigmaSquare) ...
-     ',' mat2str(info.nSubjectsScheme) ...
-     ',' mat2str(info.nSimuOneDir^3) ',%i\n'], pvalues)];
+    check_pvalues(methodName, minuslog10pvalues)
+    pvalues = 10.^(-minuslog10pvalues);
+    [~, ~, pvalues_rank] = unique(pvalues);
+    expected_p = pvalues_rank./(info.nSimuOneDir^3);
+    
+    % Downsampling    
+    digits=2;
+    roundedlog10p = round(minuslog10pvalues*10^digits)/(10^digits);
+    [~, uniquePositions] = unique(roundedlog10p);
+    
+    minuslog10pvalues = minuslog10pvalues(uniquePositions);
+    pvalues = pvalues(uniquePositions);
+    pvalues_rank = pvalues_rank(uniquePositions);
+    expected_p = expected_p(uniquePositions);
+    
+    data_to_export = num2cell([minuslog10pvalues, pvalues, pvalues_rank expected_p], 2);
+
+    mystr = [mystr sprintf([methodName ',' mat2str(info.nStudies) ',' ...
+                mat2str(info.sigmaBetweenStudies) ',' mat2str(info.sigmaSquare) ...
+            ',' mat2str(info.nSubjectsScheme) ...
+            ',' mat2str(info.nSimuOneDir^3) ',%i,%i,%i,%i\n'], ...
+          data_to_export{:} )];
 end
 
 function check_pvalues(methodName, pvalues)
