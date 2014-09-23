@@ -25,7 +25,7 @@ simudat$equivz <- qnorm(simudat$lnp, lower.tail = FALSE, log.p = TRUE)
 simudat$allgroups <- paste(simudat$Between, simudat$Within, simudat$nStudies, simudat$nSimu, simudat$numSubjectScheme)
 
 # We need to sort by z so that later on we can move by one for probas
-simudat <- simudat[with(simudat, order(methods, allgroups, equivz)), ]
+# simudat <- simudat[with(simudat, order(methods, allgroups, equivz)), ]
 
 simudat$rankp <- NaN
 simudat$expectedp <- NaN
