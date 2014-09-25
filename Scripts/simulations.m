@@ -10,7 +10,7 @@ function simulations(baseDir)
     % Number of subject per study
 %     nSubjects = [25 400 100 25]; %[10, 15, 20, 25, 30, 10, 15, 20, 25, 30, 10, 15, 20, 25, 30];
 %     nStudies = numel(nSubjects);
-    nStudiesArray = [5]% 10 25 50];
+    nStudiesArray = [5 10 25 50];
     AVG_NUM_SUB = 20;
     sigmaSquareArray = [0.25, 0.5, 1, 2, 4]*AVG_NUM_SUB;%How to compute z with var = 0?
     studyVarianceSchemes = {'identical', 'different'};
@@ -245,30 +245,6 @@ function simulations(baseDir)
 
                         spm_jobman('run', matlabbatch)
 
-                        probaFishers = spm_read_vols(spm_vol(spm_select('FPList', fisherDir, '.*_minus_log10_p\.nii$')));   
-                        simu.fishers = get_proba_CI(probaFishers(:), nSimuOneDir);
-
-                        probaStouffers = spm_read_vols(spm_vol(spm_select('FPList', stoufferDir, '.*_minus_log10_p\.nii$')));   
-                        simu.stouffers = get_proba_CI(probaStouffers(:), nSimuOneDir);
-
-                        probaStouffersMFX = spm_read_vols(spm_vol(spm_select('FPList', stoufferMFXDir, '.*_minus_log10_p\.nii$')));   
-                        simu.stouffersMFX = get_proba_CI(probaStouffersMFX(:), nSimuOneDir);
-
-                        probaWeighted = spm_read_vols(spm_vol(spm_select('FPList', weightedZDir, '.*_minus_log10_p\.nii$')));
-                        simu.weightedZ = get_proba_CI(probaWeighted(:), nSimuOneDir);
-
-                        probaMegaFFX = spm_read_vols(spm_vol(spm_select('FPList', megaFfxDir, '.*_minus_log10_p\.nii$')));
-                        simu.megaFfx = get_proba_CI(probaMegaFFX(:), nSimuOneDir);
-
-                        probaMegaRFX = spm_read_vols(spm_vol(spm_select('FPList', megaRfxDir, '.*_minus_log10_p\.nii$')));
-                        simu.megaRfx = get_proba_CI(probaMegaRFX(:), nSimuOneDir);
-
-                        probaPermutCon = spm_read_vols(spm_vol(spm_select('FPList', permutConDir, '.*lP\+\.img$')));
-                        simu.permutCon = get_proba_CI(probaPermutCon(:), nSimuOneDir);
-
-                        probaPermutZ = spm_read_vols(spm_vol(spm_select('FPList', permutZDir, '.*lP\+\.img$')));
-                        simu.permutZ = get_proba_CI(probaPermutZ(:), nSimuOneDir);
-
                         simu.config.nSubjectsScheme = subjectNumberScheme;
                         simu.config.nSubjects = nSubjects;
                         simu.config.studyVarianceScheme = studyVarianceScheme;
@@ -288,64 +264,3 @@ function simulations(baseDir)
         end
     end
 end
-
-% Compute confidance intervals
-function res = get_proba_CI(values, nSimuOneDir)
-    if ~all(size(values) == nSimuOneDir)
-        values = reshape(values, [nSimuOneDir, nSimuOneDir, nSimuOneDir]);
-    end
-    
-    repeats = sum(sum(values > -log10(0.05), 3), 2)./(nSimuOneDir^2);
-
-    m = mean(repeats);
-    s = std(repeats);
-    confidenceInterval = [m - 1.96*s; m + 1.96*s];
-    
-    res.stderror = s;
-    res.mean = m;
-    res.repeats = repeats;
-    res.values = values;
-    res.CI = confidenceInterval;
-    res.string = ['CI = [' num2str(confidenceInterval(1)), ' ; ' num2str(confidenceInterval(2)) ']' ...
-                ' - avg=' num2str(m) ', std_est=' num2str(s)];
-end
-
-% % Get number of subject per studies (50% between 20 and 25, 25% between 10
-% % and 20 and 25% between 25 and 35)
-% function nSubjects = get_n_subjects_per_studies(nStudies)
-%     nSubjects = [20 25 10 50];
-%     nPreDefined = 4;
-%     
-%     if nStudies < nPreDefined
-%         nSubjects = nSubjects(1:nStudies);
-%     elseif nStudies > nPreDefined
-%         rng(3, 'twister')
-% 
-%         quarter = round((nStudies-nPreDefined)/4);
-%         half = nStudies - nPreDefined - 2*quarter;
-%         
-%         minSmallStudies = 11;
-%         maxSmallStudies = 20;
-%         rangeSmallStudies = maxSmallStudies-minSmallStudies+1;
-%         nSubjectsSmallStudies = randi(rangeSmallStudies,1,quarter) + ...
-%                                     minSmallStudies -1;
-%         
-%         minBigStudies = 26;
-%         maxBigStudies = 50;
-%         rangeBigStudies = maxBigStudies-minBigStudies+1;
-%         nSubjectsBigStudies = randi(rangeBigStudies,1,quarter) +...
-%                                     minBigStudies -1;
-%                                 
-%         minMediumStudies = 21;
-%         maxMediumStudies = 25;
-%         rangeMediumStudies = maxMediumStudies-minMediumStudies+1;
-%         nSubjectsMediumStudies = randi(rangeMediumStudies,1,half) +...
-%                                     minMediumStudies -1;
-%         
-%         nSubjects = [ nSubjects ,...
-%                       nSubjectsMediumStudies, ...
-%                       nSubjectsSmallStudies, ...
-%                       nSubjectsBigStudies];
-%     end
-%     
-% end
