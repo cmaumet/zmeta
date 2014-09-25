@@ -1,5 +1,5 @@
 library('ggplot2')
-allsimudat <- read.csv('../data/miccai-simu/allsimudat.csv', header=T, sep=" ")
+allsimudat <- read.csv('../../../allsimudat.csv', header=T, sep=" ")
 
 # allsimudat$expectedz <- qnorm(allsimudat$expectedp, lower.tail=FALSE)
 
@@ -10,16 +10,20 @@ allsimudat$z_upper <- qnorm(allsimudat$p_upper, lower.tail=FALSE)
 allsimudat$p_lower <- qbeta(0.975, allsimudat$rankP, allsimudat$nSimu-allsimudat$rankP +1)
 allsimudat$z_lower <- qnorm(allsimudat$p_lower, lower.tail=FALSE)
 
-
 # Bland-Altman like
 p <- ggplot(data=subset(allsimudat, expectedz>0 & !(allsimudat $methods %in% levels(allsimudat $methods)[c(3,4,5,7)])), aes(x=expectedz, y=equivz-expectedz, group=allgroups, colour=factor(paste(Within))))
 
 p + geom_ribbon(aes(x=expectedz, ymin=z_lower-expectedz, ymax=z_upper-expectedz), fill="grey", alpha=.2, colour=NA) + geom_line() + geom_point(size=1) + facet_grid(methods ~ Between+numSubjectScheme,scales = "free") + theme(strip.text.x = element_text(size = 16)) + ylab("Difference between estimated and reference z-statistic") + xlab("Reference z-statistic") + geom_line(aes(x=expectedz, y=0), colour="black") 
 
-# estimated = f(reference) like
-p <- ggplot(data=subset(allsimudat, expectedz>0 & !(allsimudat $methods %in% levels(allsimudat $methods)[c(3,4,5,7)])), aes(x=expectedz, y=equivz, group=allgroups, colour=factor(paste(Within))))
+# estimated = f(reference) like on P
+p <- ggplot(data=subset(allsimudat, expectedP<0.5 & !(allsimudat $methods %in% levels(allsimudat $methods)[c(3,4,5,7)])), aes(x=-log10(expectedP), y=-log10(P), group=allgroups, colour=factor(paste(Within))))
 
-p + geom_line() + geom_point(size=1) + facet_grid(Between~methods, scales = "free") + theme(strip.text.x = element_text(size = 16)) + ylab("Difference between estimated and reference z-statistic") + xlab("Reference z-statistic") + geom_line(aes(x=expectedz, y=expectedz), colour="black") + geom_line(aes(x=expectedz, y=z_upper), colour="red") + geom_line(aes(x=expectedz, y=z_lower), colour="blue")
+p + geom_line() + geom_point(size=1) + facet_grid(Between~methods, scales = "free") + theme(strip.text.x = element_text(size = 16)) + ylab("Observed -log10(P)") + xlab("Expected -log10(P)") + geom_line(aes(x=expectedP, y=expectedP), colour="black") + geom_line(aes(x=expectedP, y=p_upper), colour="red") + geom_line(aes(x=expectedP, y=p_lower), colour="blue")
+
+# Bland-Altman like on P
+p <- ggplot(data=subset(allsimudat, expectedP<0.5 & !(allsimudat $methods %in% levels(allsimudat $methods)[c(3,4,5,7)])), aes(x=-log10(expectedP), y=(P-expectedP), group=allgroups, colour=factor(paste(Within))))
+
+p + geom_line() + geom_point(size=1) + facet_grid(Between~methods, scales = "free") + theme(strip.text.x = element_text(size = 16)) + ylab("Observed P minus expected P") + xlab("Expected -log10(P)") 
 
 p + geom_line() + geom_point(size=1) + facet_grid(methods~Between+Within+nStudies, scales = "free") + theme(strip.text.x = element_text(size = 16)) + ylab("Difference between estimated and reference z-statistic") + xlab("Reference z-statistic") + geom_abline(intercept=0, slope=1)
 
