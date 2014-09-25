@@ -1,12 +1,12 @@
 function export_full_simulations(simuDir)
-    simuDirs = find_dirs('^nStudy5_subNum-extreme_large', simuDir);
+    simuDirs = find_dirs('^nStudy', simuDir);
     
     for i = 1:numel(simuDirs)
         disp(['Exporting ' simuDirs{i}])
         filename = ['simu_all_' mat2str(i) '.csv'];
         fid = fopen(fullfile(pwd, filename), 'w');
         
-        fprintf(fid, 'methods, nStudies, Between, Within, numSubjectScheme, nSimu, minuslog10P, P, rankP, expectedP \n');
+        fprintf(fid, 'methods, nStudies, Between, Within, numSubjectScheme, varScheme, nSimu, minuslog10P, P, rankP, expectedP \n');
         
 %         info = regexp(spm_file(simuDirs{i}, 'filename'), ...
 %             'nStudy(?<nStudy>\d+)_Betw(?<Betw>\d+\.?\d*)_Within(?<Within>\d+\.?\d*)_nSimu(?<nSimu>\d+)','names');
@@ -91,7 +91,8 @@ function mystr = print_pvalues(mystr, methodName, minuslog10pvalues, info)
 
     mystr = [mystr sprintf([methodName ',' mat2str(info.nStudies) ',' ...
                 mat2str(info.sigmaBetweenStudies) ',' mat2str(info.sigmaSquare) ...
-            ',' mat2str(info.nSubjectsScheme) ...
+            ',' info.nSubjectsScheme ...
+            ',' info.studyVarianceScheme ...
             ',' mat2str(info.nSimuOneDir^3) ',%i,%i,%i,%i\n'], ...
           data_to_export{:} )];
 end
