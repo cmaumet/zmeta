@@ -13,7 +13,7 @@ function simulations(baseDir)
     nStudiesArray = [5 10 25 50];
     AVG_NUM_SUB = 20;
     sigmaSquareArray = [0.25, 0.5, 1, 2, 4]*AVG_NUM_SUB;%How to compute z with var = 0?
-    studyVarianceSchemes = {'identical', 'different'};
+    studyVarianceSchemes = {'identical'} %, 'different'}; don't know yet how to deal with uneq var
     
     % Between-studies variance (RFX?)
     sigmaBetweenStudiesArray = [0 1];
