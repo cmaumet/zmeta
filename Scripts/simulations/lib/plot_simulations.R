@@ -1,19 +1,13 @@
 library('ggplot2')
 allsimudat <- read.csv('../../../allsimudat.csv', header=T, sep=" ")
 
-# allsimudat$expectedz <- qnorm(allsimudat$expectedp, lower.tail=FALSE)
 
-# We have downsampled so can't find rank using rank function but from pvalue expected we can retreive rank
-# allsimudat$k = allsimudat$expectedp*allsimudat$nSimu^3
-allsimudat$p_upper <- qbeta(0.025, allsimudat$rankP, allsimudat$nSimu-allsimudat$rankP +1)
-allsimudat$z_upper <- qnorm(allsimudat$p_upper, lower.tail=FALSE)
-allsimudat$p_lower <- qbeta(0.975, allsimudat$rankP, allsimudat$nSimu-allsimudat$rankP +1)
-allsimudat$z_lower <- qnorm(allsimudat$p_lower, lower.tail=FALSE)
 
 # Bland-Altman like
-p <- ggplot(data=subset(allsimudat, expectedz>0 & !(allsimudat $methods %in% levels(allsimudat $methods)[c(3,4,5,7)])), aes(x=expectedz, y=equivz-expectedz, group=allgroups, colour=factor(paste(Within))))
+p <- ggplot(data=subset(allsimudat, expectedz>-1 & !(allsimudat $methods %in% levels(allsimudat $methods)[c(3,4,5,7)])), aes(x=expectedz, y=equivz-expectedz, group=allgroups, colour=factor(paste(Within))))
 
-p + geom_ribbon(aes(x=expectedz, ymin=z_lower-expectedz, ymax=z_upper-expectedz), fill="grey", alpha=.2, colour=NA) + geom_line() + geom_point(size=1) + facet_grid(methods ~ Between+numSubjectScheme,scales = "free") + theme(strip.text.x = element_text(size = 16)) + ylab("Difference between estimated and reference z-statistic") + xlab("Reference z-statistic") + geom_line(aes(x=expectedz, y=0), colour="black") 
+p + geom_ribbon(aes(x=expectedz, ymin=z_lower-expectedz, ymax=z_upper-expectedz), fill="grey", alpha=.2, colour=NA) + facet_grid(methods+Between ~ nStudies+ numSubjectScheme,scales = "free") + theme(strip.text.x = element_text(size = 16)) + ylab("Difference between estimated and reference z-statistic") + xlab("Reference z-statistic") + geom_line(aes(x=expectedz, y=0), colour="black") + geom_smooth(method = "loess", fill=NA, size=1) + xlim(0, 5)
+
 
 # estimated = f(reference) like on P
 p <- ggplot(data=subset(allsimudat, expectedP<0.5 & !(allsimudat $methods %in% levels(allsimudat $methods)[c(3,4,5,7)])), aes(x=-log10(expectedP), y=-log10(P), group=allgroups, colour=factor(paste(Within))))
