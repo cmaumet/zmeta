@@ -38,10 +38,7 @@ function create_peak_image(niftiBase, bgBase, TabDat, xSPM)
                     peaksparse(peakcoord(1)+xinc, peakcoord(2)+yinc, peakcoord(3)+zinc) = 1/TabDat.dat{i,end-3};
                 end
             end
-        end
-        
-        
-        
+        end      
         
     end
     niftiBase.dat(:,:,:) = peaksparse;
