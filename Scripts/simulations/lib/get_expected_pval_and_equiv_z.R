@@ -1,9 +1,11 @@
 # Load first simulation
-tot_num_simu = 50
+tot_num_simu = 71
+
+suffix <- "tom"
 
 for (simunum in seq(1, tot_num_simu)){
-	print(paste('Reading ',paste('../../../data/simulations/simu_all_', as.character(simunum), '.csv',sep="")))
-simudat <- read.csv(paste('../../../data/simulations/simu_all_', as.character(simunum), '.csv',sep=""), header=T)
+	print(paste('Reading ',paste('../../../data/simulations/csv_', suffix,'/simu_all_', as.character(simunum), '.csv',sep="")))
+simudat <- read.csv(paste('../../../data/simulations/csv_', suffix,'/simu_all_', as.character(simunum), '.csv',sep=""), header=T)
 
 # qnorm works with natural log (and not base 10)
 simudat$lnp <- -simudat$minuslog10P*log(10)
@@ -35,6 +37,6 @@ allsimudat$z_upper <- qnorm(allsimudat$p_upper, lower.tail=FALSE)
 allsimudat$p_lower <- qbeta(0.975, allsimudat$rankP, allsimudat$nSimu-allsimudat$rankP +1)
 allsimudat$z_lower <- qnorm(allsimudat$p_lower, lower.tail=FALSE)
 
-write.table(allsimudat,file='../../../allsimudat.csv',row.names=F)
+write.table(allsimudat,file=paste('../../../allsimudat_', suffix,'.csv', sep=""),row.names=F)
 
 
