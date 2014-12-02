@@ -12,6 +12,7 @@ function simulations(baseDir)
 %     nStudies = numel(nSubjects);
     nStudiesArray = [5 10 25 50];
     AVG_NUM_SUB = 20;
+    NUM_SUB_DIFF = 15;
     sigmaSquareArray = [0.25, 0.5, 1, 2, 4]*AVG_NUM_SUB;%How to compute z with var = 0?
     studyVarianceSchemes = {'identical'} %, 'different'}; don't know yet how to deal with uneq var
     
@@ -38,6 +39,7 @@ function simulations(baseDir)
     simuinfo.config.nSimuOneDir = nSimuOneDir;
     simuinfo.config.timing = tic;
     simuinfo.config.average_number_subjects = AVG_NUM_SUB;
+    simuinfo.config.average_diff_num_subjects = NUM_SUB_DIFF;
     
     baseSimulationDir = fullfile(baseDir, 'simulations');
     save(fullfile(baseSimulationDir, 'simuinfo.mat'), 'simuinfo');
@@ -45,7 +47,8 @@ function simulations(baseDir)
     
     
     % Number of studies in meta-analysis
-    for iStudies = 1:numel(nStudiesArray)
+%     for iStudies = 1:numel(nStudiesArray)
+    for iStudies = numel(nStudiesArray)
         nStudies = nStudiesArray(iStudies);
         
         for iSubPerStudyScheme = 1:numel(subjectPerStudiesScheme)
@@ -57,8 +60,10 @@ function simulations(baseDir)
                     nSubjects = ones(1, nStudies)*AVG_NUM_SUB;
                 case {'different'}
                     
-                    % Uniformly distributed beween AVG_NUM_SUB/2 and AVG_NUM_SUB*2 included                 
-                    nSubjects = randi([AVG_NUM_SUB/2 AVG_NUM_SUB*2], 1, nStudies);%linspace(AVG_NUM_SUB/2,AVG_NUM_SUB*2,nStudies);
+                    % Uniformly distributed beween AVG_NUM_SUB-NUM_SUB_DIFF 
+                    % and AVG_NUM_SUB+NUM_SUB_DIFF included, so that 
+                    % mean(nSubjects) = AVG_NUM_SUB
+                    nSubjects = randi([AVG_NUM_SUB-NUM_SUB_DIFF AVG_NUM_SUB+NUM_SUB_DIFF], 1, nStudies);%linspace(AVG_NUM_SUB/2,AVG_NUM_SUB*2,nStudies);
                 otherwise
                   error('')
             end
@@ -67,7 +72,7 @@ function simulations(baseDir)
             for iEffects = 1:numel(sigmaBetweenStudiesArray)
                 sigmaBetweenStudies = sigmaBetweenStudiesArray(iEffects);
 
-                for iSigmaSquare = 1:numel(sigmaSquareArray)
+                 for iSigmaSquare = 1:numel(sigmaSquareArray)
                     for iVariance = 1:numel(studyVarianceSchemes)
                         studyVarianceScheme = studyVarianceSchemes{iVariance};
                         
