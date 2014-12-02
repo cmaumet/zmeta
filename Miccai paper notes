@@ -1,5 +1,30 @@
+Main points:
+- Main question: "Is Z enough?"
+   o Compa z-based approaches to gold std GLM MFX / or contrast-based approches
+	- Check empirically validity under violation of underlying assumptions
+   		+ tau^2 != 0
+   		+ s^2_i not constant
+   		+ relation between within and between sub variance (for RFX or Z MFX)
+		=> no assumption is violated for permutation so we have no reason to test for 
+validity... unless we look at not symmetric error dist (bof!)
+
+	- How bad is the units issue? (only for contrast [+sderr] based):
+   		+ dramatic: 100 / 10 000 (not accounting for different in target across software)
+   		+ cross-software differences in normalisation procedure: 1/1.5
+   		+ cross-studies differences: 1 to 4 (contrast weights or design matrix)
+   		=> here we also need to test the gold standard because we are violating an assumption
+   		=> we need to add a constand in the one-sample glm
+
+Note: si on considère que gold standard is MFX GLM, cela signifie qu'on ne 
+s'intéresse pas aux cas où l'erreur est non normale.
+
+
+*** Simulations ***
+
+
+-------------------------------------------------------------------------------
 TODO:
-- revpoir figures avec Weighted Stouffer's et Z MFX
+- revoir figures avec Weighted Stouffer's et Z MFX
 
 
 Miccai paper notes
@@ -46,7 +71,7 @@ We do not look at H0 false to simplify and just measure FPR & efficiency.
 Let's do that with a big image per study so that one-image corresponds to many iterations of the problem. But do we want to change the parameters in one-image or keep them the same...
 
 Not yet fixed: 
-- nStudies: Let's do 4 meta-analylis involving each 5, 10, 25 or 50 studies
+- nStudies: Let's do 4 meta-analysis involving each 5, 10, 25 or 50 studies
 - nSubjects per studies: 
 5 studies: 10 15 20 25 35
 10 studies: 10 15 20 25 35 -- 10 25 20 25 35
