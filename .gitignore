@@ -33,3 +33,6 @@ unused*
 
 # data
 data/*
+
+# R autosaved files
+*(Autosaved).R
