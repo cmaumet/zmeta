@@ -1,10 +1,12 @@
 function export_full_simulations(simuDir)
     simuDirs = find_dirs('^nStudy', simuDir);
     
+    saveSimuCsvDir = fullfile(simuDir, 'csv_tom');
+    
     for i = 1:numel(simuDirs)
         disp(['Exporting ' simuDirs{i}])
         filename = ['simu_all_' mat2str(i) '.csv'];
-        fid = fopen(fullfile(pwd, filename), 'w');
+        fid = fopen(fullfile(saveSimuCsvDir, filename), 'w');
         
         fprintf(fid, 'methods, nStudies, Between, Within, numSubjectScheme, varScheme, nSimu, minuslog10P, P, rankP, expectedP \n');
         
@@ -46,6 +48,7 @@ function export_full_simulations(simuDir)
                         'statFile', 'weightedz_ffx_statistic.nii');                      
         mystr = '';
         for m = 1:numel(methods)
+           
             methodDir = fullfile(simuDirs{i}, methods(m).name);
             pValueFile = spm_select('FPList', methodDir, ...
                 ['^' regexptranslate('escape', methods(m).pValueFile) '$']);
@@ -96,7 +99,7 @@ function export_full_simulations(simuDir)
     
 end
 
-function mystr = print_pvalues(mystr, methodName, minuslog10pvalues, statValue, info)
+function mystr = print_pvalues(mystr, methodName, minuslog10pvalues, statValues, info)
     minuslog10pvalues = minuslog10pvalues(:);
 
     check_pvalues(methodName, minuslog10pvalues)
@@ -107,16 +110,34 @@ function mystr = print_pvalues(mystr, methodName, minuslog10pvalues, statValue, 
     % max(rank)
     % Need to be done on -statValue rather than pvalues to avoid scale effect
     % that should not be present in expected pvalues
-    orderByValue = -statValue(:); %pvalues(:); %-statValues(:);
-    [~, ~, statValuesIdx] = unique(orderByValue(:));
-    uniqueStatValuesRank = cumsum(accumarray(statValuesIdx, ones(size(orderByValue(:)))));
-    pvalues_rank = uniqueStatValuesRank(statValuesIdx);
+%     orderByValue = pvalues(:);%-statValues(:); %
+%     [~, ~, statValuesIdx] = unique(orderByValue(:));
+%     uniqueStatValuesRank = cumsum(accumarray(statValuesIdx, ones(size(orderByValue(:)))));
+%     pvalues_rank = uniqueStatValuesRank(statValuesIdx);
+%     
+%     ranks = get_rank_max(orderByValue);
     
-    expected_p = pvalues_rank./(info.nSimuOneDir^3);
+%     [~, ~, pvalues_rank] = unique(orderByValue);
+    
+%     if ~all(pvalues_rank'==ranks)
+%         error('error in ranks')
+%     end
+
+    pvalues = sort(pvalues);
+    minuslog10pvalues = -log10(pvalues(:));
+    
+    sample_size = numel(pvalues);
+    
+    expected_p = [(1:sample_size)./sample_size]';
+    pvalues_rank = [(1:sample_size)]';
+    
+    
+%     expected_p = pvalues_rank./(info.nSimuOneDir^3);
     
     % Downsampling    
     digits=2;
     roundedlog10expectedp = round(-log10(expected_p)*10^digits)/(10^digits);
+    % Look at this, maybe it poses a pb for permut where the same expected_p can have different obs_p     
     [~, uniquePositions] = unique(roundedlog10expectedp);
     
     minuslog10pvalues = minuslog10pvalues(uniquePositions);
