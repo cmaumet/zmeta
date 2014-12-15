@@ -8,13 +8,19 @@ function export_full_simulations(simuDir)
         filename = ['simu_all_' mat2str(i) '.csv'];
         fid = fopen(fullfile(saveSimuCsvDir, filename), 'w');
         
-        fprintf(fid, 'methods, nStudies, Between, Within, numSubjectScheme, varScheme, nSimu, minuslog10P, P, rankP, expectedP \n');
-        
+        fprintf(fid, 'methods, nStudies, Between, Within, numSubjectScheme, varScheme, soft2, soft2Factor, unitMismatch, nSimu, minuslog10P, P, rankP, expectedP \n');
 %         info = regexp(spm_file(simuDirs{i}, 'filename'), ...
 %             'nStudy(?<nStudy>\d+)_Betw(?<Betw>\d+\.?\d*)_Within(?<Within>\d+\.?\d*)_nSimu(?<nSimu>\d+)','names');
         try
             info = load(fullfile(simuDir,simuDirs{i}, 'simu.mat'));
             info = info.simu.config;
+            
+            if ~isfield(info, 'nStudiesWithSoftware2')
+                info.nStudiesWithSoftware2 = 0;
+                info.sigmaFactorWithSoftware2 = 1;
+                info.unitMismatch = 0;
+                info.unitFactor = ones(1, numel(info.nSubjects));
+            end
         catch
             warning(['Skipped' simuDirs{i}])
             continue;
@@ -151,6 +157,9 @@ function mystr = print_pvalues(mystr, methodName, minuslog10pvalues, statValues,
                 mat2str(info.sigmaBetweenStudies) ',' mat2str(info.sigmaSquare) ...
             ',' info.nSubjectsScheme ...
             ',' info.studyVarianceScheme ...
+            ',' mat2str(info.nStudiesWithSoftware2) ...
+            ',' mat2str(info.sigmaFactorWithSoftware2) ...
+            ',' mat2str(info.unitMismatch) ...
             ',' mat2str(info.nSimuOneDir^3) ',%i,%i,%i,%i\n'], ...
           data_to_export{:} )];
 end

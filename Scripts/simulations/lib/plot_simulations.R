@@ -1,12 +1,13 @@
 library('ggplot2')
-allsimudat_pval <- read.csv('../../../allsimudat_pval.csv', header=T, sep=" ")
-allsimudat_pval_rank <- read.csv('../../../allsimudat_pval_rank.csv', header=T, sep=" ")
-allsimudat_tval <- read.csv('../../../allsimudat_nopval.csv', header=T, sep=" ")
+# allsimudat_pval <- read.csv('../../../allsimudat_pval.csv', header=T, sep=" ")
+# allsimudat_pval_rank <- read.csv('../../../allsimudat_pval_rank.csv', header=T, sep=" ")
+# allsimudat_tval <- read.csv('../../../allsimudat_nopval.csv', header=T, sep=" ")
+allsimudat_tom <- read.csv('../../../allsimudat_tom.csv', header=T, sep=" ")
 
-allsimudat <- allsimudat_tval
-allsimudat <- allsimudat_pval_rank
+allsimudat <- allsimudat_tom
 
-data_subset <- subset(allsimudat, expectedz>0 & nStudies==25 &  !(allsimudat $methods %in% levels(allsimudat $methods)[c(3,4,5,7)]))
+data_subset <- subset(allsimudat, expectedz>0 & nStudies==10 & Between==1 & numSubjectScheme=="identical" & (allsimudat $methods %in% levels(allsimudat $methods)[c(3,4,5,7)]))
+#  & methods=="stouffersMFX"
 
 #methods=="permutCon" & Between==1 & nStudies==50 & numSubjectScheme=="identical" & varScheme=="identical" & Within==5)
 #
@@ -21,7 +22,7 @@ p <- ggplot(data_subset, aes(as.factor(equivz), equivz-expectedz, colour=factor(
 # Bland-Altman like
 p <- ggplot(data= data_subset, aes(x=expectedz, y=equivz-expectedz, group=allgroups, colour=factor(paste(Within))))
 
-p + geom_ribbon(aes(x=expectedz, ymin=z_lower-expectedz, ymax=z_upper-expectedz), fill="grey", alpha=.2, colour=NA) + facet_grid(methods+Between ~ nStudies+ numSubjectScheme) + theme(strip.text.x = element_text(size = 16)) + ylab("Difference between estimated and reference z-statistic") + xlab("Reference z-statistic") + geom_line(aes(x=expectedz, y=0), colour="black") + geom_line() + geom_point(size=1) 
+p + geom_ribbon(aes(x=expectedz, ymin=z_lower-expectedz, ymax=z_upper-expectedz), fill="grey", alpha=.2, colour=NA) + facet_grid( unitMismatch +soft2 +soft2Factor +Between~methods+nStudies) + theme(strip.text.x = element_text(size = 16)) + ylab("Difference between estimated and reference z-statistic") + xlab("Reference z-statistic") + geom_line(aes(x=expectedz, y=0), colour="black") + geom_line() + geom_point(size=1)
 
 + geom_smooth(method = "loess", fill=NA, size=1) + xlim(0, 3.4) + ylim(-0.05, 0.05)
 

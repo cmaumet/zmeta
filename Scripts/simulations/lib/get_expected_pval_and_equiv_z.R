@@ -1,5 +1,5 @@
 # Load first simulation
-tot_num_simu = 71
+tot_num_simu = 71+65+10
 
 suffix <- "tom"
 
@@ -13,7 +13,7 @@ simudat$lnp <- -simudat$minuslog10P*log(10)
 # It is easier to work with the equiv z stat
 simudat$equivz <- qnorm(simudat$lnp, lower.tail = FALSE, log.p = TRUE)
 
-simudat$allgroups <- paste(simudat$Between, simudat$Within, simudat$nStudies, simudat$nSimu, simudat$numSubjectScheme, simudat$varScheme)
+simudat$allgroups <- paste(simudat$Between, simudat$Within, simudat$nStudies, simudat$nSimu, simudat$numSubjectScheme, simudat$varScheme, simudat$soft2, simudat$soft2Factor, as.character(simudat$unitMismastch))
 
 # newsimudat$expectedp <- newsimudat$rankp/newsimudat$nSimu
 simudat$expectedz <- qnorm(simudat$expectedP, lower.tail = FALSE)

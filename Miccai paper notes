@@ -10,23 +10,20 @@ validity... unless we look at not symmetric error dist (bof!)
 
 	- How bad is the units issue? (only for contrast [+sderr] based):
    		+ dramatic: 100 / 10 000 (not accounting for different in target across software)
-   		+ cross-software differences in normalisation procedure: 1/1.5
+   		+ cross-software differences in normalisation procedure: 1/2
    		+ cross-studies differences: 1 to 4 (contrast weights or design matrix)
    		=> here we also need to test the gold standard because we are violating an assumption
-   		=> we need to add a constand in the one-sample glm
 
 Note: si on considère que gold standard is MFX GLM, cela signifie qu'on ne 
 s'intéresse pas aux cas où l'erreur est non normale.
 
 
+Unit mismatch: todo check what happens with smaller factor for soft2
+
 *** Simulations ***
 
 
 -------------------------------------------------------------------------------
-TODO:
-- revoir figures avec Weighted Stouffer's et Z MFX
-
-
 Miccai paper notes
 
 Probably not possible to have a look at two-sample t-tests right now... But what will we have as a conclusion??? standard z-based methods really bad at dealig with RFX. As for one-sample on BOLD fMRI GLM OLS (RFX) seems pretty robust as are permutation based approches.
