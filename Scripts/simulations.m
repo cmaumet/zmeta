@@ -63,13 +63,6 @@ function simulations(baseDir)
         
         % Cross-studies unit mismatch
         for iUnitMisMatch = unitMismatch
-            if iUnitMisMatch
-                % Uniformly distributed beween 0.4 and 1.6 included, so that 
-                % mean(unitFactor) = 1 and 1.6/0.4=4
-                unitFactor = randi([1 4], 1, nStudies)/2.5;%linspace(AVG_NUM_SUB/2,AVG_NUM_SUB*2,nStudies);
-            else
-                unitFactor = ones(1, nStudies);
-            end
 
             % Cross-software unit mismatch
             for iSigmaFactorSoftware = sigmaFactorWithSoftware2
@@ -83,6 +76,14 @@ function simulations(baseDir)
                             ', factor software=' num2str(iSigmaFactorSoftware) ...                            
                             ])
                         continue;
+                    end
+                    
+                    if iUnitMisMatch
+                        % Uniformly distributed beween 0.4 and 1.6 included, so that 
+                        % mean(unitFactor) = 1 and 1.6/0.4=4
+                        unitFactor = randi([1 4], 1, nStudies)/2.5;%linspace(AVG_NUM_SUB/2,AVG_NUM_SUB*2,nStudies);
+                    else
+                        unitFactor = ones(1, nStudies);
                     end
                     
                     studiesWithSofware = ones(nStudies, 1);
