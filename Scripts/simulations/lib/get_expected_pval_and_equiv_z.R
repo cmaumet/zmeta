@@ -1,7 +1,7 @@
 # Load first simulation
-tot_num_simu = 71+65+10
-
 suffix <- "tom"
+
+tot_num_simu = length(list.files(paste('../../../data/simulations/csv_', suffix, sep=''), pattern='simu_all.*csv'))
 
 for (simunum in seq(1, tot_num_simu)){
 	print(paste('Reading ',paste('../../../data/simulations/csv_', suffix,'/simu_all_', as.character(simunum), '.csv',sep="")))
