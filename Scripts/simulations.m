@@ -10,23 +10,23 @@ function simulations(baseDir)
     % Number of subject per study
 %     nSubjects = [25 400 100 25]; %[10, 15, 20, 25, 30, 10, 15, 20, 25, 30, 10, 15, 20, 25, 30];
 %     nStudies = numel(nSubjects);
-    nStudiesArray = [5 10 25 50];
+    nStudiesArray = 10%[5 10 25 50];
     AVG_NUM_SUB = 20;
     NUM_SUB_DIFF = 15;
-    sigmaSquareArray = [0.25, 0.5, 1, 2, 4]*AVG_NUM_SUB;%How to compute z with var = 0?
+    sigmaSquareArray = 0.25%[0.25, 0.5, 1, 2, 4]*AVG_NUM_SUB;%How to compute z with var = 0?
     studyVarianceSchemes = {'identical'} %, 'different'}; don't know yet how to deal with uneq var (for FFX!?)
     
     % Between-studies variance (RFX?)
-    sigmaBetweenStudiesArray = [0 1];
+    sigmaBetweenStudiesArray = 1%[0 1];
     
     % Number of subjects per studies     
-    subjectPerStudiesScheme = {'identical', 'different'};
+    subjectPerStudiesScheme = {'identical'}%, 'different'};
     
     % Number of studies with software 2 (fraction)
-    nStudiesWithSoftware2 = [0 0.5 4/5];
+    nStudiesWithSoftware2 = [0 1/5 0.5 4/5];
     
     % Correction factor with software 2
-    sigmaFactorWithSoftware2 = [1 2 100];
+    sigmaFactorWithSoftware2 = [0.1 0.5 1 2 100];
     
     % Study-specific bias due to units mismatch
     unitMismatch = [false, true];

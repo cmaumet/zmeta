@@ -6,13 +6,15 @@ allsimudat_tom <- read.csv('../../../allsimudat_tom.csv', header=T, sep=" ")
 
 allsimudat <- allsimudat_tom
 
-data_subset <- subset(allsimudat, expectedz>0 & nStudies==10 & Between==1 & numSubjectScheme=="identical" & (allsimudat $methods %in% levels(allsimudat $methods)[c(3,4,5,7)]))
-#  & methods=="stouffersMFX"
+data_subset <- subset(allsimudat, expectedz>0 & nStudies == 10 &  (as.logical(unitMismatch)==FALSE) & (allsimudat$methods %in% levels(allsimudat $methods)[c(3,4,5,7)]) & soft2!=0.5)
+
+ # methods=="megaRFX"
+
 
 #methods=="permutCon" & Between==1 & nStudies==50 & numSubjectScheme=="identical" & varScheme=="identical" & Within==5)
 #
 
-# With the plot below, we can check if things went wrong (i.e. expected z-stat not inscremental)
+# With the plot below, we can check if things went wrong (i.e. expected z-stat not incremental)
 p <- ggplot(data_subset, aes(as.factor(equivz), expectedz, colour=factor(paste(Within))))
 p + geom_boxplot() + stat_summary(fun.y=mean, colour="red", geom="point", shape=18, size=3,show_guide = FALSE) + facet_grid(methods+Between ~ nStudies+ numSubjectScheme) 
 
