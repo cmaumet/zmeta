@@ -20,9 +20,12 @@ p <- ggplot(data_subset, aes(as.factor(equivz), equivz-expectedz, colour=factor(
 
 
 # Bland-Altman like
-p <- ggplot(data= data_subset, aes(x=expectedz, y=equivz-expectedz, group=allgroups, colour=factor(paste(Within))))
+p <- ggplot(data=data_subset,aes(x=expectedz, y=equivz-expectedz, group=allgroups, colour=factor(paste(Within))))
+p + geom_ribbon(aes(x=expectedz, ymin=z_lower-expectedz, ymax=z_upper-expectedz), fill="grey", alpha=.2, colour=NA) + facet_grid( methods+nStudies+ soft2 ~unitMismatch  +soft2Factor ) + theme(strip.text.x = element_text(size = 16)) + ylab("Difference between estimated and reference z-statistic") + xlab("Reference z-statistic") + geom_line(aes(x=expectedz, y=0), colour="black") + geom_line() + geom_point(size=1)
 
-p + geom_ribbon(aes(x=expectedz, ymin=z_lower-expectedz, ymax=z_upper-expectedz), fill="grey", alpha=.2, colour=NA) + facet_grid( unitMismatch +soft2 +soft2Factor +Between~methods+nStudies) + theme(strip.text.x = element_text(size = 16)) + ylab("Difference between estimated and reference z-statistic") + xlab("Reference z-statistic") + geom_line(aes(x=expectedz, y=0), colour="black") + geom_line() + geom_point(size=1)
+# To be able to do boxplots we need to store all values... otherwise as digits -> infinity we get smaller and smaller box plots...
+# digits <- 1
+# + geom_boxplot(aes(x=(round(expectedz, digits)), y=equivz-expectedz, group=paste(allgroups,factor(round(expectedz, digits))) , colour=factor(paste(Within))))
 
 + geom_smooth(method = "loess", fill=NA, size=1) + xlim(0, 3.4) + ylim(-0.05, 0.05)
 
