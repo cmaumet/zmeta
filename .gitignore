@@ -24,7 +24,7 @@ unused*
 *.m~
 
 # matlab data files
-*.mat
+# *.mat (we need these for fsl design matrix files...)
 
 # neuroimaging images
 *.nii
@@ -33,6 +33,8 @@ unused*
 
 # data
 data/*
+fsl_design/*.ppm
+fsl_design/*.fsf
 
 # R autosaved files
 *(Autosaved).R

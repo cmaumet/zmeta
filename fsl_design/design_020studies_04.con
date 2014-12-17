@@ -1,0 +1,14 @@
+/ContrastName1	group A > group B 
+/ContrastName2	group B > group A 
+/ContrastName3	group A mean 
+/ContrastName4	group B mean 
+/NumWaves	2
+/NumContrasts	4
+/PPheights		1.000000e+00	1.000000e+00	1.000000e+00	1.000000e+00
+/RequiredEffect		3.109	3.109	2.781	1.391
+
+/Matrix
+1.000000e+00 -1.000000e+00 
+-1.000000e+00 1.000000e+00 
+1.000000e+00 0.000000e+00 
+0.000000e+00 1.000000e+00 
