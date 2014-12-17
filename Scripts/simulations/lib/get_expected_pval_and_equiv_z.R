@@ -1,5 +1,6 @@
 # Load first simulation
 suffix <- "tom"
+remove(allsimudat)
 
 study_dirs = dir('../../../data/simulations/', pattern="nStudy.*")
 
@@ -12,6 +13,7 @@ for (simunum in seq(tot_num_simu, 1, -1)){
 	simu_file = paste('../../../data/simulations/', study_dirs[simunum],'/simu.csv',sep="")
 	
 	if (! file.exists(simu_file)){
+		print(paste('/!\ ', simu_file, 'does not exist.'))			
 		next
 	}
 	
@@ -28,9 +30,9 @@ simudat$allgroups <- paste(simudat$Between, simudat$Within, simudat$nStudies, si
 # newsimudat$expectedp <- newsimudat$rankp/newsimudat$nSimu
 simudat$expectedz <- qnorm(simudat$expectedP, lower.tail = FALSE)
 
-if (simunum == 1)
+if (! exists("allsimudat"))
 {
-	allsimudat <-simudat
+	allsimudat <- simudat
 } else
 {
 	allsimudat <-rbind(allsimudat,simudat)
