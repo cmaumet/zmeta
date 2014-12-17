@@ -1,11 +1,21 @@
 # Load first simulation
 suffix <- "tom"
 
-tot_num_simu = length(list.files(paste('../../../data/simulations/csv_', suffix, sep=''), pattern='simu_all.*csv'))
+study_dirs = dir('../../../data/simulations/', pattern="nStudy.*")
 
-for (simunum in seq(1, tot_num_simu)){
-	print(paste('Reading ',paste('../../../data/simulations/csv_', suffix,'/simu_all_', as.character(simunum), '.csv',sep="")))
-simudat <- read.csv(paste('../../../data/simulations/csv_', suffix,'/simu_all_', as.character(simunum), '.csv',sep=""), header=T)
+tot_num_simu = length(study_dirs)
+
+print(paste(tot_num_simu, "simulations"))
+
+for (simunum in seq(tot_num_simu, 1, -1)){
+	print(paste('Reading ', simunum, ' / ', tot_num_simu))	
+	simu_file = paste('../../../data/simulations/', study_dirs[simunum],'/simu.csv',sep="")
+	
+	if (! file.exists(simu_file)){
+		next
+	}
+	
+simudat <- read.csv(simu_file, header=T)
 
 # qnorm works with natural log (and not base 10)
 simudat$lnp <- -simudat$minuslog10P*log(10)
