@@ -5,14 +5,13 @@ library('ggplot2')
 allsimudat_tom <- read.csv('../../../allsimudat_tom.csv', header=T, sep=" ")
 
 allsimudat <- allsimudat_tom
-allsimudat$unitMismatch <- as.character(allsimudat$unitMismatch)
-allsimudat$unitMismatch[allsimudat$unitMismatch=="0"]=FALSE
-allsimudat$unitMismatch[allsimudat$unitMismatch=="false"]=FALSE
-allsimudat$unitMismatch[allsimudat$unitMismatch=="true"]=TRUE
 
-data_subset <- subset(allsimudat, expectedz>0 & nStudies == 10 &  methods=="megaRFX")
 
-(allsimudat$methods %in% levels(allsimudat $methods)[c(3,4,5,6,8)]))
+data_subset <- subset(allsimudat, expectedz>0 & Within==0.25*20 & nStudies == 10 &  !(allsimudat$methods %in% c("megaMFX","megaRFX","permutCon","permutZ","stouffersMFX")) & !(allsimudat$methods %in% c("megaFFX"))
+
+methods=="megaRFX")
+
+
 
  # 
 
