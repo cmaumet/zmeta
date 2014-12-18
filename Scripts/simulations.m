@@ -10,10 +10,10 @@ function simulations(baseDir)
     % Number of subject per study
 %     nSubjects = [25 400 100 25]; %[10, 15, 20, 25, 30, 10, 15, 20, 25, 30, 10, 15, 20, 25, 30];
 %     nStudies = numel(nSubjects);
-    nStudiesArray = 10%[5 10 25 50];
+    nStudiesArray = [10 5 25 50];
     AVG_NUM_SUB = 20;
     NUM_SUB_DIFF = 15;
-    sigmaSquareArray = [0.25, 0.5, 1, 2, 4]*AVG_NUM_SUB;%How to compute z with var = 0?
+    sigmaSquareArray = AVG_NUM_SUB*[0.25, 0.5, 1, 2, 4];%How to compute z with var = 0?
     studyVarianceSchemes = {'identical'} %, 'different'}; don't know yet how to deal with uneq var (for FFX!?)
     
     % Between-studies variance (RFX?)
@@ -157,15 +157,32 @@ function simulations(baseDir)
                                     weightedZDir = fullfile(simulationDir, 'weightedZ');
                                     megaRfxDir = fullfile(simulationDir, 'megaRFX');
                                     megaFfxDir = fullfile(simulationDir, 'megaFFX');
+                                    megaFfxFslDir = fullfile(simulationDir, 'megaFFX_FSL');
+                                    megaMfxDir = fullfile(simulationDir, 'megaMFX');
                                     permutConDir = fullfile(simulationDir, 'permutCon');
                                     permutZDir = fullfile(simulationDir, 'permutZ');
 
                                     if isdir(simulationDir)
                                         already_existing = true;
                                         for iStudy = 1:nStudies
-                                            conFiles{iStudy} = fullfile(dataDir, ['con_st' num2str(iStudy) '.nii']);
-                                            varConFiles{iStudy} = fullfile(dataDir, ['varcon_st' num2str(iStudy) '.nii']);
-                                            zFiles{iStudy} = fullfile(dataDir, ['z_st' num2str(iStudy) '.nii']);
+                                            conFiles{iStudy} = fullfile(dataDir, ['con_st' num2str(iStudy, '%03d') '.nii']);
+                                            if ~exist(conFiles{iStudy}, 'file')
+                                                old_confile = fullfile(dataDir, ['con_st' num2str(iStudy) '.nii']);
+                                                copyfile(old_confile, conFiles{iStudy})
+                                                delete(old_confile)
+                                            end
+                                            varConFiles{iStudy} = fullfile(dataDir, ['varcon_st' num2str(iStudy, '%03d') '.nii']);
+                                            if ~exist(varConFiles{iStudy}, 'file')
+                                                old_varfile = fullfile(dataDir, ['varcon_st' num2str(iStudy) '.nii']);
+                                                copyfile(old_varfile, varConFiles{iStudy})
+                                                delete(old_varfile)
+                                            end
+                                            zFiles{iStudy} = fullfile(dataDir, ['z_st' num2str(iStudy, '%03d') '.nii']);
+                                            if ~exist(zFiles{iStudy}, 'file')
+                                                old_zfile = fullfile(dataDir, ['z_st' num2str(iStudy) '.nii']);
+                                                copyfile(old_zfile, zFiles{iStudy})
+                                                delete(old_zfile)
+                                            end
                                         end
                                     else
                                         already_existing = false;
@@ -201,16 +218,17 @@ function simulations(baseDir)
                                             % Estimated variance (from chi square distribution)
                         %                     estimatedSigmaSquare = var(estimatedSubContrast, 0, 4);
                                             estimatedSigmaSquare = chi2rnd(dof, [nSimuOneDir, nSimuOneDir, nSimuOneDir])*sigmaSquare*varAlpha(iStudy)/dof;
+                                            estimatedVarContrast = estimatedSigmaSquare./nSubjects(iStudy);
                                             
                                             % units correction
                                             estimatedContrast = estimatedContrast*unitFactor(iStudy);
-                                            estimatedSigmaSquare = estimatedSigmaSquare*(unitFactor(iStudy)^2);
+                                            estimatedVarContrast = estimatedVarContrast*(unitFactor(iStudy)^2);
                                             
                                             
                 %                             estimatedSigmaSquare = estimatedSigmaSquare./nSubjects(iStudy);
 
                                             % Write out parameter estimates.      
-                                            conFiles{iStudy} = fullfile(dataDir, ['con_st' num2str(iStudy) '.nii']);
+                                            conFiles{iStudy} = fullfile(dataDir, ['con_st' num2str(iStudy, '%03d') '.nii']);
                                             vol    = struct('fname',  conFiles{iStudy},...
                                                        'dim',    [nSimuOneDir nSimuOneDir nSimuOneDir],...
                                                        'dt',     [spm_type('float32') spm_platform('bigend')],...
@@ -221,19 +239,19 @@ function simulations(baseDir)
                                             spm_write_vol(vol, estimatedContrast);
 
                                             % Write out estimated variance of parameter estimates.
-                                            varConFiles{iStudy} = fullfile(dataDir, ['varcon_st' num2str(iStudy) '.nii']);
+                                            varConFiles{iStudy} = fullfile(dataDir, ['varcon_st' num2str(iStudy, '%03d') '.nii']);
                                             vol.fname =  varConFiles{iStudy};
-                                            spm_write_vol(vol, estimatedSigmaSquare);
+                                            spm_write_vol(vol, estimatedVarContrast);
 
                                             % Write out corresponding z-values.
-                                            zFiles{iStudy} = fullfile(dataDir, ['z_st' num2str(iStudy) '.nii']);
+                                            zFiles{iStudy} = fullfile(dataDir, ['z_st' num2str(iStudy, '%03d') '.nii']);
                                             vol.fname = zFiles{iStudy};
 
                                             % Z-transform of T-statistic
-                                            zData = norminv(cdf('T', estimatedContrast./sqrt(estimatedSigmaSquare./nSubjects(iStudy)), nSubjects(iStudy)-1));
+                                            zData = norminv(cdf('T', estimatedContrast./sqrt(estimatedVarContrast), nSubjects(iStudy)-1));
                                             infPos = find(isinf(zData(:)));
 
-                                            zData(infPos) = -norminv(cdf('T', -estimatedContrast(infPos)./sqrt(estimatedSigmaSquare(infPos)./nSubjects(iStudy)), nSubjects(iStudy)-1));
+                                            zData(infPos) = -norminv(cdf('T', -estimatedContrast(infPos)./sqrt(estimatedVarContrast(infPos)), nSubjects(iStudy)-1));
                                             spm_write_vol(vol, zData);                                             
                                         end
                                         mkdir(fisherDir);
@@ -244,79 +262,121 @@ function simulations(baseDir)
                                         mkdir(megaFfxDir);
                                         mkdir(permutConDir);                            
                                         mkdir(permutZDir);   
+                                        mkdir(megaMfxDir);   
+                                        mkdir(megaFfxFslDir);
                                     end  
 
                                     % --- Compute meta-analysis ---
-                                    if ~already_existing
-                                        matlabbatch = {};
-                                        % Fisher's
-                                        matlabbatch{1}.spm.tools.ibma.fishers.dir = {fisherDir};
-                                        matlabbatch{1}.spm.tools.ibma.fishers.zimages = zFiles;
+                                    matlabbatch = {};
+                                    % Fisher's
+                                    matlabbatch{1}.spm.tools.ibma.fishers.dir = {fisherDir};
+                                    matlabbatch{1}.spm.tools.ibma.fishers.zimages = zFiles;
 
-                                        % Stouffer's
+                                    % Stouffer's
+                                    if ~exist(fullfile(stoufferDir, 'stouffers_ffx_minus_log10_p.nii'), 'file')
                                         matlabbatch{end+1}.spm.tools.ibma.stouffers.dir = {stoufferDir};
                                         matlabbatch{end}.spm.tools.ibma.stouffers.zimages = zFiles;
                                         matlabbatch{end}.spm.tools.ibma.stouffers.rfx.RFX_no = 1;
+                                    else
+                                        disp('Stouffer''s already computed')
+                                    end
 
-                                        % Stouffer's MFX
+                                    % Stouffer's MFX
+                                    if ~exist(fullfile(stoufferMFXDir, 'stouffers_rfx_minus_log10_p.nii'), 'file')
                                         matlabbatch{end+1}.spm.tools.ibma.stouffers.dir = {stoufferMFXDir};
                                         matlabbatch{end}.spm.tools.ibma.stouffers.zimages = zFiles;
                                         matlabbatch{end}.spm.tools.ibma.stouffers.rfx.RFX_yes = 0;
+                                    else
+                                        disp('Stouffer''s MFX already computed')
+                                    end
 
-                                        % Optimally weighted z
+                                    % Optimally weighted z
+                                    if ~exist(fullfile(weightedZDir, 'weightedz_ffx_minus_log10_p.nii'), 'file')
                                         matlabbatch{end+1}.spm.tools.ibma.weightedz.dir = {weightedZDir};
                                         matlabbatch{end}.spm.tools.ibma.weightedz.zimages = zFiles;
                                         matlabbatch{end}.spm.tools.ibma.weightedz.nsubjects = nSubjects;
+                                    else
+                                        disp('Weighted Z already computed')
+                                    end
 
-                                        % Mega-analysis RFX
+                                    % Mega-analysis RFX
+                                    if ~exist(fullfile(megaRfxDir, 'mega_rfx_minus_log10_p.nii'), 'file')
                                         matlabbatch{end+1}.spm.tools.ibma.megarfx.dir = {megaRfxDir};
                                         matlabbatch{end}.spm.tools.ibma.megarfx.confiles = conFiles;
+                                    else
+                                        disp('Mega RFX already computed')
+                                    end
 
-                                        % Mega-analysis FFX
-                                        matlabbatch{end+1}.spm.tools.ibma.megaffx.dir = {megaFfxDir};
-                                        if length(unique(nSubjects)) == 1
-                                            matlabbatch{end}.spm.tools.ibma.megaffx.samplesize.equal.nsubjects = unique(nSubjects);
-                                        else
-                                            matlabbatch{end}.spm.tools.ibma.megaffx.samplesize.unequal.nsubjects = nSubjects;
-                                        end
-                                        matlabbatch{end}.spm.tools.ibma.megaffx.variances.equal = true;
+%                                     % Mega-analysis FFX
+%                                     if ~exist(fullfile(megaFfxDir, 'mega_ffx_ffx_minus_log10_p.nii'), 'file')
+%                                         matlabbatch{end+1}.spm.tools.ibma.megaffx.dir = {megaFfxDir};
+%                                         if length(unique(nSubjects)) == 1
+%                                             matlabbatch{end}.spm.tools.ibma.megaffx.samplesize.equal.nsubjects = unique(nSubjects);
+%                                         else
+%                                             matlabbatch{end}.spm.tools.ibma.megaffx.samplesize.unequal.nsubjects = nSubjects;
+%                                         end
+%                                         matlabbatch{end}.spm.tools.ibma.megaffx.variances.equal = true;
+% 
+%                                         matlabbatch{end}.spm.tools.ibma.megaffx.confiles = conFiles;
+%                                         matlabbatch{end}.spm.tools.ibma.megaffx.varconfiles = varConFiles;
+%                                     else
+%                                         disp('Mega FFX already computed')
+%                                     end
 
-                                        matlabbatch{end}.spm.tools.ibma.megaffx.confiles = conFiles;
-                                        matlabbatch{end}.spm.tools.ibma.megaffx.varconfiles = varConFiles;
-
-                                        % Permutation on conFiles
+                                    % Permutation on conFiles
+                                    if ~exist(fullfile(permutConDir, 'lP+.hdr'), 'file')
                                         matlabbatch{end+1}.spm.tools.snpm.des.OneSampT.DesignName = 'MultiSub: One Sample T test on diffs/contrasts';
                                         matlabbatch{end}.spm.tools.snpm.des.OneSampT.DesignFile = 'snpm_bch_ui_OneSampT';
                                         matlabbatch{end}.spm.tools.snpm.des.OneSampT.dir = {permutConDir};
                                         matlabbatch{end}.spm.tools.snpm.des.OneSampT.P = conFiles;
                                         matlabbatch{end+1}.spm.tools.snpm.cp.snpmcfg = {fullfile(permutConDir, 'SnPMcfg.mat')};
+                                    else
+                                        disp('Permutation on contrast files already computed')
+                                    end
 
-                                        % Permutation on zFiles
+                                    % Permutation on zFiles
+                                    if ~exist(fullfile(permutZDir, 'lP+.hdr'), 'file')
                                         matlabbatch{end+1}.spm.tools.snpm.des.OneSampT.DesignName = 'MultiSub: One Sample T test on diffs/contrasts';
                                         matlabbatch{end}.spm.tools.snpm.des.OneSampT.DesignFile = 'snpm_bch_ui_OneSampT';
                                         matlabbatch{end}.spm.tools.snpm.des.OneSampT.dir = {permutZDir};
                                         matlabbatch{end}.spm.tools.snpm.des.OneSampT.P = zFiles;
                                         matlabbatch{end+1}.spm.tools.snpm.cp.snpmcfg = {fullfile(permutZDir, 'SnPMcfg.mat')};
-
-                                        spm_jobman('run', matlabbatch)
-
-                                        simu.config.nSubjectsScheme = subjectNumberScheme;
-                                        simu.config.nSubjects = nSubjects;
-                                        simu.config.studyVarianceScheme = studyVarianceScheme;
-                                        simu.config.varAlpha = varAlpha;
-                                        simu.config.nStudies = nStudies;
-                                        simu.config.sigmaSquare = sigmaSquare;
-                                        simu.config.sigmaBetweenStudies = sigmaBetweenStudies;
-                                        simu.config.nSimuOneDir = nSimuOneDir;
-                                        simu.config.nStudiesWithSoftware2 = iStudiesWithSoftware2;
-                                        simu.config.sigmaFactorWithSoftware2 = iSigmaFactorSoftware;
-                                        simu.config.unitMismatch = iUnitMisMatch;
-                                        simu.config.unitFactor = unitFactor;
-
-                                        simu.config.timing = toc;
-
-                                        save(fullfile(simulationDir, 'simu.mat'), 'simu')
+                                    else
+                                        disp('Permutation on Z already computed')
                                     end
+
+                                    spm_jobman('run', matlabbatch)
+
+                                    % GLM MFX
+                                    if ~exist(fullfile(megaMfxDir,'mega_mfx_minus_log10_p.nii'), 'file')
+                                        run_fsl_mfx(dataDir, megaMfxDir, true, nSubjects, nStudies)
+                                    else
+                                        disp('Mega MFX (FSL) already computed')
+                                    end
+
+                                    % GLM FFX (via FSL)
+                                    if ~exist(fullfile(megaFfxFslDir,'mega_ffx_minus_log10_p.nii'), 'file')
+                                        run_fsl_ffx(dataDir, megaFfxFslDir, true, nSubjects, nStudies)
+                                    else
+                                        disp('Mega FFX (FSL) already computed')
+                                    end
+                                    
+                                    simu.config.nSubjectsScheme = subjectNumberScheme;
+                                    simu.config.nSubjects = nSubjects;
+                                    simu.config.studyVarianceScheme = studyVarianceScheme;
+                                    simu.config.varAlpha = varAlpha;
+                                    simu.config.nStudies = nStudies;
+                                    simu.config.sigmaSquare = sigmaSquare;
+                                    simu.config.sigmaBetweenStudies = sigmaBetweenStudies;
+                                    simu.config.nSimuOneDir = nSimuOneDir;
+                                    simu.config.nStudiesWithSoftware2 = iStudiesWithSoftware2;
+                                    simu.config.sigmaFactorWithSoftware2 = iSigmaFactorSoftware;
+                                    simu.config.unitMismatch = iUnitMisMatch;
+                                    simu.config.unitFactor = unitFactor;
+
+                                    simu.config.timing = toc;
+
+                                    save(fullfile(simulationDir, 'simu.mat'), 'simu')
                                 end
                             end
                         end

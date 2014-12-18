@@ -5,10 +5,16 @@ library('ggplot2')
 allsimudat_tom <- read.csv('../../../allsimudat_tom.csv', header=T, sep=" ")
 
 allsimudat <- allsimudat_tom
+allsimudat$unitMismatch <- as.character(allsimudat$unitMismatch)
+allsimudat$unitMismatch[allsimudat$unitMismatch=="0"]=FALSE
+allsimudat$unitMismatch[allsimudat$unitMismatch=="false"]=FALSE
+allsimudat$unitMismatch[allsimudat$unitMismatch=="true"]=TRUE
 
-data_subset <- subset(allsimudat, expectedz>0 & nStudies == 10 &  (as.logical(unitMismatch)==FALSE) & (allsimudat$methods %in% levels(allsimudat $methods)[c(3,4,5,7)]) & soft2!=0.5)
+data_subset <- subset(allsimudat, expectedz>0 & nStudies == 10 &  methods=="megaRFX")
 
- # methods=="megaRFX"
+(allsimudat$methods %in% levels(allsimudat $methods)[c(3,4,5,6,8)]))
+
+ # 
 
 
 #methods=="permutCon" & Between==1 & nStudies==50 & numSubjectScheme=="identical" & varScheme=="identical" & Within==5)
@@ -23,7 +29,7 @@ p <- ggplot(data_subset, aes(as.factor(equivz), equivz-expectedz, colour=factor(
 
 # Bland-Altman like
 p <- ggplot(data=data_subset,aes(x=expectedz, y=equivz-expectedz, group=allgroups, colour=factor(paste(Within))))
-p + geom_ribbon(aes(x=expectedz, ymin=z_lower-expectedz, ymax=z_upper-expectedz), fill="grey", alpha=.2, colour=NA) + facet_grid( methods+nStudies+ soft2 ~unitMismatch  +soft2Factor ) + theme(strip.text.x = element_text(size = 16)) + ylab("Difference between estimated and reference z-statistic") + xlab("Reference z-statistic") + geom_line(aes(x=expectedz, y=0), colour="black") + geom_line() + geom_point(size=1)
+p + geom_ribbon(aes(x=expectedz, ymin=z_lower-expectedz, ymax=z_upper-expectedz), fill="grey", alpha=.2, colour=NA) + facet_grid(Between + methods~soft2 +unitMismatch+soft2Factor  ) + theme(strip.text.x = element_text(size = 16)) + ylab("Difference between estimated and reference z-statistic") + xlab("Reference z-statistic") + geom_line(aes(x=expectedz, y=0), colour="black") + geom_line() + geom_point(size=1)
 
 # To be able to do boxplots we need to store all values... otherwise as digits -> infinity we get smaller and smaller box plots...
 # digits <- 1

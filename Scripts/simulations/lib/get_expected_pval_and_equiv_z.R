@@ -49,6 +49,12 @@ allsimudat$z_upper <- qnorm(allsimudat$p_upper, lower.tail=FALSE)
 allsimudat$p_lower <- qbeta(0.975, allsimudat$rankP, allsimudat$nSimu-allsimudat$rankP +1)
 allsimudat$z_lower <- qnorm(allsimudat$p_lower, lower.tail=FALSE)
 
+
+allsimudat$unitMismatch <- as.character(allsimudat$unitMismatch)
+allsimudat$unitMismatch[allsimudat$unitMismatch=="0"]=FALSE
+allsimudat$unitMismatch[allsimudat$unitMismatch=="false"]=FALSE
+allsimudat$unitMismatch[allsimudat$unitMismatch=="true"]=TRUE
+
 write.table(allsimudat,file=paste('../../../allsimudat_', suffix,'.csv', sep=""),row.names=F)
 
 

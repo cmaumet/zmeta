@@ -22,6 +22,9 @@ Unit mismatch: todo check what happens with smaller factor for soft2
 
 *** Simulations ***
 
+TODO:
+- estimation of Si2 is wrong in Miccai: this is study variance but not var cope (study variance = varcope * n_subjects)
+
 
 -------------------------------------------------------------------------------
 Miccai paper notes
