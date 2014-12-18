@@ -1,4 +1,5 @@
 function simulations(baseDir)
+    set_fsl_env()
 % SIMULATIONS    Perform simulations based on IBMA toolbox. 
 %
 %   simulations(baseDir)
