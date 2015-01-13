@@ -1,4 +1,4 @@
-function run_fsl_ffx(datadir, wd, onesample, nSubjects, nStudies)
+function run_fsl_ffx(datadir, wd, analysisType, nSubjects, nStudies)
     cwd = pwd;
     
     if ~isdir(wd)
@@ -6,8 +6,12 @@ function run_fsl_ffx(datadir, wd, onesample, nSubjects, nStudies)
     end
     cd(wd)
     
-    if onesample
+    if analysisType == 1
         design = ['design_ones_' num2str(nStudies, '%02d') 'st'];
+    elseif analysisType == 2
+        design = ['design_' num2str(nStudies*2, '%03d') 'studies_' num2str(nStudies, '%02d') '_equal'];        
+    elseif analysisType == 3
+        design = ['design_' num2str(nStudies*2, '%03d') 'studies_' num2str(nStudies*2/5, '%02d') '_equal'];
     end
     prepare_fsl_data(datadir, wd, nSubjects, design)
     
