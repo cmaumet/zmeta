@@ -6,8 +6,45 @@ allsimudat_tom <- read.csv('../../../allsimudat_tom.csv', header=T, sep=" ")
 
 allsimudat <- allsimudat_tom
 
+facet_labeller <- function(var, value){
+    value <- as.character(value)
+    if (var=="unitMismatch") { 
+        value[value=="FALSE"] <- "different software"    	
+        value[value=="TRUE"] <- "contrast & design matrix"    	        
+    } else if (var=="soft2Factor") { 
+        value[value==1] <- "none"    	
+        value[value==2] <- "algorithm"    	        
+        value[value==100] <- "baseline"    	        
+    } else if (var=="soft2") { 
+        value <- paste(as.numeric(value)*100, "%")
+    } else if (var=="methods") { 
+        value[value=="megaMFX"] <- "MFX"    	
+        value[value=="megaRFX"] <- "RFX"    	    
+        value[value=="permutCon"] <- "Perm. E"
+        value[value=="permutZ"] <- "Perm. Z"            	    
+        value[value=="stouffersMFX"] <- "Stouf."            	            
+    } 
+    return(value)
+}
 
-data_subset <- subset(allsimudat, expectedz>0 & Within==0.25*20 & nStudies == 10 &  !(allsimudat$methods %in% c("megaMFX","megaRFX","permutCon","permutZ","stouffersMFX")) & !(allsimudat$methods %in% c("megaFFX"))
+data_subset <- subset(allsimudat, expectedz>0 &  nStudies>10 & Between==1 &  (allsimudat$methods %in% c("megaMFX","megaRFX","permutCon","permutZ","stouffersMFX"))  & !(allsimudat$methods %in% c("megaFFX")) & glm==1)
+
+subplot=list()
+titles=list()
+
+titles[[1]] <- "Nominal"
+subplot[[1]] <- subset(data_subset, soft2==0 & unitMismatch=="FALSE")
+
+titles[[2]] <- "Data scaling: different baseline"
+subplot[[2]] <- subset(data_subset, soft2Factor==100)
+
+titles[[3]] <- "Data scaling: different baseline"
+subplot[[3]] <- subset(data_subset, soft2>0 & soft2Factor!=100)
+
+titles[[4]] <- "Contrast vector scaling"
+subplot[[4]] <- subset(data_subset, soft2==0 & unitMismatch=="TRUE")
+
+
 
 methods=="megaRFX")
 
@@ -27,8 +64,19 @@ p <- ggplot(data_subset, aes(as.factor(equivz), equivz-expectedz, colour=factor(
 
 
 # Bland-Altman like
-p <- ggplot(data=data_subset,aes(x=expectedz, y=equivz-expectedz, group=allgroups, colour=factor(paste(Within))))
-p + geom_ribbon(aes(x=expectedz, ymin=z_lower-expectedz, ymax=z_upper-expectedz), fill="grey", alpha=.2, colour=NA) + facet_grid(Between + methods~soft2 +unitMismatch+soft2Factor  ) + theme(strip.text.x = element_text(size = 16)) + ylab("Difference between estimated and reference z-statistic") + xlab("Reference z-statistic") + geom_line(aes(x=expectedz, y=0), colour="black") + geom_line() + geom_point(size=1)
+subpl=list()
+
+
+for (i in 1:4){
+	subpl[[i]] <- ggplot(data=subplot[[i]],aes(x=expectedz, y=equivz-expectedz, group=allgroups, colour=Within)))
+	
+	subpl[[i]] <- subpl[[i]] + geom_ribbon(aes(x=expectedz, ymin=z_lower-expectedz, ymax=z_upper-expectedz), fill="grey", alpha=.2, colour=NA) + facet_grid(soft2~ methods, labeller=facet_labeller) + theme(strip.text.x = element_text(size = 10)) + ylab("Estimated - reference Z") + xlab("Reference Z") + geom_line(aes(x=expectedz, y=0), colour="black") + geom_line() + geom_point(size=0.5) + ggtitle(titles[[i]])
+	
+	# subpl[[i]] <- subpl[[i]] + geom_ribbon(aes(x=expectedz, ymin=z_lower-expectedz, ymax=z_upper-expectedz), fill="grey", alpha=.2, colour=NA) + facet_grid(Between + methods + nStudies + glm ~ unitMismatch+soft2Factor+ soft2, labeller=facet_labeller) + theme(strip.text.x = element_text(size = 16)) + ylab("Difference between estimated and reference z-statistic") + xlab("Reference z-statistic") + geom_line(aes(x=expectedz, y=0), colour="black") + geom_line() + geom_point(size=1) 
+}
+
+multiplot(subpl[[1]], subpl[[2]], subpl[[3]], subpl[[4]], cols=2)
+
 
 # To be able to do boxplots we need to store all values... otherwise as digits -> infinity we get smaller and smaller box plots...
 # digits <- 1
@@ -72,3 +120,49 @@ p + geom_line() + geom_point(size=1) + facet_grid(Between~ methods) + ylim(-0.3,
 
 
 p + facet_grid(Between~ methods) +    geom_smooth(method="loess", se=FALSE, fullrange=T)
+
+# Multiple plot function
+#
+# ggplot objects can be passed in ..., or to plotlist (as a list of ggplot objects)
+# - cols:   Number of columns in layout
+# - layout: A matrix specifying the layout. If present, 'cols' is ignored.
+#
+# If the layout is something like matrix(c(1,2,3,3), nrow=2, byrow=TRUE),
+# then plot 1 will go in the upper left, 2 will go in the upper right, and
+# 3 will go all the way across the bottom.
+#
+multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
+  require(grid)
+
+  # Make a list from the ... arguments and plotlist
+  plots <- c(list(...), plotlist)
+
+  numPlots = length(plots)
+
+  # If layout is NULL, then use 'cols' to determine layout
+  if (is.null(layout)) {
+    # Make the panel
+    # ncol: Number of columns of plots
+    # nrow: Number of rows needed, calculated from # of cols
+    layout <- matrix(seq(1, cols * ceiling(numPlots/cols)),
+                    ncol = cols, nrow = ceiling(numPlots/cols))
+  }
+
+ if (numPlots==1) {
+    print(plots[[1]])
+
+  } else {
+    # Set up the page
+    grid.newpage()
+    pushViewport(viewport(layout = grid.layout(nrow(layout), ncol(layout))))
+
+    # Make each plot, in the correct location
+    for (i in 1:numPlots) {
+      # Get the i,j matrix positions of the regions that contain this subplot
+      matchidx <- as.data.frame(which(layout == i, arr.ind = TRUE))
+
+      print(plots[[i]], vp = viewport(layout.pos.row = matchidx$row,
+                                      layout.pos.col = matchidx$col))
+    }
+  }
+}
