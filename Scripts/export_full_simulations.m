@@ -1,8 +1,9 @@
 function export_full_simulations(simuDir)
-    simuDirs = find_dirs('^nStudy', simuDir);
+    simuDirs = find_dirs('^(two_|two_unb_|)nStudy', simuDir);
+%     simuDirs = find_dirs('^two_nStudy', simuDir);
     
-    saveSimuCsvDir = fullfile(simuDir, 'csv_tom');
-    
+%     saveSimuCsvDir = fullfile(simuDir, 'csv_tom');
+    numel(simuDirs)
     for i = 1:numel(simuDirs)
         disp(['Exporting ' simuDirs{i}])
         filename = 'simu.csv';
@@ -11,7 +12,12 @@ function export_full_simulations(simuDir)
         if ~exist(simu_file, 'file')
             fid = fopen(simu_file, 'w');
 
-            fprintf(fid, 'methods, nStudies, Between, Within, numSubjectScheme, varScheme, soft2, soft2Factor, unitMismatch, nSimu, minuslog10P, P, rankP, expectedP \n');
+            fprintf(fid, ['methods, glm, nStudies, Between, Within, '...
+                'numSubjectScheme, varScheme, soft2, soft2Factor, ' ... 
+                'unitMismatch, nSimu, minuslog10P, P, rankP, '...
+                'expectedP \n']);
+                ...'unitMismatch, nSimu, minuslog10P, P, stderrP, rankP, '...
+                
     %         info = regexp(spm_file(simuDirs{i}, 'filename'), ...
     %             'nStudy(?<nStudy>\d+)_Betw(?<Betw>\d+\.?\d*)_Within(?<Within>\d+\.?\d*)_nSimu(?<nSimu>\d+)','names');
             try
@@ -21,7 +27,7 @@ function export_full_simulations(simuDir)
                 if ~isfield(info, 'nStudiesWithSoftware2')
                     info.nStudiesWithSoftware2 = 0;
                     info.sigmaFactorWithSoftware2 = 1;
-                    info.unitMismatch = 0;
+                    info.unitMismatch = false;
                     info.unitFactor = ones(1, numel(info.nSubjects));
                 end
             catch
@@ -69,12 +75,24 @@ function export_full_simulations(simuDir)
                 
                 if isdir(methodDir)
                     pValueFile = spm_select('FPList', methodDir, ...
-                        ['^' regexptranslate('escape', methods(m).pValueFile) '$']);
+                        ['^' regexptranslate('escape', methods(m).pValueFile) '(\.gz)?$']);
+                    if isempty(pValueFile)
+                        error('pValueFile not found')
+                    end
                     statFile = spm_select('FPList', methodDir, ...
                         ['^' regexptranslate('escape', methods(m).statFile) '(\.gz)?$']);
+                    if isempty(statFile)
+                        error('statFile not found')
+                    end
 
                     statistic = spm_read_vols(spm_vol(statFile));
+%                     try
                     pValues = spm_read_vols(spm_vol(pValueFile));
+                    
+%                     catch
+%                         
+%                         pValues = spm_read_vols(spm_vol(pValueFile));
+%                     end
 
                     mystr = print_pvalues(mystr, methods(m).name, pValues, statistic(:), info);
                 end
@@ -160,24 +178,49 @@ function mystr = print_pvalues(mystr, methodName, minuslog10pvalues, statValues,
     digits=2;
     roundedlog10expectedp = round(-log10(expected_p)*10^digits)/(10^digits);
     % Look at this, maybe it poses a pb for permut where the same expected_p can have different obs_p     
-    [~, uniquePositions] = unique(roundedlog10expectedp);
+    [~, uniquePositions, pvalue_group] = unique(roundedlog10expectedp);
     
-    minuslog10pvalues = minuslog10pvalues(uniquePositions);
     pvalues = pvalues(uniquePositions);
+%     minuslog10pvalues = minuslog10pvalues(uniquePositions);
+%     pvalues_origin = pvalues;
+    
+%     pvalues_stderr = uniquePositions*NaN;
+%     pvalues = uniquePositions*NaN;
+%     for pos = 1:numel(uniquePositions)
+%         pvalue_positions = find(pvalue_group==pos);
+%         numpos = numel(pvalue_positions);
+%         if numpos > 1
+%             pvalues_stderr(pos,1) = std(pvalues_origin(pvalue_positions))./sqrt(numpos);
+%             pvalues(pos) = mean(pvalues_origin(pvalue_positions));
+%         end
+%     end
+    minuslog10pvalues = -log10(pvalues);
+    
     pvalues_rank = pvalues_rank(uniquePositions);
     expected_p = expected_p(uniquePositions);
     
+%     data_to_export = num2cell([minuslog10pvalues, pvalues, pvalues_stderr, pvalues_rank expected_p], 2);
     data_to_export = num2cell([minuslog10pvalues, pvalues, pvalues_rank expected_p], 2);
+    
+    if ~isfield(info, 'nStudies')
+        info.nStudies = info.nStudiesInGroup1;
+    end
 
-    mystr = [mystr sprintf([methodName ',' mat2str(info.nStudies) ',' ...
+    mystr = [mystr sprintf([methodName ',' mat2str(info.analysisType) ',' mat2str(info.nStudies) ',' ...
                 mat2str(info.sigmaBetweenStudies) ',' mat2str(info.sigmaSquare) ...
             ',' info.nSubjectsScheme ...
             ',' info.studyVarianceScheme ...
             ',' mat2str(info.nStudiesWithSoftware2) ...
             ',' mat2str(info.sigmaFactorWithSoftware2) ...
             ',' mat2str(info.unitMismatch) ...
-            ',' mat2str(info.nSimuOneDir^3) ',%i,%i,%i,%i\n'], ...
-          data_to_export{:} )];
+            ',' mat2str(info.nSimuOneDir^3) ',%i,%i,%i,%i\n'], ...            
+            data_to_export{:} )];
+%             ',' mat2str(info.nSimuOneDir^3) ',%i,%i,%i,%i,%i\n'], ...
+          
+      
+    if isempty(mystr)
+        error('empty mystr')
+    end
 end
 
 function check_pvalues(methodName, pvalues)
