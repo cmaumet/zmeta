@@ -27,7 +27,10 @@ facet_labeller <- function(var, value){
     return(value)
 }
 
-data_subset <- subset(allsimudat, expectedz>0 &  nStudies>10 & Between==1 &  (allsimudat$methods %in% c("megaMFX","megaRFX","permutCon","permutZ","stouffersMFX"))  & !(allsimudat$methods %in% c("megaFFX")) & glm==1)
+#selected_methods <- c("megaMFX","megaRFX","permutCon","permutZ","stouffersMFX")
+selected_methods <- c("megaMFX","megaRFX","permutCon")
+
+data_subset <- subset(allsimudat, expectedz>0 &  nStudies>10 & Between==1 &  (allsimudat$methods %in% selected_methods)  & !(allsimudat$methods %in% c("megaFFX")) & glm==3)
 
 subplot=list()
 titles=list()
@@ -35,19 +38,20 @@ titles=list()
 titles[[1]] <- "Nominal"
 subplot[[1]] <- subset(data_subset, soft2==0 & unitMismatch=="FALSE")
 
-titles[[2]] <- "Data scaling: different baseline"
+titles[[2]] <- "Different scaling target"
 subplot[[2]] <- subset(data_subset, soft2Factor==100)
 
-titles[[3]] <- "Data scaling: different baseline"
+titles[[3]] <- "Different scaling algorithm (same target)"
 subplot[[3]] <- subset(data_subset, soft2>0 & soft2Factor!=100)
 
-titles[[4]] <- "Contrast vector scaling"
+titles[[4]] <- "Different contrast vector scaling"
 subplot[[4]] <- subset(data_subset, soft2==0 & unitMismatch=="TRUE")
 
 
 
 methods=="megaRFX")
 
+allsimusdat$Within <- factor(allsimusdat$Within)
 
 
  # 
@@ -68,7 +72,7 @@ subpl=list()
 
 
 for (i in 1:4){
-	subpl[[i]] <- ggplot(data=subplot[[i]],aes(x=expectedz, y=equivz-expectedz, group=allgroups, colour=Within)))
+	subpl[[i]] <- ggplot(data=subplot[[i]],aes(x=expectedz, y=equivz-expectedz, group=allgroups, colour=factor(Within)))
 	
 	subpl[[i]] <- subpl[[i]] + geom_ribbon(aes(x=expectedz, ymin=z_lower-expectedz, ymax=z_upper-expectedz), fill="grey", alpha=.2, colour=NA) + facet_grid(soft2~ methods, labeller=facet_labeller) + theme(strip.text.x = element_text(size = 10)) + ylab("Estimated - reference Z") + xlab("Reference Z") + geom_line(aes(x=expectedz, y=0), colour="black") + geom_line() + geom_point(size=0.5) + ggtitle(titles[[i]])
 	

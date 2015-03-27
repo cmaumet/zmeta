@@ -1,7 +1,8 @@
 Main points:
 - Main question: "Is Z enough?"
    o Compa z-based approaches to gold std GLM MFX / or contrast-based approches
-	- Check empirically validity under violation of underlying assumptions
+	- Check empirically validity under violation of underlying assumptions 
+      i.e. in the absence of units issue (when we know that MFX is best how do z-based stat do)
    		+ tau^2 != 0
    		+ s^2_i not constant
    		+ relation between within and between sub variance (for RFX or Z MFX)
