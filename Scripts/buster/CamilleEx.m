@@ -18,34 +18,34 @@ function simulations(baseDir)
     % Number of subject per study
 %     nSubjects = [25 400 100 25]; %[10, 15, 20, 25, 30, 10, 15, 20, 25, 30, 10, 15, 20, 25, 30];
 %     nStudies = numel(nSubjects);
-    nStudiesArray = 25%[25 50];%[5 10 25 50];
+    nStudiesArray = [25 50];%[5 10 25 50];
     AVG_NUM_SUB = 20;
     NUM_SUB_DIFF = 15;
-    sigmaSquareArray = AVG_NUM_SUB*0.25%[0.25, 1, 4]%,0.25, 0.5, 1, 2, 4];%How to compute z with var = 0?
+    sigmaSquareArray = AVG_NUM_SUB*[0.25, 0.5, 1, 2, 4];%How to compute z with var = 0?
     studyVarianceSchemes = {'identical'} %, 'different'}; don't know yet how to deal with uneq var (for FFX!?)
     
     % Between-studies variance (RFX?)
-    sigmaBetweenStudiesArray = 1%[0 1];
+    sigmaBetweenStudiesArray = [0 1];
     
     % Number of subjects per studies     
     subjectPerStudiesScheme = {'identical'}%, 'different'};
     
     % Number of studies with software 2 (fraction)
-    nStudiesWithSoftware2 = [0]% 1/5 0.5];
+    nStudiesWithSoftware2 = [0 1/5 0.5];
     
     % Correction factor with software 2
-    sigmaFactorWithSoftware2 = [1]% 2 100];
+    sigmaFactorWithSoftware2 = [1 2 100];
     
     % Study-specific bias due to units mismatch
-    unitMismatch = [false]%, true];
+    unitMismatch = [false, true];
     
     % Type of analysis: one-sample (1), two-sample(2), two-sample
     % unbalanced (3)
-    analysisTypes = [1]% 2 3];
+    analysisTypes = [1 2 3];
     
     % Size of the simulation image (in 1 direction). Each voxel of the
     % simulation image is a simulation sample.
-    nSimuOneDir = 10%100;
+    nSimuOneDir = 30;%100;
     nSimu = nSimuOneDir^3;
     
     if nargin == 0
@@ -190,13 +190,16 @@ function simulations(baseDir)
                                         % Directory to store the simulation data and results.
                                         currSimuDirName = [analysisPrefix 'nStudy' num2str(nStudies) '_subNum' subjectNumberScheme '_var' studyVarianceScheme '_Betw' num2str(sigmaBetweenStudies) ...
                                             '_Within' num2str(sigmaSquare/AVG_NUM_SUB) '_nSimuOneDir' num2str(nSimuOneDir), '_unitmis' num2str(iUnitMisMatch) '_numStudySoft'...
-                                            num2str(iStudiesWithSoftware2) '_softFactor' num2str(iSigmaFactorSoftware) '_' num2str(getenv('SGE_TASK_ID'), '%03d')];
-                                        simulationDir = fullfile(baseSimulationDir, currSimuDirName);
+                                            num2str(iStudiesWithSoftware2) '_softFactor' num2str(iSigmaFactorSoftware)];
+                                        simulationDir = fullfile(baseSimulationDir, currSimuDirName, num2str(str2num(getenv('SGE_TASK_ID')), '%04d'));
 
                                         disp(simulationDir)
                                         
                                         exist_simu_dir = isdir(simulationDir);
                                         if ~exist_simu_dir
+                                            if ~isdir(fullfile(baseSimulationDir, currSimuDirName))
+                                                mkdir(fullfile(baseSimulationDir, currSimuDirName))
+                                            end
                                             mkdir(simulationDir);
                                         end
                                         
