@@ -194,7 +194,43 @@ function simulations(baseDir)
                                         simulationDir = fullfile(baseSimulationDir, currSimuDirName);
 
                                         disp(simulationDir)
+                                        
+                                        exist_simu_dir = isdir(simulationDir);
+                                        if ~exist_simu_dir
+                                            mkdir(simulationDir);
+                                        end
+                                        
+                                        simu.config.nSubjectsScheme = subjectNumberScheme;
+                                        if analysisType > 1
+                                            simu.config.nSubjectsInGroup1 = nSubjectsInGroup1;
+                                            simu.config.nSubjectsInGroup2 = nSubjectsInGroup2;
+                                        else
+                                            simu.config.nSubjects = nSubjectsInGroup1;
+                                        end
+                                        simu.config.studyVarianceScheme = studyVarianceScheme;
+                                        
+                                        if analysisType > 1
+                                            simu.config.nStudiesInGroup1 = numStudyInGroup1;
+                                            simu.config.nStudiesInGroup2 = numStudyInGroup2;
+                                            simu.config.varAlphaInGroup1 = varAlphaInGroup1;
+                                            simu.config.varAlphaInGroup2 = varAlphaInGroup2;
+                                        else
+                                            simu.config.nStudies = numStudyInGroup1;
+                                            simu.config.varAlpha = varAlphaInGroup1;
+                                        end
+                                        simu.config.sigmaSquare = sigmaSquare;
+                                        simu.config.sigmaBetweenStudies = sigmaBetweenStudies;
+                                        simu.config.nSimuOneDir = nSimuOneDir;
+                                        simu.config.nStudiesWithSoftware2 = iStudiesWithSoftware2;
+                                        simu.config.sigmaFactorWithSoftware2 = iSigmaFactorSoftware;
+                                        simu.config.unitMismatch = iUnitMisMatch;
+                                        simu.config.unitFactorInGroup1 = unitFactorInGroup1;
+                                        simu.config.unitFactorInGroup2 = unitFactorInGroup2;
+                                        simu.config.analysisType = analysisType;
+                                        simu.config.timing = toc;
 
+                                        save(fullfile(simulationDir, 'simu.mat'), 'simu')
+                                        
                                         % Simulate data only if simulationDir did not xist
                                         % before (helpful to re-run analysis on same data
                                         dataDir = fullfile(simulationDir, 'data');
@@ -209,36 +245,20 @@ function simulations(baseDir)
                                         permutConDir = fullfile(simulationDir, 'permutCon');
                                         permutZDir = fullfile(simulationDir, 'permutZ');
 
-                                        if isdir(simulationDir)
-                                            already_existing = true;
+                                        if exist_simu_dir
                                             for iStudy = 1:(numStudyInGroup1+numStudyInGroup2)
                                                 [~, conFiles{iStudy}] = find_file_nii_or_gz(fullfile(dataDir, ['con_st' num2str(iStudy, '%03d') '.nii']));
-%                                                 if ~exist(conFiles{iStudy}, 'file')
-%                                                     old_confile = fullfile(dataDir, ['con_st' num2str(iStudy) '.nii']);
-%                                                     copyfile(old_confile, conFiles{iStudy})
-%                                                     delete(old_confile)
-%                                                 end
                                                 [~, varConFiles{iStudy}] = find_file_nii_or_gz(fullfile(dataDir, ['varcon_st' num2str(iStudy, '%03d') '.nii']));
-%                                                 if ~exist(varConFiles{iStudy}, 'file')
-%                                                     old_varfile = fullfile(dataDir, ['varcon_st' num2str(iStudy) '.nii']);
-%                                                     copyfile(old_varfile, varConFiles{iStudy})
-%                                                     delete(old_varfile)
-%                                                 end
                                                 [~, zFiles{iStudy}] = find_file_nii_or_gz(fullfile(dataDir, ['z_st' num2str(iStudy, '%03d') '.nii']));
-%                                                 if ~exist(zFiles{iStudy}, 'file')
-%                                                     old_zfile = fullfile(dataDir, ['z_st' num2str(iStudy) '.nii']);
-%                                                     copyfile(old_zfile, zFiles{iStudy})
-%                                                     delete(old_zfile)
-%                                                 end
                                             end
+%                                             load(fullfile(simulationDir, 'simu.mat'))
+%                                             fields = fieldnames(simu.config);
+%                                             for f = 1:numel(fields)
+%                                                 eval([fields{f} ' = ' simu.config.(fields{f})])
+%                                             end
                                         else
-                                            already_existing = false;
-                                            mkdir(simulationDir);
-
-
                                             % Directory to store the simulation data.
                                             mkdir(dataDir);
-
 
                                             % --- Simulated data ---
                                             subIdx = 0;
@@ -260,21 +280,10 @@ function simulations(baseDir)
                                                 % Degrees of freedom of the within-study variance estimate
                                                 dof = nSubjects(studyIndex)-1;
 
-                            %                     estimatedSubContrast = NaN.*zeros([nSimuOneDir, nSimuOneDir, nSimuOneDir nSubjects(iStudy)]);
-                            %                     for iSubject = 1:nSubjects(iStudy)
-                            %                         estimatedSubContrast(:,:,:,iSubject) = normrnd(0, sqrt(sigmaSquare), [nSimuOneDir, nSimuOneDir, nSimuOneDir]);
-                            %                     end
-
-                            %                     % Store for later use to compute FFX variance
-                            %                     estimatedSubAll(:,:,:,subIdx+[1:nSubjects(iStudy)]) = estimatedSubContrast;
-                            %                     subIdx = subIdx + nSubjects(iStudy);
-
                                                 % Estimated paramater estimate.
                                                 estimatedContrast = normrnd(0, sqrt(sigmaSquare*varAlpha(studyIndex)./nSubjects(studyIndex)+sigmaBetweenStudies), [nSimuOneDir, nSimuOneDir, nSimuOneDir]);
-                            %                     estimatedContrast = mean(estimatedSubContrast, 4);%
 
                                                 % Estimated variance (from chi square distribution)
-                            %                     estimatedSigmaSquare = var(estimatedSubContrast, 0, 4);
                                                 estimatedSigmaSquare = chi2rnd(dof, [nSimuOneDir, nSimuOneDir, nSimuOneDir])*sigmaSquare*varAlpha(studyIndex)/dof;
                                                 estimatedVarContrast = estimatedSigmaSquare./nSubjects(studyIndex);
 
@@ -310,7 +319,12 @@ function simulations(baseDir)
                                                 infPos = find(isinf(zData(:)));
 
                                                 zData(infPos) = -norminv(cdf('T', -estimatedContrast(infPos)./sqrt(estimatedVarContrast(infPos)), nSubjects(studyIndex)-1));
-                                                spm_write_vol(vol, zData);                                             
+                                                spm_write_vol(vol, zData);   
+                                                
+                                                clear studyIndex;
+                                                clear nSubjects;
+                                                clear unitFactor;
+                                                clear varAlpha;
                                             end
                                             if analysisType == 1
                                                 mkdir(fisherDir);
@@ -360,7 +374,7 @@ function simulations(baseDir)
                                             if ~find_file_nii_or_gz(fullfile(weightedZDir, 'weightedz_ffx_minus_log10_p.nii'))
                                                 matlabbatch{end+1}.spm.tools.ibma.weightedz.dir = {weightedZDir};
                                                 matlabbatch{end}.spm.tools.ibma.weightedz.zimages = zFiles;
-                                                matlabbatch{end}.spm.tools.ibma.weightedz.nsubjects = nSubjects;
+                                                matlabbatch{end}.spm.tools.ibma.weightedz.nsubjects = nSubjectsInGroup1;
                                             else
                                                 disp('Weighted Z already computed')
                                             end
@@ -477,38 +491,6 @@ function simulations(baseDir)
                                         else
                                             disp('Mega FFX (FSL) already computed')
                                         end
-
-                                        simu.config.nSubjectsScheme = subjectNumberScheme;
-                                        if analysisType > 1
-                                            simu.config.nSubjectsInGroup1 = nSubjectsInGroup1;
-                                            simu.config.nSubjectsInGroup2 = nSubjectsInGroup2;
-                                        else
-                                            simu.config.nSubjects = nSubjectsInGroup1;
-                                        end
-                                        simu.config.studyVarianceScheme = studyVarianceScheme;
-                                        
-                                        if analysisType > 1
-                                            simu.config.nStudiesInGroup1 = numStudyInGroup1;
-                                            simu.config.nStudiesInGroup2 = numStudyInGroup2;
-                                            simu.config.varAlphaInGroup1 = varAlphaInGroup1;
-                                            simu.config.varAlphaInGroup2 = varAlphaInGroup2;
-                                        else
-                                            simu.config.nStudies = numStudyInGroup1;
-                                            simu.config.varAlpha = varAlphaInGroup1;
-                                        end
-                                        simu.config.sigmaSquare = sigmaSquare;
-                                        simu.config.sigmaBetweenStudies = sigmaBetweenStudies;
-                                        simu.config.nSimuOneDir = nSimuOneDir;
-                                        simu.config.nStudiesWithSoftware2 = iStudiesWithSoftware2;
-                                        simu.config.sigmaFactorWithSoftware2 = iSigmaFactorSoftware;
-                                        simu.config.unitMismatch = iUnitMisMatch;
-                                        simu.config.unitFactorInGroup1 = unitFactorInGroup1;
-                                        simu.config.unitFactorInGroup2 = unitFactorInGroup2;
-                                        simu.config.analysisType = analysisType;
-
-                                        simu.config.timing = toc;
-
-                                        save(fullfile(simulationDir, 'simu.mat'), 'simu')
                                     end
                                 end
                             end
