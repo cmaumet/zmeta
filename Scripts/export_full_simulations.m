@@ -1,4 +1,8 @@
-function export_full_simulations(simuDir)
+function export_full_simulations(simuDir, redo)
+    if nargin < 2
+        redo = false;
+    end
+
     simuDirs = find_dirs('^(two_|two_unb_|)nStudy', simuDir);
 %     simuDirs = find_dirs('^two_nStudy', simuDir);
     
@@ -9,12 +13,12 @@ function export_full_simulations(simuDir)
         filename = 'simu.csv';
         simu_file = fullfile(simuDir, simuDirs{i}, filename);
         
-        if ~exist(simu_file, 'file')
+        if redo || ~exist(simu_file, 'file')
             fid = fopen(simu_file, 'w');
 
             fprintf(fid, ['methods, glm, nStudies, Between, Within, '...
                 'numSubjectScheme, varScheme, soft2, soft2Factor, ' ... 
-                'unitMismatch, nSimu, minuslog10P, P, rankP, '...
+                'unitMismatch, nSimu, minuslog10P, P, stderr_P, rankP, '...
                 'expectedP \n']);
                 ...'unitMismatch, nSimu, minuslog10P, P, stderrP, rankP, '...
                 
@@ -174,13 +178,29 @@ function mystr = print_pvalues(mystr, methodName, minuslog10pvalues, statValues,
     
 %     expected_p = pvalues_rank./(info.nSimuOneDir^3);
     
-    % Downsampling    
+    % Downsampling expected p
     digits=2;
     roundedlog10expectedp = round(-log10(expected_p)*10^digits)/(10^digits);
     % Look at this, maybe it poses a pb for permut where the same expected_p can have different obs_p     
     [~, uniquePositions, pvalue_group] = unique(roundedlog10expectedp);
     
-    pvalues = pvalues(uniquePositions);
+%     pvalues = pvalues(uniquePositions);
+    original_pvalues = pvalues;
+    pvalues = accumarray(pvalue_group, original_pvalues, [], @mean);
+    
+    pvalue_count = accumarray(pvalue_group,1);
+    pvalues_stderr = accumarray(pvalue_group, original_pvalues, [], @std)./sqrt(pvalue_count);
+    
+    % This is to cope with Matlab behaviour where std(x) = 0 (when x is a 
+    % vector of a single number)     
+    pvalues_stderr(pvalue_count==1) = Inf;
+    % We also ignore stderr when only 2 observations    
+    pvalues_stderr(pvalue_count==2) = Inf;
+    
+    if any(pvalues_stderr==0) && ~(strcmp(methodName, 'permutZ') ||strcmp(methodName, 'permutCon'))
+        error('null standard error')
+    end
+
 %     minuslog10pvalues = minuslog10pvalues(uniquePositions);
 %     pvalues_origin = pvalues;
     
@@ -196,11 +216,11 @@ function mystr = print_pvalues(mystr, methodName, minuslog10pvalues, statValues,
 %     end
     minuslog10pvalues = -log10(pvalues);
     
-    pvalues_rank = pvalues_rank(uniquePositions);
-    expected_p = expected_p(uniquePositions);
+    pvalues_rank = accumarray(pvalue_group, pvalues_rank, [], @mean);%pvalues_rank(uniquePositions);
+    expected_p = accumarray(pvalue_group, expected_p, [], @mean);%expected_p(uniquePositions);
     
-%     data_to_export = num2cell([minuslog10pvalues, pvalues, pvalues_stderr, pvalues_rank expected_p], 2);
-    data_to_export = num2cell([minuslog10pvalues, pvalues, pvalues_rank expected_p], 2);
+    data_to_export = num2cell([minuslog10pvalues, pvalues, pvalues_stderr, pvalues_rank, expected_p], 2);
+%     data_to_export = num2cell([minuslog10pvalues, pvalues, pvalues_rank expected_p], 2);
     
     if ~isfield(info, 'nStudies')
         info.nStudies = info.nStudiesInGroup1;
@@ -213,7 +233,7 @@ function mystr = print_pvalues(mystr, methodName, minuslog10pvalues, statValues,
             ',' mat2str(info.nStudiesWithSoftware2) ...
             ',' mat2str(info.sigmaFactorWithSoftware2) ...
             ',' mat2str(info.unitMismatch) ...
-            ',' mat2str(info.nSimuOneDir^3) ',%i,%i,%i,%i\n'], ...            
+            ',' mat2str(info.nSimuOneDir^3) ',%i,%i,%i,%i,%i\n'], ...            
             data_to_export{:} )];
 %             ',' mat2str(info.nSimuOneDir^3) ',%i,%i,%i,%i,%i\n'], ...
           

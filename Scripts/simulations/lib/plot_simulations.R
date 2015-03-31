@@ -30,7 +30,7 @@ facet_labeller <- function(var, value){
 #selected_methods <- c("megaMFX","megaRFX","permutCon","permutZ","stouffersMFX")
 selected_methods <- c("megaMFX","megaRFX","permutCon")
 
-data_subset <- subset(allsimudat, expectedz>0 &  nStudies>10 & Between==1 &  (allsimudat$methods %in% selected_methods)  & !(allsimudat$methods %in% c("megaFFX")) & glm==3)
+data_subset <- subset(allsimudat, expectedz>0 &  nStudies>10 & Between==1 &  (allsimudat$methods %in% selected_methods)  & !(allsimudat$methods %in% c("megaFFX")) & glm==2)
 
 subplot=list()
 titles=list()
@@ -74,10 +74,14 @@ subpl=list()
 for (i in 1:4){
 	subpl[[i]] <- ggplot(data=subplot[[i]],aes(x=expectedz, y=equivz-expectedz, group=allgroups, colour=factor(Within)))
 	
-	subpl[[i]] <- subpl[[i]] + geom_ribbon(aes(x=expectedz, ymin=z_lower-expectedz, ymax=z_upper-expectedz), fill="grey", alpha=.2, colour=NA) + facet_grid(soft2~ methods, labeller=facet_labeller) + theme(strip.text.x = element_text(size = 10)) + ylab("Estimated - reference Z") + xlab("Reference Z") + geom_line(aes(x=expectedz, y=0), colour="black") + geom_line() + geom_point(size=0.5) + ggtitle(titles[[i]])
+	subpl[[i]] <- subpl[[i]] + geom_ribbon(aes(x=expectedz, ymin=z_lower-expectedz, ymax=z_upper-expectedz), fill="grey", alpha=.2, colour=NA) + facet_grid(soft2~ methods, labeller=facet_labeller) + theme(strip.text.x = element_text(size = 10)) + ylab("Estimated - reference Z") + xlab("Reference Z") + geom_line(aes(x=expectedz, y=0), colour="black") + geom_line() + geom_point(size=0.5) + ggtitle(titles[[i]])   
+	
+	# + geom_ribbon(aes(x=expectedz, ymax = equivz_upper-expectedz, ymin= equivz_lower-expectedz), width=0.20) 
 	
 	# subpl[[i]] <- subpl[[i]] + geom_ribbon(aes(x=expectedz, ymin=z_lower-expectedz, ymax=z_upper-expectedz), fill="grey", alpha=.2, colour=NA) + facet_grid(Between + methods + nStudies + glm ~ unitMismatch+soft2Factor+ soft2, labeller=facet_labeller) + theme(strip.text.x = element_text(size = 16)) + ylab("Difference between estimated and reference z-statistic") + xlab("Reference z-statistic") + geom_line(aes(x=expectedz, y=0), colour="black") + geom_line() + geom_point(size=1) 
 }
+
+# subpl[[1]]
 
 multiplot(subpl[[1]], subpl[[2]], subpl[[3]], subpl[[4]], cols=2)
 
