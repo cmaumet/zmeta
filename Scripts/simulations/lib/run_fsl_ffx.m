@@ -21,7 +21,8 @@ function run_fsl_ffx(datadir, wd, analysisType, nSubjects, nStudies)
         ' --runmode=fe'])
     
     statFile = fullfile(wd, 'stats', 'zstat1.nii.gz');
-    statFile = gunzip_if_gz(statFile);
+    system(['gunzip ' statFile])
+    statFile = strrep(statFile, '.gz', '');
     
     originalStatFile = statFile;
     statFile = fullfile(wd, 'zstat1.nii');
