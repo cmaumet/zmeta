@@ -2,7 +2,7 @@
 #$ -S /bin/bash
 #$ -l h_rt=00:30:00
 #$ -l h_vmem=4G
-#$ -t 10:10
+#$ -t 1:100
 #$ -cwd
 #$ -o $HOME/logs
 #$ -e $HOME/logs
