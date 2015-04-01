@@ -49,7 +49,7 @@ function simulations(baseDir)
     nSimu = nSimuOneDir^3;
     
     if nargin == 0
-        baseDir = pwd;
+        baseDir = '/storage/wmsmfe';
     end
     
     simuinfo.config.nSimuOneDir = nSimuOneDir;
