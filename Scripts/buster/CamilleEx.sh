@@ -1,6 +1,6 @@
 #!/bin/bash
 #$ -S /bin/bash
-#$ -l h_rt=00:30:00
+#$ -l h_rt=10:00:00
 #$ -l h_vmem=4G
 #$ -t 1:100
 #$ -cwd
