@@ -3,6 +3,8 @@
 #$ -l h_rt=10:00:00
 #$ -l h_vmem=4G
 #$ -t 1:100
+#$ -o log/filename_$TASK_ID.stdout
+#$ -e log/filename_$TASK_ID.stderr
 #$ -cwd
 #$ -l h=!exec6
 #$ -pe threaded 4
