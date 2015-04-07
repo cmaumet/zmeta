@@ -7,7 +7,7 @@
 #$ -e log/filename_$TASK_ID.stderr
 #$ -cwd
 #$ -l h=!exec6
-#$ -pe threaded 4
+#$ -pe matlab 4
 
 
 . /etc/profile
