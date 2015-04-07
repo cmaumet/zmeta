@@ -7,6 +7,7 @@
 #$ -o $HOME/logs
 #$ -e $HOME/logs
 #$ -l h=!exec6
+#$ -pe threaded 4
 
 
 . /etc/profile
@@ -14,6 +15,7 @@
 module add matlab
 module add fsl
 
-matlab -nodisplay -nojvm -r CamilleEx
+# matlab -nodisplay -nojvm -r CamilleEx
+matlab -nojvm -nodisplay -r "maxNumCompThreads=4;my_matlab_program;quit"
 #matlab -nodisplay -nojvm -r pwd
 
