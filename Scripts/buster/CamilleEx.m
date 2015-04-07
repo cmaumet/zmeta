@@ -41,7 +41,7 @@ function simulations(baseDir)
     
     % Type of analysis: one-sample (1), two-sample(2), two-sample
     % unbalanced (3)
-    analysisTypes = [1 2 3];
+    analysisTypes = [1]% 2 3];
     
     % Size of the simulation image (in 1 direction). Each voxel of the
     % simulation image is a simulation sample.
@@ -469,7 +469,16 @@ function simulations(baseDir)
     end
 
                                         if ~isempty(matlabbatch)
-                                            spm_jobman('run', matlabbatch)                                        
+                                            try
+                                                spm_jobman('run', matlabbatch)
+                                            catch ME
+                                                switch ME.identifier
+                                                    case 'matlabbatch:run:jobfailederr'
+                                                        warning('One job failed.');
+                                                    otherwise
+                                                        rethrow(ME)
+                                                end
+                                            end
                                         end
                                         
                                         if true
