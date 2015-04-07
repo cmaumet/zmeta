@@ -18,7 +18,7 @@ function simulations(baseDir)
     % Number of subject per study
 %     nSubjects = [25 400 100 25]; %[10, 15, 20, 25, 30, 10, 15, 20, 25, 30, 10, 15, 20, 25, 30];
 %     nStudies = numel(nSubjects);
-    nStudiesArray = [25 50];%[5 10 25 50];
+    nStudiesArray = [25]% 50];%[5 10 25 50];
     AVG_NUM_SUB = 20;
     NUM_SUB_DIFF = 15;
     sigmaSquareArray = AVG_NUM_SUB*[0.25, 0.5, 1, 2, 4];%How to compute z with var = 0?
