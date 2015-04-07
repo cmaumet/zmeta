@@ -4,8 +4,6 @@
 #$ -l h_vmem=4G
 #$ -t 1:100
 #$ -cwd
-#$ -o $HOME/logs
-#$ -e $HOME/logs
 #$ -l h=!exec6
 #$ -pe threaded 4
 
