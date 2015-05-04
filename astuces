@@ -1,0 +1,447 @@
+--- Find all dir thatdo not have a certain file --
+find . -type d \! -exec test -e '{}/README' \; -print
+
+find ./*/*/megaMFX/stats -type d \! -exec test -e '{}/zstat1.nii' \; -print
+
+find */*/permut*/ -type d \! -exec test -e '{}/lP+.img' \; -print
+
+ls nStudy25_subNumidentical_varidentical_Betw0_Within4_nSimuOneDir30_unitmis1_numStudySoft0_softFactor1/*/megaMFX/mega_mfx_minus_log10_p.nii 
+
+-- delete all pyc --
+CHECK:
+find . -name "*.pyc" -type f
+RUN:
+find . -name "*.pyc" -type f -delete
+
+
+-- replace coordinate123 -> coordinate --
+coord_1_in_vox="(\d+\.?\d+)",\s*coord_2_in_vox="(\d+\.?\d+)",\s*coord_3_in_vox="(\d+\.?\d+)"
+coord_in_vox="[$1, $2, $3]"
+
+coord_1="(-?\d?\.?\d+)",\s*coord_2="(-?\d?\.?\d+)",\s*coord_3="(-?\d?\.?\d+)"
+coord="[$1, $2, $3]"
+
+coord([^\s]*)="\[([^\s]*)\s*,\s*([^\s]*)\s*,\s*([^\s]*)\s*]"
+coord$1="[$2, $3, $4]"
+
+-- Number of files/directory in current folder --
+ls | wc -l
+
+-- Count number of directory in subdirectories (depth=1)
+find . -mindepth 1 -maxdepth 1 -type d | xargs -I folder sh -c 'find folder -mindepth 1 -maxdepth 1 -type d | wc -l'
+
+find . -mindepth 1 -maxdepth 1 -type d -name 'nStudy50_subNumidentical_varidentical_Betw0*' | xargs -I folder sh -c 'find folder -mindepth 1 -maxdepth 1 -type d | wc -l'
+
+find . -mindepth 1 -maxdepth 1 -type d -name 'two_*' | xargs -I folder sh -c 'find folder -mindepth 1 -maxdepth 1 -type d | wc -l; echo folder'
+
+
+-- Remove a file from a commit -
+git rebase -i commit_id
+add "e" for edit in front of commmits to be modified
+
+When rebase stops:
+# List file changed in a given commit ---
+git show --pretty="format:" --name-status HEAD
+# Retreive version of a given file from the commit before the last one
+git checkout HEAD^ myfile 
+# Remove committed file
+git rm myfile
+
+amend commit: 
+git commit --amend
+git rebase --continue
+
+NOPE:
+git reset HEAD^ path/to/unwanted_file
+git commit --amend
+
+
+NOPE:
+# discard all changes in working directory
+git checkout -- .
+# discard changes to a given file
+git checkout -- path/to/unwanted_file
+
+---
+
+idiosyncratic
+
+-- Rename a branch --
+git branch -m <oldname> <newname>
+
+-- Uninstall package install using python setup.py install --
+pip freeze -> find package_name
+pip uninstall package_name
+
+
+
+--- Get processes ---
+ps -fA | grep python
+
+--- FSL ---
+Paste in FSL window (ctrl+y)
+
+--- AFNI ---
+export PATH=$PATH:/Users/cmaumet/Softs/external/AFNI/macosx_10.7_Intel_64
+export DYLD_FALLBACK_LIBRARY_PATH=/Users/cmaumet/Softs/external/AFNI/macosx_10.7_Intel_64
+
+afni_system_check.py -check_all| less
+
+--- Split a commit 
+Perform an interactive rebase including the target commit (e.g. git rebase -i <commit-to-split>^ branch) and mark it to be edited.
+
+When the rebase reaches that commit, use git reset HEAD^ to reset to before the commit, but keep your work tree intact.
+
+Incrementally add changes and commit them, making as many commits as desired. add -p can be useful to add only some of the changes in a given file. Use commit -c ORIG_HEAD if you want to re-use the original commit message for a certain commit.
+
+----
+
+git stash --keep-index
+
+--- Updating anaconda ----
+conda update conda
+conda update anaconda
+
+
+--- UNDO last commit in git ---
+$ git reset HEAD^ --hard
+$ git push mathnet -f
+
+--- Curation status ---
+* nidm:Uncurated
+<rdf:Description rdf:about="http://purl.obolibrary.org/obo/IAO_0000124"/><!-- uncurated -->
+Nothing done yet beyond assigning a unique class ID and proposing a preferred term.
+
+* nidm:MetadataIncomplete - Metadata incomplete
+<rdf:Description rdf:about="http://purl.obolibrary.org/obo/IAO_0000123"/><!-- metadata incomplete -->
+Class is being worked on; however, the metadata (including definition) are not complete or sufficiently clear to the branch editors.
+
+* nidm:ToBeReplacedByExternalOntologyTerm - To be replaced by external ontology term
+<rdf:Description rdf:about="http://purl.obolibrary.org/obo/IAO_0000423"/><!-- to be replaced with external ontology term -->
+Terms with this status should eventually replaced with a term from another ontology.
+
+* Metadata complete
+<rdf:Description rdf:about="http://purl.obolibrary.org/obo/IAO_0000120"/><!-- metadata complete -->
+Class has all its metadata, but is either not guaranteed to be in its final location in the asserted IS_A hierarchy or refers to another class that is not complete.
+
+* nidm:PendingFinalVetting - Pending final vetting
+<rdf:Description rdf:about="http://purl.obolibrary.org/obo/IAO_0000125"/><!-- pending final vetting -->
+All definitions, placement in the asserted IS_A hierarchy and required minimal metadata are complete. The class is awaiting a final review by someone other than the term editor.
+
+* Requires discussion
+<rdf:Description rdf:about="http://purl.obolibrary.org/obo/IAO_0000428"/><!-- requires discussion -->
+A term that is metadata complete, has been reviewed, and problems have been identified that require discussion before release. Such a term requires editor note(s) to identify the outstanding issues.
+
+* nidm:ReadyForRelease - Ready for release
+<rdf:Description rdf:about="http://purl.obolibrary.org/obo/IAO_0000122"/><!-- ready for release -->
+Class has undergone final review, is ready for use, and will be included in the next release. Any class lacking "ready_for_release" should be considered likely to change place in hierarchy, have its definition refined, or be obsoleted in the next release.  Those classes deemed "ready_for_release" will also derived from a chain of ancestor classes that are also "ready_for_release."
+
+ Other --
+
+* organizational term
+<rdf:Description rdf:about="http://purl.obolibrary.org/obo/IAO_0000121"/><!-- organizational term -->
+Term created to ease viewing/sort terms for development purpose, and will not be included in a release
+
+* Example to be eventually removed
+<rdf:Description rdf:about="http://purl.obolibrary.org/obo/IAO_0000002"/><!-- example to be eventually removed -->
+
+
+--- disk usage ---
+du -d 1 -h
+
+greater than 1000MB:
+du -d 1 -m | awk '$1 > 1000'
+
+
+--- git subtree ---
+git subtree add --prefix nidm https://github.com/incf-nidash/nidm.git master --squash
+
+--- Create new git repo from subdir ---
+
+git subtree: https://help.github.com/articles/about-git-subtree-merges
+
+http://stackoverflow.com/questions/359424/detach-subdirectory-into-separate-git-repository/17864475#17864475
+
+Prepare the old repo
+
+pushd <big-repo>
+git subtree split -P <name-of-folder> -b <name-of-new-branch>
+popd
+Note: <name-of-folder> must NOT contain leading or trailing characters. For instance, the folder named subproject MUST be passed as subproject, NOT ./subproject/
+
+Create the new repo
+
+mkdir <new-repo>
+pushd <new-repo>
+
+git init
+git pull </path/to/big-repo> <name-of-new-branch>
+Link the new repo to Github or wherever
+
+git remote add origin <git@github.com:my-user/new-repo.git>
+git push origin -u master
+Cleanup, if desired
+
+popd # get out of <new-repo>
+pushd <big-repo>
+
+git rm -rf <name-of-folder>
+Note: This leaves all the historical references in the repository.See the Appendix below if you're actually concerned about having committed a password or you need to decreasing the file size of your .git folder.
+
+----- Issue in PR ---
+hub pull-request -i x
+
+------- Respec ----
+* Definitions
+Definition: <dfn>dahut</dfn>
+Link to definition: <a>dahut</a>
+Link to definition with alternative text: <a title='cryptoanimal'>cryptoanimals</a>
+
+* Sections and Figures
+Section: <h2>foo</h2>
+Section with user-defined id: <h2 id="mysection">My section with a very long title</h2>
+Link to section: <a href='#foo'></a> or <a href='#mysection'></a> 
+
+
+IMC room 114, room 106: code = 3009
+
+----- Git -----
+List unpushed commits:
+git log origin/master..HEAD
+
+----- Python module path ----
+import a_module
+print a_module.__file__
+
+------ Add provconvert to PATH ----
+PATH="/Users/cmaumet/Softs/external/provToolbox/bin/:$PATH"
+
+------ Add to python path ----
+PYTHONPATH="/Users/cmaumet/Projects/Data_sharing/dev:$PYTHONPATH"
+PYTHONPATH="/Users/cmaumet/Projects/Data_sharing/dev/niexportForFSL:$PYTHONPATH"
+
+
+PYTHONPATH="/Users/cmaumet/Softs/external/prov_cmaumet:$PYTHONPATH"
+
+export PYTHONPATH
+
+FSLCONFDIR=${FSLDIR}/config
+export $FSLCONFIG
+
+------------ Move a git directory to create a new reop out of it ---------
+Source: http://gbayer.com/development/moving-files-from-one-git-repository-to-another-preserving-history/
+
+1. Create repo and clone into ni-exportForFSL
+cd ni-exportForFSL/
+ls
+> README.md
+git remote add nidm ../../nidm_copy/ni-dm/
+git remote -v
+> nidm	../../nidm_copy/ni-dm/ (fetch)
+> nidm	../../nidm_copy/ni-dm/ (push)
+> origin	https://github.com/ni-/ni-exportForFSL.git (fetch)
+> origin	https://github.com/ni-/ni-exportForFSL.git (push)
+git branch
+> * master
+git pull nidm export
+> From ../../nidm_copy/ni-dm
+>  * branch            export     -> FETCH_HEAD
+> Auto-merging README.md
+> CONFLICT (add/add): Merge conflict in README.md
+> Automatic merge failed; fix conflicts and then commit the result.
+open README.md 
+git add README.md 
+git commit
+> [master 9ae7ab9] Merge branch 'export' of ../../nidm_copy/ni-dm
+git remote rm nidm
+git remote -v
+origin	https://github.com/ni-/ni-exportForFSL.git (fetch)
+origin	https://github.com/ni-/ni-exportForFSL.git (push)
+ls
+> FSLparser.py	NIDMStat.py	README.md	__init__.py
+git push
+
+------------- Install modif in prov ----
+sudo python setup.py install
+
+Attention pour la version 1.0.0 l'install ne fonctionne pas
+PYTHONPATH="/Users/cmaumet/Softs/external/prov_cmaumet:$PYTHONPATH"
+export PYTHONPATH
+
+PYTHONPATH="/Users/cmaumet/Projects/Data_sharing/dev/nidm/nidm/nidm-results/test:$PYTHONPATH"
+
+------------- Install provToolbox ----
+- Download realease code from: https://github.com/lucmoreau/ProvToolbox/releases
+cd into dir and then
+$ export MAVEN_OPTS=-Xmx512m
+$ mvn install
+
+------------- Move a git tag -------
+git tag -a -f my_tag 
+
+------------- Tags -----------
+git tag -a SnPM13.1.02 -m "SnPM version 13.1.02" 
+git push --tag
+
+git push upstream tag_name
+
+------------- File listing -------------
+ls -d1 `pwd`/??/??_left.feat ; ls -d1 `pwd`/??/??_right.feat
+
+ls -d1 `pwd`/tntmp/?*/gFeat/flm?*/cope?*.feat/filtered_func_data.nii.gz
+
+
+This gives you a complete listing of the full pathnames of the FEAT directories in the right order. (The `pwd` part tells the shell to replace what's within the quotes with the result of running the command - in this case, filling out the full pathname of the current directory. The ? characters are expanded by the shell to fit any single character, in alphabetical order, hence all the "left" FEAT directories are listed first, and then all the "right".) You can now highlight this list with the mouse, and paste it into the FEAT paste window with the middle mouse button (or possibly by clicking in the paste window and typing control-y).
+
+------------- Merge with parent -------------
+# Assigns the original repository to a remote called "upstream"
+git remote add upstream https://github.com/ni-/ni-dm
+# Pulls in changes not present in your local repository, without modifying your files
+git fetch upstream
+# Merges any changes fetched into your working files
+git merge upstream/master
+
+
+------------- Conflicts -------------
+Une fois qu'on a fait un merge ouvrir les fichiers dans lesquels il y a conflict
+Enregistrer puis
+git add spm_results.provn
+git add spm_results.png
+git commit
+
+Restart an errored job:
+qmod -cj 212110
+
+------------- Create branch --------------
+$ git checkout -b iss53
+Switched to a new branch "iss53"
+
+------------- Switch branch --------------
+git checkout mybranch
+
+------------- Delete branch after merge -------------
+git tag archive/<branchname> <branchname>
+git branch -d <branchname>
+git checkout master
+The branch will be deleted, and can be retrieved later by checking out the tag.
+
+------------ Conflicts: choosing remote or local -----------
+http://gitready.com/advanced/2009/02/25/keep-either-file-in-merge-conflicts.html
+
+So, the scenario is: you’re in the middle of a merge, and you want to keep one file or the other.
+$ git merge master     
+  Auto-merged _layouts/default.html
+  CONFLICT (content): Merge conflict in _layouts/default.html
+  Auto-merged index.html
+  CONFLICT (content): Merge conflict in index.html
+  Automatic merge failed; fix conflicts and then commit the result.
+There’s two unmerged files here. According to the git checkout manpage, there’s a --theirs and --ours options on the command. The former will keep the version of the file that you merged in, and the other will keep the original one we had.
+The following commands will keep the original file for index.html, and then use the merged in file only for _layouts/default.html.
+git checkout --ours index.html
+git checkout --theirs _layouts/default.html
+
+----- delete empty directories ----
+find . -empty -type d -delete
+
+------------- buster --------------
+ssh wmsmfe@buster.stats.warwick.ac.uk
+
+scp CamilleEx.m wmsmfe@buster.stats.warwick.ac.uk:/storage/wmsmfe
+
+scp CamilleEx.sh wmsmfe@buster.stats.warwick.ac.uk:/storage/wmsmfe
+
+scp wmsmfe@buster.stats.warwick.ac.uk:/home/essicd/data/OpenfMRI/ds005_smoothed_group.tgz .
+
+scp -r wmsmfe@buster.stats.warwick.ac.uk:/storage/wmsmfe/simulations/nStudy25_subNumidentical_varidentical_Betw1_*/ /Volumes/camille/MBIA_buster/
+
+scp -r wmsmfe@buster.stats.warwick.ac.uk:/storage/wmsmfe/simulations/nStudy50* /Volumes/camille/MBIA_buster/
+
+# rsync can be interrupted...
+rsync -av --progress --inplace --rsh='ssh' wmsmfe@buster.stats.warwick.ac.uk:/storage/wmsmfe/simulations/nStudy25\* /Volumes/camille/MBIA_buster
+
+-a => recursion -v => verbose -z => compress -h => help??
+–remove-source-files 
+-e => for ssh
+
+# This one
+rsync -avzhe ssh --remove-source-files wmsmfe@buster.stats.warwick.ac.uk:/storage/wmsmfe/simulations/two_unb_* /Volumes/camille/MBIA_buster/
+
+rsync -avzhe ssh /Volumes/camille/MBIA_buster/nStudy25_subNumidentical_varidentical_Betw1* wmsmfe@buster.stats.warwick.ac.uk:/storage/wmsmfe/simulations/
+
+
+ls /home/essicd/data/OpenfMRI/
+ds001_smoothed_group.tgz  ds006A_smoothed_group.tgz  ds107_smoothed_group.tgz
+ds002_smoothed_group.tgz  ds008_smoothed_group.tgz   test_file.txt
+ds005_smoothed_group.tgz  ds101_smoothed_group.tgz
+
+scp -r openfmri_nidm_exports/ wmsmfe@buster.stats.warwick.ac.uk:/home/essicd/data/OpenfMRI/
+
+See all jobs:
+qstat -u "*"
+
+** clear Eqw error
+qmod -cj <job_id>
+
+------------- Build SPM toolbox --------------
+<mytbxname>_cfg_<myfunname> => config file for matlabbatch (inputs, help…)
+<mytbxname>_run_<myfunname> => mapping between core of <myfunname> and job specified as in <mytbxname>_cfg_<myfunname> (job as an input)
+<myfunname> => core of <myfunname>
+
+1. Create tbx_cfg_<mytbxname>
+toolboxDir = spm_str_manip(mfilename('fullpath'), 'h');
+addpath(toolboxDir);
+
+
+Top of the toolbox:
+to be recognised by SPM:
+- in the toolbox directory
+- must have a function tbx_cfg_<mytbxname>.m which is called at SPM startup which add path whats needed and call head of toolbox cfg??
+snpmBatch = tbx_cfg_snpm13()
+Function called by SPM to create the SnPM submenu in SPM -> Tools in the
+%  batch Window. This function must be called "tbx_cfg_snpm" in order to be
+%  automatically detected and called by SPM.
+
+
+% spm_<my_tbx_name>
+%  Called by SPM to create the SnPM submenu under Toolbox in the main SPM
+%  window. This function must be called "spm_SnPM" to be automatically 
+% detected and called by SPM.
+
+Warning: Can not find executable node 'spm.tools.snpm.cp' - running matlabbatch without default node. 
+> In spm_jobman at 178 
+
+------------- Diff on dirs --------------
+diff -rw dir1 dir2 > text_diff.txt
+-r = recursive
+-w = ignore white
+
+------------- New SnPM release -----------
+- Push to branch SnPMXX (with new version SnPMXX.YY in snpm('ver'))
+- Create a zip file:  
+cd ~/Softs/dev/SnPM/spm8/toolbox/
+
+zip -r SnPM13_XX.zip `find ./SnPM13 -type f -name '*.m'`
+
+ -print | zip -r SnPM13_XX.zip SnPM13/*.m SnPM13/config/*.m SnPM13/test/*.m
+- Copy the unzip version of the code into ~/Softs/external/SnPM/spm8/toolbox/
+- Re-run the tests
+addpath('/Users/cmaumet/Softs/external/spm/spm8/')
+spm fmri
+snpm('ver')
+addpath('/Users/cmaumet/Softs/external/spm/spm8/toolbox/SnPM13/test')
+cd /Users/cmaumet/Data/snpm_test_data/results
+addpath(pwd)
+suite = matlab.unittest.TestSuite.fromFolder('/Users/cmaumet/Softs/dev/SnPM/spm8/toolbox/SnPM13/test/')
+res=run(suite)
+- Créer l'update en regardant la différence entre SnPM13_00 et SnPM13_YY:
+./create_update.sh 
+- Une fois OK, mettre SnPM13_YY.zip en ligne
+- Faire un diff de SnPM13.XX avec précédente version pour mettre a jour le README de l'update
+
+zip SnPM13_updates_05.zip -r ./SnPM13_updates_05
+
+tag et merge avec master
+
+---- Typical paper length (word count) ---
+~7400 words: The secret lives of experiments: methods reporting in the fMRI literature. Carp 2012
+~5200 words: NeuroVault.org: A web-based repository for collecting and sharing unthresholded statistical maps of the human brain. Gorgolewski 2015
