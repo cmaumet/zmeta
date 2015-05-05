@@ -1,4 +1,9 @@
-function simulations(baseDir)
+function simulations(baseDir, redo)
+    if ~exist('redo', 'var')
+        redo = false;
+    end
+    redo
+
     disp(['This is run ' getenv('SGE_TASK_ID')])
     addpath(fullfile(pwd, 'code', 'spm12'))
     disp(fullfile(pwd, 'code','spm12'))
@@ -18,14 +23,14 @@ function simulations(baseDir)
     % Number of subject per study
 %     nSubjects = [25 400 100 25]; %[10, 15, 20, 25, 30, 10, 15, 20, 25, 30, 10, 15, 20, 25, 30];
 %     nStudies = numel(nSubjects);
-    nStudiesArray = [25]% 50];%[5 10 25 50];
+    nStudiesArray = [50]% 50];%[5 10 25 50];
     AVG_NUM_SUB = 20;
     NUM_SUB_DIFF = 15;
     sigmaSquareArray = AVG_NUM_SUB*[0.25, 0.5, 1, 2, 4];%How to compute z with var = 0?
     studyVarianceSchemes = {'identical'} %, 'different'}; don't know yet how to deal with uneq var (for FFX!?)
     
     % Between-studies variance (RFX?)
-    sigmaBetweenStudiesArray = [0 1];
+    sigmaBetweenStudiesArray = [0]%  1];
     
     % Number of subjects per studies     
     subjectPerStudiesScheme = {'identical'}%, 'different'};
@@ -196,6 +201,13 @@ function simulations(baseDir)
                                         disp(simulationDir)
                                         
                                         exist_simu_dir = isdir(simulationDir);
+
+                                        if redo && exist_simu_dir
+                                            % Move existing simulation directory
+                                            movefile(simulationDir, [simulationDir '_OLD'])
+                                            exist_simu_dir = false
+                                        end
+
                                         if ~exist_simu_dir
                                             if ~isdir(fullfile(baseSimulationDir, currSimuDirName))
                                                 mkdir(fullfile(baseSimulationDir, currSimuDirName))
