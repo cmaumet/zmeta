@@ -45,8 +45,8 @@ for study in studies:
     """
     sd = nidm_graph.query(query)
 
-    x_pos, y_pos, z_pos = [40, 14, 4]
-    tol = 20
+    x_pos, y_pos, z_pos = [-58, -23, 20]
+    tol = 30
 
     study_activated = False
     if sd:
@@ -56,6 +56,7 @@ for study in studies:
 
             for el in row:
                 x, y, z = json.loads(str(el))
+
                 if (x > (x_pos-tol/2)) and (x < (x_pos+tol/2)) and \
                    (y > (y_pos-tol/2)) and (y < (y_pos+tol/2)) and \
                    (z > (z_pos-tol/2)) and (z < (z_pos+tol/2)):
