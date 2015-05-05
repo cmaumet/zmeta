@@ -28,9 +28,9 @@ function prepare_fsl_data(datadir, wd, nSubjects, design)
             delete(dof_file);
         end
         
-        copyfile(['../../../../fsl_design/' design '.mat'], [design '.mat'])
-        copyfile(['../../../../fsl_design/' design '.grp'], [design '.grp'])
-        copyfile(['../../../../fsl_design/' design '.con'], [design '.con'])
+        copyfile(fullfile(cwd, ['../../../../fsl_design/' design '.mat']), [design '.mat'])
+        copyfile(fullfile(cwd, ['../../../../fsl_design/' design '.grp']), [design '.grp'])
+        copyfile(fullfile(cwd, ['../../../../fsl_design/' design '.con']), [design '.con'])
 
         cd(cwd)
     end
