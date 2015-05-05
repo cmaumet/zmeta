@@ -29,20 +29,9 @@ for study in studies:
     prefix prov: <http://www.w3.org/ns/prov#>
     prefix nidm: <http://purl.org/nidash/nidm#>
 
-    prefix contrast_estimation: <http://purl.org/nidash/nidm#NIDM_0000001>
-    prefix contrast_map: <http://purl.org/nidash/nidm#NIDM_0000002>
-    prefix stderr_map: <http://purl.org/nidash/nidm#NIDM_0000013>
-    prefix contrast_name: <http://purl.org/nidash/nidm#NIDM_0000085>
-    prefix statistic_map: <http://purl.org/nidash/nidm#NIDM_0000076>
-    prefix mask_map: <http://purl.org/nidash/nidm#NIDM_0000054>
-
     prefix coordinate_vector: <http://purl.org/nidash/nidm#NIDM_0000086>
     prefix peak: <http://purl.org/nidash/nidm#NIDM_0000062>
     prefix significant_cluster: <http://purl.org/nidash/nidm#NIDM_0000070>
-    prefix equivalent_zstatistic: <http://purl.org/nidash/nidm#NIDM_0000092>
-    prefix pvalue_fwer: <http://purl.org/nidash/nidm#NIDM_0000115>
-    prefix pvalue_uncorrected: <http://purl.org/nidash/nidm#NIDM_0000116>
-    prefix statistic_type: <http://purl.org/nidash/nidm#NIDM_0000123>
 
     SELECT ?x WHERE {
       ?peak a peak: .
