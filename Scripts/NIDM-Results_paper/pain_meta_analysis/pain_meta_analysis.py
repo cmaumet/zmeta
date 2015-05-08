@@ -84,35 +84,40 @@ for study in studies:
                              "-usesqform " +
                              "-out " + resliced_file],
                             shell=True)
-                        if not to_reslice == mask_file:
-                            rescaled_file = os.path.join(
-                                pre_dir, study + "_" + file_name + "_rs")
-                            check_call(
-                                ["cd " + nidm_dir + ";" +
-                                 " fslmaths " + resliced_file + " -mul 100 " +
-                                 rescaled_file],
-                                shell=True)
+                        # if not to_reslice == mask_file:
+                        #     rescaled_file = os.path.join(
+                        #         pre_dir, study + "_" + file_name + "_rs")
+                        #     check_call(
+                        #         ["cd " + nidm_dir + ";" +
+                        #          " fslmaths " + resliced_file + " -mul 100 " +
+                        #          rescaled_file],
+                        #         shell=True)
 
-                            if to_reslice == con_file:
-                                con_maps[study] = rescaled_file
-                            elif to_reslice == std_file:
-                                sterr_maps[study] = rescaled_file
+                        if to_reslice == con_file:
+                            con_maps[study] = resliced_file
+                        elif to_reslice == std_file:
+                            sterr_maps[study] = resliced_file
                         else:
                             mask_file = resliced_file
 
                 elif str(software == FSL_SOFTWARE):
+                    # If study was performed with FSL, rescale to a target
+                    # value of 100
+                    for to_rescale in [con_file, std_file]:
+                        file_name = os.path.basename(to_rescale).split(".")[0]
+                        rescaled_file = os.path.join(
+                            pre_dir, study + "_" + file_name + "_s")
+                        check_call(
+                            ["cd " + nidm_dir + ";" +
+                             " fslmaths " + file_name + " -div 100 " +
+                             rescaled_file],
+                            shell=True)
+                        if to_rescale == con_file:
+                            con_maps[study] = rescaled_file
+                        elif to_rescale == std_file:
+                            sterr_maps[study] = rescaled_file
+
                     mask_file = mask_file.replace("file://.", nidm_dir)
-                    con_maps[study] = con_file.replace("file://.", nidm_dir)
-                    sterr_maps[study] = std_file.replace("file://.", nidm_dir)
-                #     # If study was performed with FSL, rescale to a target
-                #     # value of 100
-                #     for to_rescale in [con_file, std_file]:
-                #         file_name = os.path.basename(to_rescale).split(".")[0]
-                #         check_call(
-                #             ["cd " + nidm_dir + ";" +
-                #              " fslmaths " + file_name + " -div 100 " +
-                #              file_name + "_r"],
-                #             shell=True)
 
                 # mask_file = mask_file.replace("file://.", pre_dir)
 
