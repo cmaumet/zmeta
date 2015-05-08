@@ -12,13 +12,14 @@ if not os.path.exists(export_dir):
 # print [x[0] for x in os.walk(fsl_pain_data_dir)]
 # import_files = glob.glob(os.path.join(NIDMPATH, "imports", '*.ttl'))
 # All studies but the 10 first (computed with SPM)
-studies = next(os.walk(fsl_pain_data_dir))[1][10:]
+studies = next(os.walk(fsl_pain_data_dir))[1][11:]
+print studies
 
 con_maps = dict()
 sterr_maps = dict()
 
 for study in studies:
-    # print "\n\n"+study
+    print "\n\n"+study
 
     gfeat_dir = os.path.join(
         fsl_pain_data_dir, study, "gFeat", "flm_05mm.gfeat")
@@ -31,13 +32,18 @@ for study in studies:
     nidm_dirname = nidm_dir.split("/")[-1]
 
     nidm_export_dir = os.path.join(export_dir, study+"_"+nidm_dirname)
-    shutil.copytree(nidm_dir, nidm_export_dir)
+    shutil.move(nidm_dir, nidm_export_dir)
 
     assert os.path.isdir(nidm_export_dir)
 
     # Replace "group mean ac" and "group mean" by "pain: group mean"
     ttl = os.path.join(nidm_export_dir, "nidm.ttl")
     assert os.path.isfile(ttl)
-    with open(ttl, "r+") as fp:
+
+    with open(ttl, "r") as fp:
         ttl_txt = fp.read()
-        fp.write(ttl_txt.replace("group mean", "pain: group mean"))
+
+    ttl_txt = ttl_txt.replace("group mean", "pain: group mean")
+    fw = open(ttl, "w")
+    fw.write(ttl_txt)
+    fw.close()

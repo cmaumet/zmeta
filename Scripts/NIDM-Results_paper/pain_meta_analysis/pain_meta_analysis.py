@@ -1,34 +1,22 @@
-# import glob
 import os
 from rdflib.graph import Graph
 from subprocess import call
 import shutil
-# from nidmfsl.fsl_exporter.fsl_exporter import FSLtoNIDMExporter
 
-fsl_pain_data_dir = "/Users/cmaumet/Projects/Meta-analysis/Data/" + \
-    "FSL_pain_studies/tntmp"
+SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
+data_dir = os.path.join(SCRIPT_DIR, "data")
 
-# print [x[0] for x in os.walk(fsl_pain_data_dir)]
-# import_files = glob.glob(os.path.join(NIDMPATH, "imports", '*.ttl'))
-studies = next(os.walk(fsl_pain_data_dir))[1]
+print data_dir
+
+studies = next(os.walk(data_dir))[1]
+
+print studies
 
 con_maps = dict()
 sterr_maps = dict()
 
 for study in studies:
-    # print "\n\n"+study
-
-    gfeat_dir = os.path.join(
-        fsl_pain_data_dir, study, "gFeat", "flm_05mm.gfeat")
-    assert os.path.isdir(gfeat_dir)
-
-    # # Export as NIDM-Results
-    # fslnidm = FSLtoNIDMExporter(feat_dir=gfeat_dir, version="1.0.0")
-    # fslnidm.parse()
-    # nidm_dir = fslnidm.export()
-    # print 'NIDM export available at: '+str(nidm_dir)
-
-    nidm_dir = os.path.join(gfeat_dir, "nidm")
+    nidm_dir = os.path.join(data_dir, study)
     assert os.path.isdir(nidm_dir)
 
     nidm_doc = os.path.join(nidm_dir, "nidm.ttl")
@@ -68,19 +56,23 @@ for study in studies:
         for row in sd:
             con_name, con_file, std_file, mask_file = row
 
-            if str(con_name) == "group mean ac" or \
-               str(con_name) == "group mean":
+            if str(con_name) == "pain: group mean ac" or \
+               str(con_name) == "pain: group mean" or \
+               str(con_name) == "Group: pain":
                 con_maps[study] = str(con_file).replace("file://.", nidm_dir)
                 sterr_maps[study] = \
                     str(std_file).replace("file://.", nidm_dir)
                 mask = str(mask_file).replace("file://.", nidm_dir)
-            # # else:
-            # #     print "con_name=--"+str(con_name)+"--"
+            else:
+                print study
+                print "con_name=--"+str(con_name)+"--"
+                print "********"
 
             # print "\n\nrow:"
             # for el in row:
             #     print str(el)
     else:
+        print study
         print "not found"
 
 call(["fslmerge -t cope.nii.gz "+" ".join(con_maps.values())], shell=True)
