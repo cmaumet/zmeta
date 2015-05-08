@@ -37,23 +37,23 @@ for st = 1:10
               error(['Study ' studies{st} ' unknown']);
         end
         
-%         original_subject_cope = fullfile(subject_dir, 'stats', ['cope' cope_num '.nii.gz']);
-%         subject_cope = fullfile(out_study_dir, ['sub' num2str(sub, '%02d') '_cope' cope_num '.nii.gz']);
-%         copyfile(original_subject_cope, subject_cope);
-%         
-%         gunzip(subject_cope)
-%         delete(subject_cope)
-%         subject_cope = strrep(subject_cope, '.gz', '');
-%         
-%         % SPM-like scaling        
-%         clear matlabbatch
+        original_subject_cope = fullfile(subject_dir, 'stats', ['cope' cope_num '.nii.gz']);
+        subject_cope = fullfile(out_study_dir, ['sub' num2str(sub, '%02d') '_cope' cope_num '.nii.gz']);
+        copyfile(original_subject_cope, subject_cope);
+        
+        gunzip(subject_cope)
+        delete(subject_cope)
+        subject_cope = strrep(subject_cope, '.gz', '');
+        
+        % SPM-like scaling        
+        clear matlabbatch
         subject_cope_sc = ['sub' num2str(sub, '%02d') '_cope' cope_num '_sc.nii'];
-%         matlabbatch{1}.spm.util.imcalc.input = {[subject_cope ',1']};
-%         matlabbatch{1}.spm.util.imcalc.output = subject_cope_sc;
-%         matlabbatch{1}.spm.util.imcalc.outdir = {out_study_dir};
-%         matlabbatch{1}.spm.util.imcalc.expression = 'i1/100*2.5';
-%         matlabbatch{1}.spm.util.imcalc.options.dtype = 64;
-%         spm_jobman('run', matlabbatch)
+        matlabbatch{1}.spm.util.imcalc.input = {[subject_cope ',1']};
+        matlabbatch{1}.spm.util.imcalc.output = subject_cope_sc;
+        matlabbatch{1}.spm.util.imcalc.outdir = {out_study_dir};
+        matlabbatch{1}.spm.util.imcalc.expression = 'i1/100*2.5';
+        matlabbatch{1}.spm.util.imcalc.options.dtype = 64;
+        spm_jobman('run', matlabbatch)
         
         subject_copes{sub, 1} = fullfile(out_study_dir, subject_cope_sc);
     end
