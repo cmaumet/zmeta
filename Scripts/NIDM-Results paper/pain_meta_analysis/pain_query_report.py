@@ -21,9 +21,6 @@ assert os.path.isdir(gfeat_dir)
 nidm_dir = os.path.join(gfeat_dir, "nidm")
 assert os.path.isdir(nidm_dir)
 
-owl_graph = Graph()
-owl_graph.parse(owl_file, format='turtle')
-
 nidm_doc = os.path.join(nidm_dir, "nidm.ttl")
 print nidm_doc
 nidm_graph = Graph()
@@ -81,6 +78,10 @@ P_VALUE_UNCORRECTED = 'p-value uncorrected'
     # ?height_thresh a HeightThreshold: ;
     #                userSpecifiedThresholdType: ?height_thresh_type ;
     #                prov:value ?height_thresh_value .
+
+owl_graph = Graph()
+owl_graph.parse(owl_file, format='turtle')
+
 if sd:
     for row in sd:
 
