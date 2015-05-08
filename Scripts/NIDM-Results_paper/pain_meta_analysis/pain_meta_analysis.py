@@ -12,7 +12,7 @@ if not os.path.exists(pre_dir):
 studies = next(os.walk(data_dir))[1]
 
 con_maps = dict()
-sterr_maps = dict()
+varcon_maps = dict()
 mask_maps = dict()
 
 ma_mask_name = os.path.join(pre_dir, "meta_analysis_mask")
@@ -95,7 +95,7 @@ for study in studies:
                             if to_reslice == con_file:
                                 con_maps[study] = rescaled_file
                             elif to_reslice == std_file:
-                                sterr_maps[study] = rescaled_file
+                                std_file = rescaled_file
                         else:
                             mask_file = resliced_file
 
@@ -118,7 +118,13 @@ for study in studies:
 
                     mask_file = mask_file.replace("file://.", nidm_dir)
                     con_maps[study] = con_file.replace("file://.", nidm_dir)
-                    sterr_maps[study] = mask_file.replace("file://.", nidm_dir)
+                    std_file = std_file.replace("file://.", nidm_dir)
+                    varcon_maps[study] = varcope_file
+
+                varcope_file = os.path.join(pre_dir, study + "_varcope")
+                check_call([" fslmaths " + std_file + " -sqr " + varcope_file],
+                           shell=True)
+                varcon_maps[study] = varcope_file
 
                 # mask_file = mask_file.replace("file://.", pre_dir)
 
@@ -151,8 +157,8 @@ for study in studies:
 # Binarize the analysis mask
 check_call(["fslmaths " + ma_mask + " -thr 0.9 -bin " + ma_mask], shell=True)
 
-to_merge = {'copes': sorted(con_maps.values()), 
-            'varcopes': sorted(sterr_maps.values())}
+to_merge = {'copes': sorted(con_maps.values()),
+            'varcopes': sorted(varcon_maps.values())}
 for file_name, files in to_merge.items():
     print ["fslmerge -t "+os.path.join(pre_dir, file_name) +
          ".nii.gz "+" ".join(files)]
@@ -168,4 +174,4 @@ check_call([
     "--mask="+ma_mask_name+" --runmode=flame1"], shell=True)
 
 check_call(["cd " + pre_dir + "; fslmaths stats/zstat1 -ztop stats/p_unc"])
-check_call(["cd " + pre_dir + "; fdr -i stats/p_unc -q 0.05 --othresh=stats/thresh_fdr05"])
+check_call(["cd " + pre_dir + "; fdr -i stats/p_unc -q 0.05 --order=stats/thresh_fdr05_order"])
