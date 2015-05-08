@@ -84,40 +84,41 @@ for study in studies:
                              "-usesqform " +
                              "-out " + resliced_file],
                             shell=True)
-                        # if not to_reslice == mask_file:
-                        #     rescaled_file = os.path.join(
-                        #         pre_dir, study + "_" + file_name + "_rs")
-                        #     check_call(
-                        #         ["cd " + nidm_dir + ";" +
-                        #          " fslmaths " + resliced_file + " -mul 100 " +
-                        #          rescaled_file],
-                        #         shell=True)
-
-                        if to_reslice == con_file:
-                            con_maps[study] = resliced_file
-                        elif to_reslice == std_file:
-                            sterr_maps[study] = resliced_file
+                        if not to_reslice == mask_file:
+                            rescaled_file = os.path.join(
+                                pre_dir, study + "_" + file_name + "_rs")
+                            check_call(
+                                ["cd " + nidm_dir + ";" +
+                                 " fslmaths " + resliced_file + " -mul 100 " +
+                                 rescaled_file],
+                                shell=True)
+                            if to_reslice == con_file:
+                                con_maps[study] = rescaled_file
+                            elif to_reslice == std_file:
+                                sterr_maps[study] = rescaled_file
                         else:
                             mask_file = resliced_file
 
                 elif str(software == FSL_SOFTWARE):
                     # If study was performed with FSL, rescale to a target
                     # value of 100
-                    for to_rescale in [con_file, std_file]:
-                        file_name = os.path.basename(to_rescale).split(".")[0]
-                        rescaled_file = os.path.join(
-                            pre_dir, study + "_" + file_name + "_s")
-                        check_call(
-                            ["cd " + nidm_dir + ";" +
-                             " fslmaths " + file_name + " -div 100 " +
-                             rescaled_file],
-                            shell=True)
-                        if to_rescale == con_file:
-                            con_maps[study] = rescaled_file
-                        elif to_rescale == std_file:
-                            sterr_maps[study] = rescaled_file
+                    # for to_rescale in [con_file, std_file]:
+                    #     file_name = os.path.basename(to_rescale).split(".")[0]
+                    #     rescaled_file = os.path.join(
+                    #         pre_dir, study + "_" + file_name + "_s")
+                    #     check_call(
+                    #         ["cd " + nidm_dir + ";" +
+                    #          " fslmaths " + file_name + " -div 100 " +
+                    #          rescaled_file],
+                    #         shell=True)
+                    #     if to_rescale == con_file:
+                    #         con_maps[study] = rescaled_file
+                    #     elif to_rescale == std_file:
+                    #         sterr_maps[study] = rescaled_file
 
                     mask_file = mask_file.replace("file://.", nidm_dir)
+                    con_maps[study] = con_file.replace("file://.", nidm_dir)
+                    sterr_maps[study] = mask_file.replace("file://.", nidm_dir)
 
                 # mask_file = mask_file.replace("file://.", pre_dir)
 
@@ -157,6 +158,11 @@ for file_name, files in to_merge.items():
          ".nii.gz "+" ".join(files.values())],
         shell=True)
 
-check_call(["flameo --cope=copes --vc=varcopes --ld=stats --dm=pain_meta_analysis.mat"
-      " --cs=pain_meta_analysis.grp --tc=pain_meta_analysis.con "
-      "--mask="+ma_mask_name+" --runmode=flame1"], shell=True)
+check_call([
+    "cd " + pre_dir + "; flameo --cope=copes --vc=varcopes --ld=stats "
+    "--dm=../pain_meta_analysis.mat"
+    " --cs=../pain_meta_analysis.grp --tc=../pain_meta_analysis.con "
+    "--mask="+ma_mask_name+" --runmode=flame1"], shell=True)
+
+check_call(["cd " + pre_dir + "; fslmaths stats/zstat1 -ztop stats/p_unc"])
+check_call(["cd " + pre_dir + "; fdr -i stats/p_unc -q 0.05 --othresh=stats/thresh_fdr05"])
