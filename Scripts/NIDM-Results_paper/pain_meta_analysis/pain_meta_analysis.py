@@ -1,9 +1,10 @@
 import os
 from rdflib.graph import Graph
 from subprocess import check_call
+import collections
 
 SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
-data_dir = os.path.join(SCRIPT_DIR, "data")
+data_dir = os.path.join(SCRIPT_DIR, "data_spm_fsl")
 pre_dir = os.path.join(SCRIPT_DIR, "pre")
 
 if not os.path.exists(pre_dir):
@@ -21,7 +22,12 @@ ma_mask = None
 SPM_SOFTWARE = "http://neurolex.org/wiki/nif-0000-00343"
 FSL_SOFTWARE = "http://neurolex.org/wiki/birnlex_2067"
 
+
+# studies = studies[0:3]
+
 for study in studies:
+    print study
+
     nidm_dir = os.path.join(data_dir, study)
     assert os.path.isdir(nidm_dir)
 
@@ -71,6 +77,7 @@ for study in studies:
                str(con_name) == "Group: pain":
 
                 if str(software) == SPM_SOFTWARE:
+                    print "--> with SPM"
                     # If study was performed with SPM, reslice to FSL's
                     # template space
                     for to_reslice in [con_file, std_file, mask_file]:
@@ -89,7 +96,7 @@ for study in studies:
                                 pre_dir, study + "_" + file_name + "_rs")
                             check_call(
                                 ["cd " + nidm_dir + ";" +
-                                 " fslmaths " + resliced_file + " -mul 100 " +
+                                 " fslmaths " + resliced_file + " -mul 40 " +
                                  rescaled_file],
                                 shell=True)
                             if to_reslice == con_file:
@@ -100,6 +107,7 @@ for study in studies:
                             mask_file = resliced_file
 
                 elif str(software == FSL_SOFTWARE):
+                    print "--> with FSL"
                     # If study was performed with FSL, rescale to a target
                     # value of 100
                     # for to_rescale in [con_file, std_file]:
@@ -119,7 +127,6 @@ for study in studies:
                     mask_file = mask_file.replace("file://.", nidm_dir)
                     con_maps[study] = con_file.replace("file://.", nidm_dir)
                     std_file = std_file.replace("file://.", nidm_dir)
-                    varcon_maps[study] = varcope_file
 
                 varcope_file = os.path.join(pre_dir, study + "_varcope")
                 check_call([" fslmaths " + std_file + " -sqr " + varcope_file],
@@ -157,14 +164,14 @@ for study in studies:
 # Binarize the analysis mask
 check_call(["fslmaths " + ma_mask + " -thr 0.9 -bin " + ma_mask], shell=True)
 
-to_merge = {'copes': sorted(con_maps.values()),
-            'varcopes': sorted(varcon_maps.values())}
+# Sort copes and varcopes by study names
+to_merge = {'copes': collections.OrderedDict(sorted(con_maps.items())),
+            'varcopes': collections.OrderedDict(sorted(varcon_maps.items()))}
 for file_name, files in to_merge.items():
-    print ["fslmerge -t "+os.path.join(pre_dir, file_name) +
-         ".nii.gz "+" ".join(files)]
+
     check_call(
         ["fslmerge -t "+os.path.join(pre_dir, file_name) +
-         ".nii.gz "+" ".join(files)],
+         ".nii.gz "+" ".join(files.values())],
         shell=True)
 
 check_call([
@@ -173,5 +180,7 @@ check_call([
     " --cs=../pain_meta_analysis.grp --tc=../pain_meta_analysis.con "
     "--mask="+ma_mask_name+" --runmode=flame1"], shell=True)
 
+print ["cd " + pre_dir + "; fslmaths stats/zstat1 -ztop stats/p_unc"]
 check_call(["cd " + pre_dir + "; fslmaths stats/zstat1 -ztop stats/p_unc"])
-check_call(["cd " + pre_dir + "; fdr -i stats/p_unc -q 0.05 --order=stats/thresh_fdr05_order"])
+print ["cd " + pre_dir + "; fdr -i stats/p_unc -q 0.05 -a stats/thresh_fdr05_p_adj"]
+check_call(["cd " + pre_dir + "; fdr -i stats/p_unc -q 0.05 -a stats/thresh_fdr05_p_adj"])
