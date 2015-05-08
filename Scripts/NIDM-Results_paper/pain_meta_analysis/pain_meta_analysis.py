@@ -1,19 +1,21 @@
 import os
 from rdflib.graph import Graph
 from subprocess import check_call
-import shutil
 
 SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
 data_dir = os.path.join(SCRIPT_DIR, "data")
+pre_dir = os.path.join(SCRIPT_DIR, "pre")
+
+if not os.path.exists(pre_dir):
+    os.makedirs(pre_dir)
 
 studies = next(os.walk(data_dir))[1]
-print studies
 
 con_maps = dict()
 sterr_maps = dict()
 mask_maps = dict()
 
-ma_mask_name = "meta_analysis_mask"
+ma_mask_name = os.path.join(pre_dir, "meta_analysis_mask")
 ma_mask = None
 
 SPM_SOFTWARE = "http://neurolex.org/wiki/nif-0000-00343"
@@ -73,50 +75,59 @@ for study in studies:
                     # template space
                     for to_reslice in [con_file, std_file, mask_file]:
                         file_name = os.path.basename(to_reslice).split(".")[0]
+                        resliced_file = os.path.join(
+                            pre_dir, study + "_" + file_name + "_r")
                         check_call(
                             ["cd " + nidm_dir + ";" +
                              " flirt -in " + file_name + " -ref " +
                              "$FSLDIR/data/standard/MNI152_T1_2mm -applyxfm " +
-                             "-usesqform -out " + file_name + "_r"],
+                             "-usesqform " +
+                             "-out " + resliced_file],
                             shell=True)
-                    for to_rescale in [con_file, std_file]:
-                        file_name = os.path.basename(to_rescale).split(".")[0]
-                        check_call(
-                            ["cd " + nidm_dir + ";" +
-                             " fslmaths " + file_name + "_r -mul 40 " +
-                             file_name + "_rs"],
-                            shell=True)
-                    con_file = con_file.replace(".nii", "_rs.nii")
-                    std_file = std_file.replace(".nii", "_rs.nii")
-                    mask_file = mask_file.replace(".nii", "_r.nii")
+                        if not to_reslice == mask_file:
+                            rescaled_file = os.path.join(
+                                pre_dir, study + "_" + file_name + "_rs")
+                            check_call(
+                                ["cd " + nidm_dir + ";" +
+                                 " fslmaths " + resliced_file + " -mul 100 " +
+                                 rescaled_file],
+                                shell=True)
 
-                mask_file = mask_file.replace("file://.", nidm_dir)
+                            if to_reslice == con_file:
+                                con_maps[study] = rescaled_file
+                            elif to_reslice == std_file:
+                                sterr_maps[study] = rescaled_file
+                        else:
+                            mask_file = resliced_file
 
-                if ma_mask is None:
-                    ma_mask = mask_file
-                else:
-                    print [" fslmaths " + mask_file + " -min " +
-                           ma_mask + " " + ma_mask_name]
-                    check_call([" fslmaths " + mask_file + " -min " +
-                           ma_mask + " " + ma_mask_name],
-                               shell=True)
-                    ma_mask = ma_mask_name
-
-
-                # elif str(software == FSL_SOFTWARE):
+                elif str(software == FSL_SOFTWARE):
+                    mask_file = mask_file.replace("file://.", nidm_dir)
+                    con_maps[study] = con_file.replace("file://.", nidm_dir)
+                    sterr_maps[study] = std_file.replace("file://.", nidm_dir)
                 #     # If study was performed with FSL, rescale to a target
                 #     # value of 100
-                #     for to_relice in [con_file, std_file]:
-                #         file_name = os.path.basename(to_relice).split(".")[0]
+                #     for to_rescale in [con_file, std_file]:
+                #         file_name = os.path.basename(to_rescale).split(".")[0]
                 #         check_call(
                 #             ["cd " + nidm_dir + ";" +
                 #              " fslmaths " + file_name + " -div 100 " +
                 #              file_name + "_r"],
                 #             shell=True)
+
+                # mask_file = mask_file.replace("file://.", pre_dir)
+
+                if ma_mask is None:
+                    ma_mask = mask_file
+                else:
+                    check_call([" fslmaths " + mask_file + " -min " +
+                           ma_mask + " " + ma_mask_name],
+                               shell=True)
+                    ma_mask = ma_mask_name
+
                 con_maps[study] = \
                     str(con_file).replace("file://.", nidm_dir)
                 sterr_maps[study] = \
-                    str(con_file).replace("file://.", nidm_dir)
+                    str(std_file).replace("file://.", nidm_dir)
                 # mask_maps[study] = \
                 #     str(mask_file).replace("file://.", nidm_dir)
             else:
@@ -131,25 +142,16 @@ for study in studies:
         print study
         print "not found"
 
-# Binarize the mask
-check_call(["fslmaths "+ ma_mask +" -thr 0.9 -bin "+ ma_mask], shell=True)
+# Binarize the analysis mask
+check_call(["fslmaths " + ma_mask + " -thr 0.9 -bin " + ma_mask], shell=True)
 
-to_merge = {'copes': con_maps, 'varcopes': sterr_maps} #, 'masks': mask_maps}
-for file_type, files in to_merge.items():
+to_merge = {'copes': con_maps, 'varcopes': sterr_maps}
+for file_name, files in to_merge.items():
     check_call(
-        ["fslmerge -t "+file_type+".nii.gz "+" ".join(files.values())],
+        ["fslmerge -t "+os.path.join(pre_dir, file_name) +
+         ".nii.gz "+" ".join(files.values())],
         shell=True)
-# check_call(
-#     ["fslmerge -t varcope.nii.gz "+" ".join(sterr_maps.values())], shell=True)
-# check_call(
-#     ["fslmerge -t mask.nii.gz "+" ".join(mask_maps.values())], shell=True)
 
-# FIXME: should use a combined mask across all studies
-# print mask
-# shutil.copyfile(
-#     mask,
-#     os.path.join(os.path.dirname(os.path.realpath(__file__)), "mask.nii.gz"))
-
-check_call(["flameo --cope=cope --vc=varcope --ld=stats --dm=pain_meta_analysis.mat"
+check_call(["flameo --cope=copes --vc=varcopes --ld=stats --dm=pain_meta_analysis.mat"
       " --cs=pain_meta_analysis.grp --tc=pain_meta_analysis.con "
       "--mask="+ma_mask_name+" --runmode=flame1"], shell=True)
