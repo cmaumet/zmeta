@@ -130,10 +130,10 @@ for study in studies:
                                shell=True)
                     ma_mask = ma_mask_name
 
-                con_maps[study] = \
-                    str(con_file).replace("file://.", nidm_dir)
-                sterr_maps[study] = \
-                    str(std_file).replace("file://.", nidm_dir)
+                # con_maps[study] = \
+                #     str(con_file).replace("file://.", nidm_dir)
+                # sterr_maps[study] = \
+                #     str(std_file).replace("file://.", nidm_dir)
                 # mask_maps[study] = \
                 #     str(mask_file).replace("file://.", nidm_dir)
             else:
@@ -151,11 +151,14 @@ for study in studies:
 # Binarize the analysis mask
 check_call(["fslmaths " + ma_mask + " -thr 0.9 -bin " + ma_mask], shell=True)
 
-to_merge = {'copes': con_maps, 'varcopes': sterr_maps}
+to_merge = {'copes': sorted(con_maps.values()), 
+            'varcopes': sorted(sterr_maps.values())}
 for file_name, files in to_merge.items():
+    print ["fslmerge -t "+os.path.join(pre_dir, file_name) +
+         ".nii.gz "+" ".join(files)]
     check_call(
         ["fslmerge -t "+os.path.join(pre_dir, file_name) +
-         ".nii.gz "+" ".join(files.values())],
+         ".nii.gz "+" ".join(files)],
         shell=True)
 
 check_call([
