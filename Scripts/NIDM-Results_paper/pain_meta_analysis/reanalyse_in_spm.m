@@ -11,53 +11,43 @@ isub = [d(:).isdir]; %# returns logical vector
 studies = {d(isub).name}';
 studies(ismember(studies,{'.','..'})) = [];
 
-for st = 1:10
-    study_dir = fullfile(data_dir, studies{st}, 'iFeat', '05mm');
+for st = 1:10    
+    switch studies{st}
+        case {'chantal_001', 'chantal_002', 'chantal_003', 'chantal_004'}
+            cope_num = '1';
+        case {'debbie_001', 'debbie_002', 'debbie_003', 'giannet_001', ...
+               'giannet_002', 'giannet_003', 'giannet_004'}
+            cope_num = '6';
+        otherwise
+            error(['Study ' studies{st} ' unknown']);
+    end
     
-    d = dir(study_dir);
-    isub = [d(:).isdir]; %# returns logical vector
-    subjects = {d(isub).name}';
-    subjects(ismember(subjects,{'.','..'})) = [];
+    study_dir = fullfile(data_dir, studies{st}, 'gFeat', ...
+        'flm_05mm.gfeat', ['cope' num2str(cope_num) '.feat']);
+    disp(study_dir)
+    disp(isdir(study_dir))
     
     out_study_dir = fullfile(out_dir, studies{st});
     if ~isdir(out_study_dir)
         mkdir(out_study_dir)
     end
     
-    subject_copes = cell(numel(subjects),1);
-    for sub = 1:numel(subjects)
-        subject_dir = fullfile(study_dir, subjects{sub});      
-        switch studies{st}
-           case {'chantal_001', 'chantal_002', 'chantal_003', 'chantal_004'}
-              cope_num = '1';
-           case {'debbie_001', 'debbie_002', 'debbie_003', 'giannet_001', ...
-                   'giannet_002', 'giannet_003', 'giannet_004'}
-              cope_num = '6';
-           otherwise
-              error(['Study ' studies{st} ' unknown']);
-        end
-        
-        original_subject_cope = fullfile(subject_dir, 'stats', ['cope' cope_num '.nii.gz']);
-        subject_cope = fullfile(out_study_dir, ['sub' num2str(sub, '%02d') '_cope' cope_num '.nii.gz']);
-        copyfile(original_subject_cope, subject_cope);
-        
-        gunzip(subject_cope)
-        delete(subject_cope)
-        subject_cope = strrep(subject_cope, '.gz', '');
-        
-        % SPM-like scaling        
-        clear matlabbatch
-        subject_cope_sc = ['sub' num2str(sub, '%02d') '_cope' cope_num '_sc.nii'];
-        matlabbatch{1}.spm.util.imcalc.input = {[subject_cope ',1']};
-        matlabbatch{1}.spm.util.imcalc.output = subject_cope_sc;
-        matlabbatch{1}.spm.util.imcalc.outdir = {out_study_dir};
-        matlabbatch{1}.spm.util.imcalc.expression = 'i1/100*2.5';
-        matlabbatch{1}.spm.util.imcalc.options.dtype = 64;
-        spm_jobman('run', matlabbatch)
-        
-        subject_copes{sub, 1} = fullfile(out_study_dir, subject_cope_sc);
-    end
+    % Work with "filtered_func_data" rather than original copes because
+    % already in standardised space    
+    original_copes = fullfile(study_dir, 'filtered_func_data.nii.gz');
+    copes = fullfile(out_study_dir, ['copes' cope_num '.nii.gz']);
+    copyfile(original_copes, copes);    
     
+    gunzip(copes)
+    delete(copes)
+    copes = strrep(copes, '.gz', '');
+
+    % SPM-like scaling
+    copes_scaled = fullfile(out_study_dir, ['copes' cope_num '_sc.nii']);
+    copyfile(copes, copes_scaled);
+    copes_scaled_img = nifti(copes_scaled);
+    copes_scaled_img.dat(:) = copes_scaled_img.dat(:)/100*2.5;
+
     % One-sample t-test
     stat_dir = fullfile(out_study_dir, 'stat');
     if ~isdir(stat_dir)
@@ -66,7 +56,11 @@ for st = 1:10
     
     clear matlabbatch;
     matlabbatch{1}.spm.stats.factorial_design.dir = {stat_dir};
-    matlabbatch{1}.spm.stats.factorial_design.des.t1.scans = subject_copes;
+    matlabbatch{1}.spm.stats.factorial_design.des.t1.scans = ...
+        cellstr(spm_select('ExtFPList', out_study_dir, ...
+        ['^' ...
+        regexptranslate('escape', spm_file(copes_scaled, 'filename')) ...
+        '$']));
     matlabbatch{2}.spm.stats.fmri_est.spmmat = {fullfile(stat_dir, 'SPM.mat')};
     matlabbatch{3}.spm.stats.con.spmmat = {fullfile(stat_dir, 'SPM.mat')};
     matlabbatch{3}.spm.stats.con.consess{1}.tcon.name = 'Group: pain';
@@ -78,25 +72,25 @@ for st = 1:10
     matlabbatch{4}.spm.stats.results.conspec.thresh = 0.01;
     switch studies{st}
         case {'chantal_001'}
-            FWEc = 94;
+            FWEc = 446;
         case {'chantal_002'}
-            FWEc = 231;            
+            FWEc = 1470;            
         case {'chantal_003'}
-            FWEc = 80;
+            FWEc = 1408;
         case {'chantal_004'}
-            FWEc = 107;            
+            FWEc = 566;            
         case {'debbie_001'}
-            FWEc = 66;
+            FWEc = 2966;
         case {'debbie_002'}
-            FWEc = 60;            
+            FWEc = 32788;            
         case {'debbie_003'}
-            FWEc = 97;                        
+            FWEc = 566;                        
         case {'giannet_001'}
-            FWEc = 80;            
+            FWEc = 533;            
         case {'giannet_002'}
-            FWEc = 81;                        
+            FWEc = 545;                        
         case {'giannet_003'}
-            FWEc = 69;                                    
+            FWEc = 804;                                    
         otherwise
             error(['Study ' studies{st} ' unknown']);
     end
