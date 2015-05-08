@@ -35,6 +35,7 @@ unused*
 data/*
 fsl_design/*.ppm
 fsl_design/*.fsf
+Scripts/NIDM-Results\ paper/pain_meta_analysis/data/*
 
 # R autosaved files
 *(Autosaved).R
