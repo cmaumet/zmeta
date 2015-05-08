@@ -190,3 +190,5 @@ print ["cd " + pre_dir + "; fslmaths stats/zstat1 -ztop stats/p_unc"]
 check_call(["cd " + pre_dir + "; fslmaths stats/zstat1 -ztop stats/p_unc"])
 print ["cd " + pre_dir + "; fdr -i stats/p_unc -q 0.05 -a stats/thresh_fdr05_p_adj"]
 check_call(["cd " + pre_dir + "; fdr -i stats/p_unc -q 0.05 -a stats/thresh_fdr05_p_adj"])
+# fslmaths stats/thresh_fdr05_p_adj_m.nii.gz -mul -1 -add 1 -thr 0.95 -mas stats/mask.nii.gz stats/thresh_fdr05_1mp_adj_m.nii.gz
+# fslmaths stats/zstat1.nii.gz -mas stats/thresh_fdr05_1mp_adj_m.nii.gz -mas stats/mask.nii.gz stats/thresh_zstat1.nii.gz
