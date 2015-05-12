@@ -32,10 +32,10 @@ unused*
 *.hdr
 
 # data
-data/*
+# Ignore all directories called data
+data/
 fsl_design/*.ppm
 fsl_design/*.fsf
-Scripts/NIDM-Results_paper/pain_meta_analysis/data/*
 
 # R autosaved files
 *(Autosaved).R
