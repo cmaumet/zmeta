@@ -2,9 +2,10 @@
 import os
 from rdflib.graph import Graph
 
-fsl_pain_data_dir = "/Users/cmaumet/Projects/Meta-analysis/Data/" + \
-    "FSL_pain_studies/tntmp"
-studies = next(os.walk(fsl_pain_data_dir))[1]
+SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
+data_dir = os.path.join(SCRIPT_DIR, "data_spm_fsl")
+
+studies = next(os.walk(data_dir))[1]
 
 con_maps = dict()
 sterr_maps = dict()
@@ -14,11 +15,7 @@ study = studies[0]
 owl_file = "https://raw.githubusercontent.com/incf-nidash/nidm/master/nidm/\
 nidm-results/terms/releases/nidm-results_100.owl"
 
-gfeat_dir = os.path.join(
-    fsl_pain_data_dir, study, "gFeat", "flm_05mm.gfeat")
-assert os.path.isdir(gfeat_dir)
-
-nidm_dir = os.path.join(gfeat_dir, "nidm")
+nidm_dir = os.path.join(data_dir, study)
 assert os.path.isdir(nidm_dir)
 
 nidm_doc = os.path.join(nidm_dir, "nidm.ttl")
