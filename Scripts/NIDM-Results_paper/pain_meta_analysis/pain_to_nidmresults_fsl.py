@@ -4,16 +4,17 @@ from nidmfsl.fsl_exporter.fsl_exporter import FSLtoNIDMExporter
 
 fsl_pain_data_dir = "/Users/cmaumet/Projects/Meta-analysis/Data/" + \
     "FSL_pain_studies/tntmp"
-export_dir = os.path.join(fsl_pain_data_dir, 'export_fsl')
-
-if not os.path.exists(export_dir):
-    os.makedirs(export_dir)
 
 # print [x[0] for x in os.walk(fsl_pain_data_dir)]
 # import_files = glob.glob(os.path.join(NIDMPATH, "imports", '*.ttl'))
 # All studies but the 10 first (computed with SPM)
 studies = next(os.walk(fsl_pain_data_dir))[1][11:]
 print studies
+
+export_dir = os.path.join(fsl_pain_data_dir, '..', 'export_fsl')
+
+if not os.path.exists(export_dir):
+    os.makedirs(export_dir)
 
 con_maps = dict()
 sterr_maps = dict()
