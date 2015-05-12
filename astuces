@@ -364,7 +364,7 @@ rsync -av --progress --inplace --rsh='ssh' wmsmfe@buster.stats.warwick.ac.uk:/st
 -e => for ssh
 
 # This one
-rsync -avzhe ssh --remove-source-files wmsmfe@buster.stats.warwick.ac.uk:/storage/wmsmfe/simulations/two_unb_nStudy50_subNumidentical_varidentical_Betw0*_numStudySoft0.5* /Volumes/camille/MBIA_buster/
+rsync -avzhe ssh --remove-source-files wmsmfe@buster.stats.warwick.ac.uk:/storage/wmsmfe/simulations/two_unb_nStudy50* /Volumes/camille/MBIA_buster/
 
 rsync -avzhe ssh /Volumes/camille/MBIA_buster/nStudy25_subNumidentical_varidentical_Betw1* wmsmfe@buster.stats.warwick.ac.uk:/storage/wmsmfe/simulations/
 
