@@ -44,7 +44,6 @@ nidm#NIDM_0000125>
     SELECT DISTINCT ?est_method ?homoscedasticity ?contrast_name
             ?search_region_nifti  ?search_vol_vox ?extent_thresh
             ?user_extent_thresh ?height_thresh ?user_height_thresh ?software
-            WHERE {
         ?mpe a ModelParamEstimation: .
         ?mpe withEstimationMethod: ?est_method .
         ?mpe prov:used ?error_model .
@@ -52,20 +51,20 @@ nidm#NIDM_0000125>
         ?stat_map prov:wasGeneratedBy/prov:used/prov:wasGeneratedBy ?mpe ;
                   a StatisticMap: ;
                   contrastName: ?contrast_name .
-        ?search_region prov:wasGeneratedBy/prov:used ?stat_map ;
+        ?search_region prov:wasGeneratedBy ?inference ;
                        a SearchSpaceMaskMap: ;
                        prov:atLocation ?search_region_nifti ;
                        searchVolumeInVoxels: ?search_vol_vox .
-        ?inference prov:used ?stat_map ;
-                   prov:used ?extent_thresh ;
-                   prov:used ?height_thresh ;
-                   prov:wasAssociatedWith ?soft_id .
         ?extent_thresh a ExtentThreshold: .
         OPTIONAL {
             ?extent_thresh userSpecifiedThresholdType: ?user_extent_thresh
         } .
         ?height_thresh a HeightThreshold: ;
                        userSpecifiedThresholdType: ?user_height_thresh .
+        ?inference prov:used ?stat_map ;
+                   prov:used ?extent_thresh ;
+                   prov:used ?height_thresh ;
+                   prov:wasAssociatedWith ?soft_id .
         ?soft_id a ?software .
 
         FILTER(?software NOT IN (prov:SoftwareAgent, prov:Agent))
@@ -171,8 +170,6 @@ comparisons "
                     elif user_height_thresh == Z_STATISTIC:
                         thresh = "Z > %0.2f uncorrected" % float(height_value)
 
-
-                    print extent_value
                     thresh += " and clusters smaller than %d were discarded" \
                               % int(extent_value)
 
