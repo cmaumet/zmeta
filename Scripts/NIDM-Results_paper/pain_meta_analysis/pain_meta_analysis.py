@@ -47,22 +47,24 @@ for study in studies:
     prefix statistic_map: <http://purl.org/nidash/nidm#NIDM_0000076>
     prefix mask_map: <http://purl.org/nidash/nidm#NIDM_0000054>
 
-    SELECT ?contrastName ?con_file ?std_file ?mask_file ?software WHERE {
+    SELECT ?contrastName ?con_file ?std_file
+    ?mask_file ?software WHERE {
      ?con_id a contrast_map: ;
           contrast_name: ?contrastName ;
-          prov:atLocation ?con_file .
+          prov:atLocation ?con_file ;
+          prov:wasGeneratedBy ?con_est .
      ?std_id a stderr_map: ;
-          prov:atLocation ?std_file .
-     ?con_est a contrast_estimation: ;
-              prov:wasAssociatedWith ?soft_id.
-     ?con_id prov:wasGeneratedBy ?con_est .
-     ?std_id prov:wasGeneratedBy ?con_est .
-     ?con_est prov:used ?mask_id .
+          prov:atLocation ?std_file ;
+          prov:wasGeneratedBy ?con_est .
      ?mask_id a mask_map: ;
           prov:atLocation ?mask_file .
      ?soft_id a ?software .
+     ?con_est a contrast_estimation: ;
+              prov:wasAssociatedWith ?soft_id ;
+              prov:used ?mask_id .
 
-      FILTER(?software NOT IN (prov:SoftwareAgent, prov:Agent))
+      FILTER(?software NOT IN (
+        prov:SoftwareAgent, prov:Agent))
     }
 
     """
