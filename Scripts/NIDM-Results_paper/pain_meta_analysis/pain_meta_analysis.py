@@ -192,3 +192,5 @@ print ["cd " + pre_dir + "; fdr -i stats/p_unc -q 0.05 -a stats/thresh_fdr05_p_a
 check_call(["cd " + pre_dir + "; fdr -i stats/p_unc -q 0.05 -a stats/thresh_fdr05_p_adj"])
 # fslmaths stats/thresh_fdr05_p_adj_m.nii.gz -mul -1 -add 1 -thr 0.95 -mas stats/mask.nii.gz stats/thresh_fdr05_1mp_adj_m.nii.gz
 # fslmaths stats/zstat1.nii.gz -mas stats/thresh_fdr05_1mp_adj_m.nii.gz -mas stats/mask.nii.gz stats/thresh_zstat1.nii.gz
+# ttologp -logpout logp1 varcope1 cope1 20
+# fslmaths logp1.nii.gz -div -2.3026 -mas mask.nii.gz -mas thresh_zstat1.nii.gz thresh_minuslog10p1.nii.gz
