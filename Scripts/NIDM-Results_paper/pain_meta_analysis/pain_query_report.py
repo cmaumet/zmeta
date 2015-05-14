@@ -36,14 +36,19 @@ for study in [studies[0], studies[15]]:
     prefix contrastName: <http://purl.org/nidash/nidm#NIDM_0000085>
     prefix StatisticMap: <http://purl.org/nidash/nidm#NIDM_0000076>
     prefix searchVolumeInVoxels: <http://purl.org/nidash/nidm#NIDM_0000121>
+    prefix searchVolumeInUnits: <http://purl.org/nidash/nidm#NIDM_0000136>
     prefix HeightThreshold: <http://purl.org/nidash/nidm#NIDM_0000034>
     prefix userSpecifiedThresholdType: <http://purl.org/nidash/\
 nidm#NIDM_0000125>
     prefix ExtentThreshold: <http://purl.org/nidash/nidm#NIDM_0000026>
+    prefix ExcursionSetMap: <http://purl.org/nidash/nidm#NIDM_0000025>
+    prefix softwareVersion: <http://purl.org/nidash/nidm#NIDM_0000122>
 
     SELECT DISTINCT ?est_method ?homoscedasticity ?contrast_name
-            ?search_region_nifti  ?search_vol_vox ?extent_thresh
-            ?user_extent_thresh ?height_thresh ?user_height_thresh ?software
+            ?search_vol_vox ?search_vol_units
+            ?extent_thresh ?user_extent_thresh ?height_thresh
+            ?user_height_thresh ?software ?excursion_set_id ?soft_version
+        WHERE {
         ?mpe a ModelParamEstimation: .
         ?mpe withEstimationMethod: ?est_method .
         ?mpe prov:used ?error_model .
@@ -53,8 +58,8 @@ nidm#NIDM_0000125>
                   contrastName: ?contrast_name .
         ?search_region prov:wasGeneratedBy ?inference ;
                        a SearchSpaceMaskMap: ;
-                       prov:atLocation ?search_region_nifti ;
-                       searchVolumeInVoxels: ?search_vol_vox .
+                       searchVolumeInVoxels: ?search_vol_vox ;
+                       searchVolumeInUnits: ?search_vol_units .
         ?extent_thresh a ExtentThreshold: .
         OPTIONAL {
             ?extent_thresh userSpecifiedThresholdType: ?user_extent_thresh
@@ -65,7 +70,10 @@ nidm#NIDM_0000125>
                    prov:used ?extent_thresh ;
                    prov:used ?height_thresh ;
                    prov:wasAssociatedWith ?soft_id .
-        ?soft_id a ?software .
+        ?soft_id a ?software ;
+                   softwareVersion: ?soft_version .
+        ?excursion_set_id a ExcursionSetMap: ;
+                   prov:wasGeneratedBy ?inference .
 
         FILTER(?software NOT IN (prov:SoftwareAgent, prov:Agent))
 
@@ -91,9 +99,10 @@ nidm#NIDM_0000125>
 
     if sd:
         for row in sd:
-            est_method, homoscedasticity, contrast_name, search_region_nifti, \
-                search_vol_vox, extent_thresh, user_extent_thresh, \
-                height_thresh, user_height_thresh, software = row
+            est_method, homoscedasticity, contrast_name, \
+                search_vol_vox, search_vol_units, extent_thresh, \
+                user_extent_thresh, height_thresh, user_height_thresh, \
+                software, exc_set, soft_version = row
 
             if user_extent_thresh is None:
                 user_extent_thresh = CLUSTER_SIZE
@@ -179,19 +188,18 @@ comparisons "
                     variance = 'unequal'
 
                 print "-------------------"
-                print "%s was performed assuming %s variances. %s inference \
-was performed %susing a threshold %s. The search volume was made of %d voxels \
-(cf. %s)" % (
-                    owl_graph.label(est_method), variance, inference_type,
-                    multiple_compa, thresh, int(search_vol_vox),
-                    search_region_nifti.replace("file://./", ""))
+                print "Group statistic was performed in %s (version %s). \
+%s was performed assuming %s variances. %s inference \
+was performed %susing a threshold %s. The search volume was %d cm^3 \
+(%d voxels)." % (
+                    owl_graph.label(software), soft_version,
+                    owl_graph.label(est_method).capitalize(), variance, inference_type,
+                    multiple_compa, thresh, float(search_vol_units)/1000,
+                    int(search_vol_vox))
 
                 print "-------------------"
 
-                if str(software) == SPM_SOFTWARE:
-                    print "SPM"
-                elif str(software) == FSL_SOFTWARE:
-                    print "FSL"
+
 
                 # print "row:"
                 # for el in row:
