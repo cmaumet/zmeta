@@ -1,3 +1,25 @@
+-- Uploading a package to pypi --
+
+https://python-packaging-user-guide.readthedocs.org/en/latest/distributing.html#packaging-your-project
+
+# Create setup.cfg
+# Create ~/.pypirc (login)
+rm -rf dist
+python setup.py sdist
+python setup.py bdist_wheel --universal
+twine upload -r pypitest dist/*
+pip install -i https://testpypi.python.org/pypi nidmresults
+
+-- NIDM-Results 1.0.0 --
+original tag at: https://github.com/incf-nidash/nidm/commit/ca15bed0c02b82dae459c01bcd97ae9b0ccd4134
+
+-- branch that contains a given regexp in changes --
+1. find commit that contains a given change
+git rev-list --all | xargs git grep "isclose"
+
+2. find branch that contains a given commit
+git branch --contains b3a943c2c0b37f608d6e6ad4cf707195a4f6d8de
+
 --- Find all dir thatdo not have a certain file --
 find . -type d \! -exec test -e '{}/README' \; -print
 
@@ -32,7 +54,7 @@ find . -mindepth 1 -maxdepth 1 -type d | xargs -I folder sh -c 'find folder -min
 
 find . -mindepth 1 -maxdepth 1 -type d -name 'nStudy50_subNumidentical_varidentical_Betw0*' | xargs -I folder sh -c 'find folder -mindepth 1 -maxdepth 1 -type d | wc -l'
 
-find . -mindepth 1 -maxdepth 1 -type d -name 'two_*' | xargs -I folder sh -c 'find folder -mindepth 1 -maxdepth 1 -type d | wc -l; echo folder'
+find . -mindepth 1 -maxdepth 1 -type d -name 'two_*Betw0*' | xargs -I folder sh -c 'find folder -mindepth 1 -maxdepth 1 -type d | wc -l; echo folder'
 
 
 -- Remove a file from a commit -
@@ -218,7 +240,7 @@ PATH="/Users/cmaumet/Softs/external/provToolbox/bin/:$PATH"
 
 ------ Add to python path ----
 PYTHONPATH="/Users/cmaumet/Projects/Data_sharing/dev:$PYTHONPATH"
-PYTHONPATH="/Users/cmaumet/Projects/Data_sharing/dev/niexportForFSL:$PYTHONPATH"
+PYTHONPATH="/Users/cmaumet/Projects/Data_sharing/dev/nidm-results_fsl:$PYTHONPATH"
 
 
 PYTHONPATH="/Users/cmaumet/Softs/external/prov_cmaumet:$PYTHONPATH"
@@ -364,7 +386,7 @@ rsync -av --progress --inplace --rsh='ssh' wmsmfe@buster.stats.warwick.ac.uk:/st
 -e => for ssh
 
 # This one
-rsync -avzhe ssh --remove-source-files wmsmfe@buster.stats.warwick.ac.uk:/storage/wmsmfe/simulations/two_unb_nStudy50* /Volumes/camille/MBIA_buster/
+rsync -avzhe ssh --remove-source-files wmsmfe@buster.stats.warwick.ac.uk:/storage/wmsmfe/simulations/two_unb_nStudy25* /Volumes/camille/MBIA_buster/
 
 rsync -avzhe ssh /Volumes/camille/MBIA_buster/nStudy25_subNumidentical_varidentical_Betw1* wmsmfe@buster.stats.warwick.ac.uk:/storage/wmsmfe/simulations/
 
