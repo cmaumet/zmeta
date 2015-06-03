@@ -1,3 +1,6 @@
+-- Checkout a git tag --
+git checkout tags/NIDM-Results_1.1.0
+
 -- Uploading a package to pypi --
 
 https://python-packaging-user-guide.readthedocs.org/en/latest/distributing.html#packaging-your-project
@@ -7,11 +10,21 @@ https://python-packaging-user-guide.readthedocs.org/en/latest/distributing.html#
 rm -rf dist
 python setup.py sdist
 python setup.py bdist_wheel --universal
+
+# first time only: register project
+python setup.py register -r https://testpypi.python.org/pypi
+
 twine upload -r pypitest dist/*
-pip install -i https://testpypi.python.org/pypi nidmresults
+pip install -i https://testpypi.python.org/pypi nidmfsl
 
 -- NIDM-Results 1.0.0 --
 original tag at: https://github.com/incf-nidash/nidm/commit/ca15bed0c02b82dae459c01bcd97ae9b0ccd4134
+then: https://github.com/incf-nidash/nidm/commit/8a0cc5ee8f9646558c36c83c3ad0ed6065e3acd2
+
+-- NIDM-Results 1.1.0 --
+original tag at: https://github.com/incf-nidash/nidm/commit/5f9e9bb4838ef77aed068e2e6746d63fc7197115
+then: https://github.com/incf-nidash/nidm/commit/f1798eed23e29d4b6f14a9921cbb3ea52631288b
+then: 
 
 -- branch that contains a given regexp in changes --
 1. find commit that contains a given change
@@ -303,6 +316,9 @@ git tag -a -f my_tag
 
 ------------- Tags -----------
 git tag -a SnPM13.1.02 -m "SnPM version 13.1.02" 
+
+git tag -a NIDM-Results_1.1.0 -m "NIDM-Results 1.1.0" 
+
 git push --tag
 
 git push upstream tag_name
