@@ -8,7 +8,7 @@ fsl_pain_data_dir = "/Users/cmaumet/Projects/Meta-analysis/Data/" + \
 # print [x[0] for x in os.walk(fsl_pain_data_dir)]
 # import_files = glob.glob(os.path.join(NIDMPATH, "imports", '*.ttl'))
 # All studies but the 10 first (computed with SPM)
-studies = next(os.walk(fsl_pain_data_dir))[1][11:]
+studies = next(os.walk(fsl_pain_data_dir))[1][10:]
 print studies
 
 export_dir = os.path.join(fsl_pain_data_dir, '..', 'export_fsl')
@@ -27,7 +27,7 @@ for study in studies:
     assert os.path.isdir(gfeat_dir)
 
     # Export as NIDM-Results
-    fslnidm = FSLtoNIDMExporter(feat_dir=gfeat_dir, version="1.0.0")
+    fslnidm = FSLtoNIDMExporter(feat_dir=gfeat_dir, version="1.1.0")
     fslnidm.parse()
     nidm_dir = fslnidm.export()
     nidm_dirname = nidm_dir.split("/")[-1]

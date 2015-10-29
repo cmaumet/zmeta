@@ -1,3 +1,17 @@
+-- fetch tags --
+git fetch --tags
+
+-- Update a git tag --
+git checkout tags/NIDM-Results_x.x.x
+git checkout -b nidmresults_xxx
+git commit -m "fix: xxx"
+git push origin nidmresults_xxx
+== verif tests are passing on travis ==
+git tag -fa NIDM-Results_x.x.x
+git push origin NIDM-Results_x.x.x
+git push upstream NIDM-Results_x.x.x
+
+
 -- Checkout a git tag --
 git checkout tags/NIDM-Results_1.1.0
 
@@ -20,6 +34,7 @@ pip install -i https://testpypi.python.org/pypi nidmfsl
 -- NIDM-Results 1.0.0 --
 original tag at: https://github.com/incf-nidash/nidm/commit/ca15bed0c02b82dae459c01bcd97ae9b0ccd4134
 then: https://github.com/incf-nidash/nidm/commit/8a0cc5ee8f9646558c36c83c3ad0ed6065e3acd2
+then: https://github.com/incf-nidash/nidm/commit/7eb790b80ce22cdf25a6fa046a9bb6911eb185e9
 
 -- NIDM-Results 1.1.0 --
 original tag at: https://github.com/incf-nidash/nidm/commit/5f9e9bb4838ef77aed068e2e6746d63fc7197115
