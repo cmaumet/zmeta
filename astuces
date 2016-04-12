@@ -1,3 +1,145 @@
+--- write git-lfs push all files in commit --
+$ git lfs pointer --file=MNI152_T1_1mm.nii.gz
+Git LFS pointer for MNI152_T1_1mm.nii.gz
+
+version https://git-lfs.github.com/spec/v1
+oid sha256:d1f03e160c2548592a01d98d44d7e0ffa8a8ef58bc9b07d26369e214ba170edb
+size 10963667
+
+
+-----
+
+
+show files mofified by one commit
+git show --pretty="format:" --name-only 4ea7e7a
+
+----
+Merge folders: http://askubuntu.com/questions/259772/how-to-merge-folders-and-subfolders
+
+rsync -aP /ORIGINAL_A/* /DESTINATION_C/
+This is like a copy of the folder A
+
+rsync -aP /ORIGINAL_B/* /DESTINATION_C/
+That should sync the folders A an B to another the new folder C.
+
+You could sync the file from A to B directly but you don't will have data loss this way.
+----
+
+Ce fichier est potentiellement mauvais:
+
+(reverse-i-search)`cp': cp ~/Desktop/nidmresults-examples_ruth/spm_FDR_p005/spmT_0001.nii /Users/cmaumet/Projects/Data_sharing/dev/nidmresults-examples_3/.git/lfs/objects/de/be/debed2b80efe53f1240e3b86cd7749a8cf66da8264d27abe3cffa9d324b6f31a
+
+-- svn number of lines by author (type m and r only) --
+svn ls -R | egrep -v -e "\/$" | egrep -e "\.[mRr]$" | xargs svn blame | awk '{print $2}' | sort | uniq -c
+
+*** 
+
+TOTAUX:
+* autofmri
+cmaumet:trunk $ svn ls -R | egrep -v -e "\/$" | egrep -e "\.[mRr]$" | xargs svn blame | awk '{print $2}' | sort | uniq -c
+   4 arnaudgfor
+39847 cmaumet
+21264 ebannier
+2710 facao
+2431 icorouge
+7004 lecarvenne
+ 144 litmi
+ 420 lschmitt
+1378 lsoustel
+tot: 39847 + 21264 + 2710 + 2431 + 7004 + 144 + 420 + 1378 = 75 198
+
+* autoasl
+41126 cmaumet
+ 745 cmeuree
+10543 icorouge
+   3 pmaurel
+5072 rdubujet
+tot 41126 + 745 + 10543 + 3 + 5072 = 57489
+
+cmaumet:commons $ svn ls -R | egrep -v -e "\/$" | egrep -e "\.[mRr]$" | xargs svn blame | awk '{print $2}' | sort | uniq -c
+   4 arnaudgfor
+9244 cmaumet
+  62 ebannier
+ 680 icorouge
+ 144 litmi
+> 10009 (.m) et 
+
+cmaumet:autres $ svn ls -R | egrep -v -e "\/$" | egrep -e "\.[mRr]$" | xargs svn blame | awk '{print $2}' | sort | uniq -c
+12920 cmaumet
+15867 ebannier
+ 180 icorouge
+> total 24442 (.m) + 4407 (.R) ~ OK
+
+cmaumet:draft $ svn ls -R | egrep -v -e "\/$" | egrep -e "\.[mRr]$" | xargs svn blame | awk '{print $2}' | sort | uniq -c
+2912 cmaumet
+
+cmaumet:dti $ svn ls -R | egrep -v -e "\/$" | egrep -e "\.[mRr]$" | xargs svn blame | awk '{print $2}' | sort | uniq -c
+ 970 cmaumet
+
+ cmaumet:fiber_tracking $ svn ls -R | egrep -v -e "\/$" | egrep -e "\.[mRr]$" | xargs svn blame | awk '{print $2}' | sort | uniq -c
+ 389 cmaumet
+7004 lecarvenne
+
+cmaumet:fmri $ svn ls -R | egrep -v -e "\/$" | egrep -e "\.[mRr]$" | xargs svn blame | awk '{print $2}' | sort | uniq -c
+5546 cmaumet
+  38 ebannier
+ 683 icorouge
+
+ cmaumet:morpho $ svn ls -R | egrep -v -e "\/$" | egrep -e "\.[mRr]$" | xargs svn blame | awk '{print $2}' | sort | uniq -c
+1438 cmaumet
+  85 ebannier
+
+  cmaumet:ncemra $ svn ls -R | egrep -v -e "\/$" | egrep -e "\.[mRr]$" | xargs svn blame | awk '{print $2}' | sort | uniq -c
+4931 ebannier
+ 420 lschmitt
+
+ cmaumet:relaxo $ svn ls -R | egrep -v -e "\/$" | egrep -e "\.[mRr]$" | xargs svn blame | awk '{print $2}' | sort | uniq -c
+ 429 cmaumet
+2710 facao
+ 274 icorouge
+1378 lsoustel
+
+cmaumet:roi $ svn ls -R | egrep -v -e "\/$" | egrep -e "\.[mRr]$" | xargs svn blame | awk '{print $2}' | sort | uniq -c
+3918 cmaumet
+ 281 ebannier
+
+ cmaumet:tum $ svn ls -R | egrep -v -e "\/$" | egrep -e "\.[mRr]$" | xargs svn blame | awk '{print $2}' | sort | uniq -c
+1117 cmaumet
+
+cmaumet:vbm $ svn ls -R | egrep -v -e "\/$" | egrep -e "\.[mRr]$" | xargs svn blame | awk '{print $2}' | sort | uniq -c
+ 558 cmaumet
+ 614 icorouge
+
+
+
+-- display branches sorted by date --
+git for-each-ref --sort=-committerdate refs/heads/
+
+-- exclude build dir in sublime texte search --
+-*/build/*.*
+
+-- add files with pattern in git --
+git add '*.py'
+
+-- delete all git branches that have been merged / delete merged --
+git branch --merged | grep -v "\*" | grep -v master | grep -v dev | xargs -n 1 git branch -d
+
+
+-- direct path to automatic replies in google outlook --
+https://outlook.office.com/owa/#path=/options/automaticreplies
+
+-- count files by types --
+find . -type f | sed 's/.*\.//' | sort | uniq -c
+
+
+-- files in subdirectories by size --
+on mac: install coreutils first: brew install coreutils
+
+du -ah ~/Sub01_full.feat | gsort -rh | head -30
+
+-- google docs strikethrough --
+alt + shift + 5
+
 -- fetch tags --
 git fetch --tags
 
@@ -398,6 +540,8 @@ find . -empty -type d -delete
 
 ------------- buster --------------
 ssh wmsmfe@buster.stats.warwick.ac.uk
+
+scp -r wmsmfe@buster.stats.warwick.ac.uk:/storage/essicd/data/NIDM-Ex/BIDS_Data/RESULTS/TEST/nidmresults-examples nidmresults-examples_alex
 
 scp CamilleEx.m wmsmfe@buster.stats.warwick.ac.uk:/storage/wmsmfe
 
