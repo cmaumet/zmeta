@@ -4,6 +4,14 @@ function export_full_simulations(simuDir, redo)
     end
 
     simuDirs = find_dirs('^(two_|two_unb_|)nStudy', simuDir);
+    
+    simuDirs_iter = '';
+    for s = 1:numel(simuDirs)
+        simuDirs_iter = strvcat(simuDirs_iter, find_dirs('\d*', fullfile(simuDir, simuDirs{s})));
+        disp(simuDirs_iter)
+    end
+    disp(simuDirs_iter)
+    aa=1
 %     simuDirs = find_dirs('^two_nStudy', simuDir);
     
 %     saveSimuCsvDir = fullfile(simuDir, 'csv_tom');
@@ -25,7 +33,9 @@ function export_full_simulations(simuDir, redo)
     %         info = regexp(spm_file(simuDirs{i}, 'filename'), ...
     %             'nStudy(?<nStudy>\d+)_Betw(?<Betw>\d+\.?\d*)_Within(?<Within>\d+\.?\d*)_nSimu(?<nSimu>\d+)','names');
             try
-                info = load(fullfile(simuDir,simuDirs{i}, 'simu.mat'));
+                simu_mat_file = fullfile(simuDir, simuDirs{i}, 'simu.mat');
+                disp(simu_mat_file)
+                info = load(simu_mat_file);
                 info = info.simu.config;
 
                 if ~isfield(info, 'nStudiesWithSoftware2')
