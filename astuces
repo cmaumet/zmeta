@@ -1,3 +1,11 @@
+f
+------- find all files ignored by git
+find . -type f  | git check-ignore --stdin
+
+and copy them into a new folder (preserving directory structure and excluding .DS_Store files)
+
+find . -type f \( ! -iname ".DS_Store" \) | git check-ignore --stdin | cpio  -pvdumB ../new-dir
+
 --- write git-lfs push all files in commit --
 $ git lfs pointer --file=MNI152_T1_1mm.nii.gz
 Git LFS pointer for MNI152_T1_1mm.nii.gz
@@ -164,8 +172,10 @@ https://python-packaging-user-guide.readthedocs.org/en/latest/distributing.html#
 # Create setup.cfg
 # Create ~/.pypirc (login)
 rm -rf dist
+rm -rf build
+rm -rf *.egg-info
 python setup.py sdist
-python setup.py bdist_wheel --universal
+python setup.py bdist_wheel
 
 # first time only: register project
 python setup.py register -r https://testpypi.python.org/pypi
@@ -642,3 +652,28 @@ tag et merge avec master
 ---- Typical paper length (word count) ---
 ~7400 words: The secret lives of experiments: methods reporting in the fMRI literature. Carp 2012
 ~5200 words: NeuroVault.org: A web-based repository for collecting and sharing unthresholded statistical maps of the human brain. Gorgolewski 2015
+
+elife
+https://elifesciences.org/content/4/e11466
+intro: 1223 words
+results & discussion: 6353 words
+=> 7576 words
+
+https://elifesciences.org/content/5/e12812
+intro: 641 words
+results: 2397 words
+discussion: 1294 words
+=> 4332 words
+
+https://elifesciences.org/content/5/e11712
+intro: 502 words
+results: 1285 words
+discussion: 1028 words
+=> 2815 words
+
+https://elifesciences.org/content/5/e10566
+intro: 552 words
+results: 2158 words
+discussion: 1021 words
+=> 3731 words
+
