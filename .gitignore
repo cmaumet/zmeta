@@ -1,3 +1,9 @@
+# NIfTI images
+*.nii
+*.nii.gz
+*.img
+*.hdr
+
 # Latex compiled files
 *.aux
 *.bbl
