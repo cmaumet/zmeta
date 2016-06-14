@@ -89,12 +89,12 @@ function export_full_simulations(simuDir, redo)
                         pValueFile = spm_select('FPList', methodDir, ...
                             ['^' regexptranslate('escape', methods(m).pValueFile) '(\.gz)?$']);
                         if isempty(pValueFile)
-                            error('pValueFile not found')
+                            warning('pValueFile not found')
                         end
                         statFile = spm_select('FPList', methodDir, ...
                             ['^' regexptranslate('escape', methods(m).statFile) '(\.gz)?$']);
                         if isempty(statFile)
-                            error('statFile not found')
+                            warning('statFile not found')
                         end
 
                         statistic = spm_read_vols(spm_vol(statFile));
