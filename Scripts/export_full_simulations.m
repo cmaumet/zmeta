@@ -9,15 +9,19 @@ function export_full_simulations(simuDir, redo)
 %     simuDirs = find_dirs('^two_nStudy', simuDir);
     
 %     saveSimuCsvDir = fullfile(simuDir, 'csv_tom');
-    disp([num2str(numel(simuDirs)) ' simulations']);
+    num_simu = numel(simuDirs);
+    disp([num2str(num_simu) ' simulations']);
     for s = 1:numel(simuDirs)
         iter_dirs = dir(fullfile(simuDir, simuDirs(s).name, '0*'));
         
-        for it = 1:numel(iter_dirs)
+        num_iter = numel(iter_dirs);
+        for it = 1:num_iter
             this_simu_dir = fullfile(...
                 simuDir, simuDirs(s).name, iter_dirs(it).name);
 
-            disp(['Exporting ' this_simu_dir])
+            disp([num2str(num_simu-s+1, '%03d') '-' ...
+                  num2str(num_iter-it+1, '%02d')  ...
+                  '. Exporting ' this_simu_dir])
             filename = 'simu.csv';
             simu_file = fullfile(this_simu_dir, filename);
 
