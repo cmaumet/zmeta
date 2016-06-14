@@ -3,151 +3,150 @@ function export_full_simulations(simuDir, redo)
         redo = false;
     end
 
-    simuDirs = find_dirs('^(two_|two_unb_|)nStudy', simuDir);
-    
-    simuDirs_iter = '';
-    for s = 1:numel(simuDirs)
-        simuDirs_iter = strvcat(simuDirs_iter, find_dirs('\d*', fullfile(simuDir, simuDirs{s})));
-        disp(simuDirs_iter)
-    end
-    disp(simuDirs_iter)
-    aa=1
+%     simuDirs = find_dirs('^(two_|two_unb_|)nStudy', simuDir);
+    simuDirs = dir(fullfile(simuDir, 'nStudy50_subNumidentical_varidentical*'));
+        
 %     simuDirs = find_dirs('^two_nStudy', simuDir);
     
 %     saveSimuCsvDir = fullfile(simuDir, 'csv_tom');
-    numel(simuDirs)
-    for i = 1:numel(simuDirs)
-        disp(['Exporting ' simuDirs{i}])
-        filename = 'simu.csv';
-        simu_file = fullfile(simuDir, simuDirs{i}, filename);
+    disp([num2str(numel(simuDirs)) ' simulations']);
+    for s = 1:numel(simuDirs)
+        iter_dirs = dir(fullfile(simuDir, simuDirs(s).name, '0*'));
         
-        if redo || ~exist(simu_file, 'file')
-            fid = fopen(simu_file, 'w');
+        for it = 1:numel(iter_dirs)
+            this_simu_dir = fullfile(...
+                simuDir, simuDirs(s).name, iter_dirs(it).name);
 
-            fprintf(fid, ['methods, glm, nStudies, Between, Within, '...
-                'numSubjectScheme, varScheme, soft2, soft2Factor, ' ... 
-                'unitMismatch, nSimu, minuslog10P, P, stderr_P, rankP, '...
-                'expectedP \n']);
-                ...'unitMismatch, nSimu, minuslog10P, P, stderrP, rankP, '...
-                
-    %         info = regexp(spm_file(simuDirs{i}, 'filename'), ...
-    %             'nStudy(?<nStudy>\d+)_Betw(?<Betw>\d+\.?\d*)_Within(?<Within>\d+\.?\d*)_nSimu(?<nSimu>\d+)','names');
-            try
-                simu_mat_file = fullfile(simuDir, simuDirs{i}, 'simu.mat');
-                disp(simu_mat_file)
-                info = load(simu_mat_file);
-                info = info.simu.config;
+            disp(['Exporting ' this_simu_dir])
+            filename = 'simu.csv';
+            simu_file = fullfile(this_simu_dir, filename);
 
-                if ~isfield(info, 'nStudiesWithSoftware2')
-                    info.nStudiesWithSoftware2 = 0;
-                    info.sigmaFactorWithSoftware2 = 1;
-                    info.unitMismatch = false;
-                    info.unitFactor = ones(1, numel(info.nSubjects));
-                end
-            catch
-                warning(['Skipped' simuDirs{i}])
-                continue;
-            end
+            if redo || ~exist(simu_file, 'file')
+                fid = fopen(simu_file, 'w');
 
-            simuDirs{i} = fullfile(simuDir, simuDirs{i});
+                fprintf(fid, ['methods, glm, nStudies, Between, Within, '...
+                    'numSubjectScheme, varScheme, soft2, soft2Factor, ' ... 
+                    'unitMismatch, nSimu, minuslog10P, P, stderr_P, rankP, '...
+                    'expectedP \n']);
+                    ...'unitMismatch, nSimu, minuslog10P, P, stderrP, rankP, '...
 
-            methods(1) = struct( 'name', 'fishers', ...
-                            'pValueFile', 'fishers_ffx_minus_log10_p.nii',...
-                            'statFile', 'fishers_ffx_statistic.nii');
-            methods(2) = struct( 'name', 'megaRFX', ...
-                            'pValueFile', 'mega_rfx_minus_log10_p.nii',...
-                            'statFile', 'spmT_0001.nii');
-            methods(3) = struct( 'name', 'permutZ', ...
-                            'pValueFile', 'lP+.hdr',...
-                            'statFile', 'snpmT+.hdr');
-            methods(4) = struct( 'name', 'permutCon', ...
-                            'pValueFile', 'lP+.hdr',...
-                            'statFile', 'snpmT+.hdr');
-%             methods(5) = struct( 'name', 'megaFFX', ...
-%                             'pValueFile', 'mega_ffx_ffx_minus_log10_p.nii',...
-%                             'statFile', 'mega_ffx_statistic.nii');                    
-            methods(5) = struct( 'name', 'stouffers', ...
-                            'pValueFile', 'stouffers_ffx_minus_log10_p.nii',...
-                            'statFile', 'stouffers_ffx_statistic.nii');                      
-            methods(6) = struct( 'name', 'stouffersMFX', ...
-                            'pValueFile', 'stouffers_rfx_minus_log10_p.nii',...
-                            'statFile', 'spmT_0001.nii');                      
-            methods(7) = struct( 'name', 'weightedZ', ...
-                            'pValueFile', 'weightedz_ffx_minus_log10_p.nii',...
-                            'statFile', 'weightedz_ffx_statistic.nii');                      
-            methods(8) = struct( 'name', 'megaMFX', ...
-                            'pValueFile', 'mega_mfx_minus_log10_p.nii',...
-                            'statFile', 'zstat1.nii');                      
-            methods(9) = struct( 'name', 'megaFFX_FSL', ...
-                            'pValueFile', 'mega_ffx_minus_log10_p.nii',...
-                            'statFile', 'zstat1.nii');                             
-                        
-            mystr = '';
-            for m = 1:numel(methods)
+        %         info = regexp(spm_file(this_simu_dir, 'filename'), ...
+        %             'nStudy(?<nStudy>\d+)_Betw(?<Betw>\d+\.?\d*)_Within(?<Within>\d+\.?\d*)_nSimu(?<nSimu>\d+)','names');
+                try
+                    simu_mat_file = fullfile(this_simu_dir, 'simu.mat');
+                    disp(simu_mat_file)
+                    info = load(simu_mat_file);
+                    info = info.simu.config;
 
-                methodDir = fullfile(simuDirs{i}, methods(m).name);
-                
-                if isdir(methodDir)
-                    pValueFile = spm_select('FPList', methodDir, ...
-                        ['^' regexptranslate('escape', methods(m).pValueFile) '(\.gz)?$']);
-                    if isempty(pValueFile)
-                        error('pValueFile not found')
+                    if ~isfield(info, 'nStudiesWithSoftware2')
+                        info.nStudiesWithSoftware2 = 0;
+                        info.sigmaFactorWithSoftware2 = 1;
+                        info.unitMismatch = false;
+                        info.unitFactor = ones(1, numel(info.nSubjects));
                     end
-                    statFile = spm_select('FPList', methodDir, ...
-                        ['^' regexptranslate('escape', methods(m).statFile) '(\.gz)?$']);
-                    if isempty(statFile)
-                        error('statFile not found')
-                    end
-
-                    statistic = spm_read_vols(spm_vol(statFile));
-%                     try
-                    pValues = spm_read_vols(spm_vol(pValueFile));
-                    
-%                     catch
-%                         
-%                         pValues = spm_read_vols(spm_vol(pValueFile));
-%                     end
-
-                    mystr = print_pvalues(mystr, methods(m).name, pValues, statistic(:), info);
+                catch
+                    warning(['Skipped' this_simu_dir])
+                    continue;
                 end
+
+                methods(1) = struct( 'name', 'fishers', ...
+                                'pValueFile', 'fishers_ffx_minus_log10_p.nii',...
+                                'statFile', 'fishers_ffx_statistic.nii');
+                methods(2) = struct( 'name', 'megaRFX', ...
+                                'pValueFile', 'mega_rfx_minus_log10_p.nii',...
+                                'statFile', 'spmT_0001.nii');
+                methods(3) = struct( 'name', 'permutZ', ...
+                                'pValueFile', 'lP+.hdr',...
+                                'statFile', 'snpmT+.hdr');
+                methods(4) = struct( 'name', 'permutCon', ...
+                                'pValueFile', 'lP+.hdr',...
+                                'statFile', 'snpmT+.hdr');
+    %             methods(5) = struct( 'name', 'megaFFX', ...
+    %                             'pValueFile', 'mega_ffx_ffx_minus_log10_p.nii',...
+    %                             'statFile', 'mega_ffx_statistic.nii');                    
+                methods(5) = struct( 'name', 'stouffers', ...
+                                'pValueFile', 'stouffers_ffx_minus_log10_p.nii',...
+                                'statFile', 'stouffers_ffx_statistic.nii');                      
+                methods(6) = struct( 'name', 'stouffersMFX', ...
+                                'pValueFile', 'stouffers_rfx_minus_log10_p.nii',...
+                                'statFile', 'spmT_0001.nii');                      
+                methods(7) = struct( 'name', 'weightedZ', ...
+                                'pValueFile', 'weightedz_ffx_minus_log10_p.nii',...
+                                'statFile', 'weightedz_ffx_statistic.nii');                      
+                methods(8) = struct( 'name', 'megaMFX', ...
+                                'pValueFile', 'mega_mfx_minus_log10_p.nii',...
+                                'statFile', 'zstat1.nii');                      
+                methods(9) = struct( 'name', 'megaFFX_FSL', ...
+                                'pValueFile', 'mega_ffx_minus_log10_p.nii',...
+                                'statFile', 'zstat1.nii');                             
+
+                mystr = '';
+                for m = 1:numel(methods)
+
+                    methodDir = fullfile(this_simu_dir, methods(m).name);
+
+                    if isdir(methodDir)
+                        pValueFile = spm_select('FPList', methodDir, ...
+                            ['^' regexptranslate('escape', methods(m).pValueFile) '(\.gz)?$']);
+                        if isempty(pValueFile)
+                            error('pValueFile not found')
+                        end
+                        statFile = spm_select('FPList', methodDir, ...
+                            ['^' regexptranslate('escape', methods(m).statFile) '(\.gz)?$']);
+                        if isempty(statFile)
+                            error('statFile not found')
+                        end
+
+                        statistic = spm_read_vols(spm_vol(statFile));
+    %                     try
+                        pValues = spm_read_vols(spm_vol(pValueFile));
+
+    %                     catch
+    %                         
+    %                         pValues = spm_read_vols(spm_vol(pValueFile));
+    %                     end
+
+                        mystr = print_pvalues(mystr, methods(m).name, pValues, statistic(:), info);
+                    end
+                end
+
+        %         fisherFile = spm_select('FPList', fullfile(this_simu_dir, 'fishers'), '^fishers_ffx_minus_log10_p\.nii$');
+        % %         statVal.fishers = spm_read_vols(spm_vol(spm_select('FPList', fullfile(this_simu_dir, 'fishers'), '^fishers_ffx_statistic.nii$')));
+        %         pVal.fishers = spm_read_vols(spm_vol(fisherFile));
+        %         mystr = print_pvalues('', 'fishers', pVal.fishers, info);
+        %         
+        %         pVal.GLMRFX = spm_read_vols(spm_vol(spm_select('FPList', fullfile(this_simu_dir, 'megaRFX'), '^mega_rfx_minus_log10_p.nii$')));
+        % %         statVal.GLMRFX = spm_read_vols(spm_vol(spm_select('FPList', fullfile(this_simu_dir, 'megaRFX'), '^spmT_0001.nii$')));
+        %         
+        %         mystr = print_pvalues(mystr, 'GLMRFX', pVal.GLMRFX, info);
+        %         
+        %         pVal.PermutZ = spm_read_vols(spm_vol(spm_select('FPList', fullfile(this_simu_dir, 'permutZ'), '^lP\+\.hdr$')));
+        % %         statVal.PermutZ = spm_read_vols(spm_vol(spm_select('FPList', fullfile(this_simu_dir, 'permutZ'), '^snpmT\+\.hdr$')));
+        %         mystr = print_pvalues(mystr, 'PermutZ', pVal.PermutZ, info);
+        %         
+        %         pVal.PermutCon = spm_read_vols(spm_vol(spm_select('FPList', fullfile(this_simu_dir, 'permutCon'), '^lP\+\.hdr$')));
+        % %         statVal.PermutCon = spm_read_vols(spm_vol(spm_select('FPList', fullfile(this_simu_dir, 'permutCon'), '^snpmT\+\.hdr$')));
+        %         mystr = print_pvalues(mystr, 'PermutCon', pVal.PermutCon, info);
+        %         
+        %         pVal.GLMFFX = spm_read_vols(spm_vol(spm_select('FPList', fullfile(this_simu_dir, 'megaFFX'), '^mega_ffx_ffx_minus_log10_p\.nii$')));
+        % %         statVal.GLMFFX = spm_read_vols(spm_vol(spm_select('FPList', fullfile(this_simu_dir, 'megaFFX'), '^mega_ffx_statistic\.nii$')));
+        %         mystr = print_pvalues(mystr, 'GLMFFX', pVal.GLMFFX, info);        
+        %         
+        %         pVal.Stouffers = spm_read_vols(spm_vol(spm_select('FPList', fullfile(this_simu_dir, 'stouffers'), '^stouffers_ffx_minus_log10_p\.nii$')));
+        % %         statVal.Stouffers = spm_read_vols(spm_vol(spm_select('FPList', fullfile(this_simu_dir, 'stouffers'), '^stouffers_ffx_statistic\.nii$')));
+        %         mystr = print_pvalues(mystr, 'Stouffers', pVal.Stouffers, info);                
+        %         
+        %         pVal.StouffersMFX = spm_read_vols(spm_vol(spm_select('FPList', fullfile(this_simu_dir, 'stouffersMFX'), '^stouffers_rfx_minus_log10_p\.nii$')));
+        % %         statVal.StouffersMFX = spm_read_vols(spm_vol(spm_select('FPList', fullfile(this_simu_dir, 'stouffersMFX'), '^spmT_0001\.nii$')));
+        %         mystr = print_pvalues(mystr, 'StouffersMFX', pVal.StouffersMFX, info);                
+        %         
+        %         pVal.WeightedZ = spm_read_vols(spm_vol(spm_select('FPList', fullfile(this_simu_dir, 'weightedZ'), '^weightedz_ffx_minus_log10_p\.nii$')));
+        % %         statVal.WeightedZ = spm_read_vols(spm_vol(spm_select('FPList', fullfile(this_simu_dir, 'weightedZ'), '^weightedz_ffx_statistic\.nii$')));        
+        %         mystr = print_pvalues(mystr, 'WeightedZ', pVal.WeightedZ, info);                        
+
+                fprintf(fid, '%s', mystr);
+                fclose(fid);
             end
-
-    %         fisherFile = spm_select('FPList', fullfile(simuDirs{i}, 'fishers'), '^fishers_ffx_minus_log10_p\.nii$');
-    % %         statVal.fishers = spm_read_vols(spm_vol(spm_select('FPList', fullfile(simuDirs{i}, 'fishers'), '^fishers_ffx_statistic.nii$')));
-    %         pVal.fishers = spm_read_vols(spm_vol(fisherFile));
-    %         mystr = print_pvalues('', 'fishers', pVal.fishers, info);
-    %         
-    %         pVal.GLMRFX = spm_read_vols(spm_vol(spm_select('FPList', fullfile(simuDirs{i}, 'megaRFX'), '^mega_rfx_minus_log10_p.nii$')));
-    % %         statVal.GLMRFX = spm_read_vols(spm_vol(spm_select('FPList', fullfile(simuDirs{i}, 'megaRFX'), '^spmT_0001.nii$')));
-    %         
-    %         mystr = print_pvalues(mystr, 'GLMRFX', pVal.GLMRFX, info);
-    %         
-    %         pVal.PermutZ = spm_read_vols(spm_vol(spm_select('FPList', fullfile(simuDirs{i}, 'permutZ'), '^lP\+\.hdr$')));
-    % %         statVal.PermutZ = spm_read_vols(spm_vol(spm_select('FPList', fullfile(simuDirs{i}, 'permutZ'), '^snpmT\+\.hdr$')));
-    %         mystr = print_pvalues(mystr, 'PermutZ', pVal.PermutZ, info);
-    %         
-    %         pVal.PermutCon = spm_read_vols(spm_vol(spm_select('FPList', fullfile(simuDirs{i}, 'permutCon'), '^lP\+\.hdr$')));
-    % %         statVal.PermutCon = spm_read_vols(spm_vol(spm_select('FPList', fullfile(simuDirs{i}, 'permutCon'), '^snpmT\+\.hdr$')));
-    %         mystr = print_pvalues(mystr, 'PermutCon', pVal.PermutCon, info);
-    %         
-    %         pVal.GLMFFX = spm_read_vols(spm_vol(spm_select('FPList', fullfile(simuDirs{i}, 'megaFFX'), '^mega_ffx_ffx_minus_log10_p\.nii$')));
-    % %         statVal.GLMFFX = spm_read_vols(spm_vol(spm_select('FPList', fullfile(simuDirs{i}, 'megaFFX'), '^mega_ffx_statistic\.nii$')));
-    %         mystr = print_pvalues(mystr, 'GLMFFX', pVal.GLMFFX, info);        
-    %         
-    %         pVal.Stouffers = spm_read_vols(spm_vol(spm_select('FPList', fullfile(simuDirs{i}, 'stouffers'), '^stouffers_ffx_minus_log10_p\.nii$')));
-    % %         statVal.Stouffers = spm_read_vols(spm_vol(spm_select('FPList', fullfile(simuDirs{i}, 'stouffers'), '^stouffers_ffx_statistic\.nii$')));
-    %         mystr = print_pvalues(mystr, 'Stouffers', pVal.Stouffers, info);                
-    %         
-    %         pVal.StouffersMFX = spm_read_vols(spm_vol(spm_select('FPList', fullfile(simuDirs{i}, 'stouffersMFX'), '^stouffers_rfx_minus_log10_p\.nii$')));
-    % %         statVal.StouffersMFX = spm_read_vols(spm_vol(spm_select('FPList', fullfile(simuDirs{i}, 'stouffersMFX'), '^spmT_0001\.nii$')));
-    %         mystr = print_pvalues(mystr, 'StouffersMFX', pVal.StouffersMFX, info);                
-    %         
-    %         pVal.WeightedZ = spm_read_vols(spm_vol(spm_select('FPList', fullfile(simuDirs{i}, 'weightedZ'), '^weightedz_ffx_minus_log10_p\.nii$')));
-    % %         statVal.WeightedZ = spm_read_vols(spm_vol(spm_select('FPList', fullfile(simuDirs{i}, 'weightedZ'), '^weightedz_ffx_statistic\.nii$')));        
-    %         mystr = print_pvalues(mystr, 'WeightedZ', pVal.WeightedZ, info);                        
-
-            fprintf(fid, '%s', mystr);
-            fclose(fid);
         end
     end
     
