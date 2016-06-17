@@ -11,14 +11,20 @@ tot_num_simu = length(study_dirs)
 print(paste(tot_num_simu, "simulations"))
 
 for (simunum in seq(tot_num_simu, 1, -1)){
-	print(paste('Reading ', simunum, ' / ', tot_num_simu))	
-	simu_file = paste(study_dir, study_dirs[simunum],'/simu.csv',sep="")
-	print(simu_file)
 	
-	if (! file.exists(simu_file)){
-		print(paste('/!\ ', simu_file, 'does not exist.'))			
-		next
-	}
+	iter_dirs = dir(paste(study_dir, study_dirs[simunum], sep="/"), pattern="[[:digit:]]+")
+	tot_iters = length(iter_dirs)
+	print(paste(tot_iters, "iterations"))
+	for (iternum in seq(tot_iters, 1, -1)){
+		print(paste('Reading ', simunum, ' / ', tot_num_simu, '-', iternum, ' / ', tot_iters))	
+	
+		simu_file = paste(iter_dirs[iternum], '/simu.csv',sep="")
+		print(simu_file)
+	
+		if (! file.exists(simu_file)){
+			print(paste('/!\ ', simu_file, 'does not exist.'))			
+			next
+		}
 	
 simudat <- read.csv(simu_file, header=T,row.names = NULL)
 
@@ -53,7 +59,10 @@ if (! exists("allsimudat"))
 {
 	allsimudat <-rbind(allsimudat,simudat)
 }
+print(nrow(simudat))
+print(nrow(allsimudat))
 
+}
 }
 
 # allsimudat$expectedz <- qnorm(allsimudat$expectedp, lower.tail=FALSE)
