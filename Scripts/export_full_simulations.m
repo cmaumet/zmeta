@@ -57,6 +57,7 @@ function export_full_simulations(simuDir, redo, keep_one_in)
         simu_file = fullfile(main_simu_dir, filename);
         
         if redo || ~exist(simu_file, 'file')
+            mystr = '';            
             fid = fopen(simu_file, 'w');
             fprintf(fid, ['methods, glm, nStudies, Between, Within, '...
                 'numSubjectScheme, varScheme, soft2, soft2Factor, ' ... 
@@ -89,10 +90,6 @@ function export_full_simulations(simuDir, redo, keep_one_in)
                         warning(['Skipped' this_simu_dir])
                         continue;
                     end             
-
-                    mystr = '';
-
-
                         methodDir = fullfile(this_simu_dir, methods(m).name);
 
                         if isdir(methodDir)
