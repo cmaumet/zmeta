@@ -31,7 +31,9 @@ facet_labeller <- function(var, value){
 selected_methods <- c("megaMFX","megaRFX","permutCon")
 
 # data_subset <- subset(allsimudat, expectedz>0 &  nStudies>10 & Between==0 &  (allsimudat$methods %in% selected_methods)  & !(allsimudat$methods %in% c("megaFFX")) & glm==1)
-data_subset <- allsimudat
+
+# expectedz is minus infinity if expected p is 1 which happens when rank = sample_size
+data_subset <- subset(allsimudat, is.finite(expectedz))
 
 subplot=list()
 titles=list()
