@@ -30,7 +30,8 @@ facet_labeller <- function(var, value){
 #selected_methods <- c("megaMFX","megaRFX","permutCon","permutZ","stouffersMFX")
 selected_methods <- c("megaMFX","megaRFX","permutCon")
 
-data_subset <- subset(allsimudat, expectedz>0 &  nStudies>10 & Between==1 &  (allsimudat$methods %in% selected_methods)  & !(allsimudat$methods %in% c("megaFFX")) & glm==2)
+# data_subset <- subset(allsimudat, expectedz>0 &  nStudies>10 & Between==0 &  (allsimudat$methods %in% selected_methods)  & !(allsimudat$methods %in% c("megaFFX")) & glm==1)
+data_subset <- allsimudat
 
 subplot=list()
 titles=list()
@@ -60,11 +61,11 @@ allsimudat$Within <- factor(allsimudat$Within)
 #methods=="permutCon" & Between==1 & nStudies==50 & numSubjectScheme=="identical" & varScheme=="identical" & Within==5)
 #
 
-# With the plot below, we can check if things went wrong (i.e. expected z-stat not incremental)
-p <- ggplot(data_subset, aes(as.factor(equivz), expectedz, colour=factor(paste(Within))))
-p + geom_boxplot() + stat_summary(fun.y=mean, colour="red", geom="point", shape=18, size=3,show_guide = FALSE) + facet_grid(methods+Between ~ nStudies+ numSubjectScheme) 
+# # # With the plot below, we can check if things went wrong (i.e. expected z-stat not incremental)
+# p <- ggplot(data_subset, aes(as.factor(equivz), expectedz, colour=factor(paste(Within))))
+# p + geom_boxplot() + stat_summary(fun.y=mean, colour="red", geom="point", shape=18, size=3,show_guide = FALSE) + facet_grid(methods+Between ~ nStudies+ numSubjectScheme) 
 
-p <- ggplot(data_subset, aes(as.factor(equivz), equivz-expectedz, colour=factor(paste(Within))))
+# p <- ggplot(data_subset, aes(as.factor(equivz), equivz-expectedz, colour=factor(paste(Within))))
 
 
 # Bland-Altman like
