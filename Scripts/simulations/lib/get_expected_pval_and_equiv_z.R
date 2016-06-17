@@ -1,8 +1,10 @@
 # Load first simulation
+
 suffix <- "tom"
 remove(allsimudat)
 
-study_dirs = dir('../../../data/simulations/', pattern="[two_|two_unb]?nStudy.*")
+study_dir = '/Volumes/camille/MBIA_buster/'
+study_dirs = dir(study_dir, pattern="nStudy.*")
 
 tot_num_simu = length(study_dirs)
 
@@ -10,7 +12,7 @@ print(paste(tot_num_simu, "simulations"))
 
 for (simunum in seq(tot_num_simu, 1, -1)){
 	print(paste('Reading ', simunum, ' / ', tot_num_simu))	
-	simu_file = paste('../../../data/simulations/', study_dirs[simunum],'/simu.csv',sep="")
+	simu_file = paste(study_dir, study_dirs[simunum],'/simu.csv',sep="")
 	print(simu_file)
 	
 	if (! file.exists(simu_file)){
