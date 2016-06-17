@@ -13,7 +13,7 @@ function export_full_simulations(simuDir, redo, downs_tot)
     donws_pos = [];
     
 %     simuDirs = find_dirs('^(two_|two_unb_|)nStudy', simuDir);
-    simuDirs = dir(fullfile(simuDir, 'nStudy50_subNumidentical_varidentical_Betw1_*'));
+    simuDirs = dir(fullfile(simuDir, 'nStudy25_subNumidentical_varidentical_Betw1_*'));
 
     % p-value and stat file names for each method
     methods(1) = struct( 'name', 'fishers', ...
