@@ -16,53 +16,48 @@ print(paste(tot_num_simu, "simulations"))
 for (simunum in seq(tot_num_simu, 1, -1)){
 	remove(thissimudat)
 	
-	iter_dirs = dir(paste(study_dir, study_dirs[simunum], sep="/"), pattern="[[:digit:]]+")
-	tot_iters = length(iter_dirs)
-	print(paste(tot_iters, "iterations"))
-	for (iternum in seq(tot_iters, 1, -1)){
-		print(paste('Reading ', simunum, ' / ', tot_num_simu, '-', iternum, ' / ', tot_iters))	
-	
-		simu_file = paste(study_dir, study_dirs[simunum], iter_dirs[iternum], 'simu.csv', sep="/")
-		print(simu_file)
-	
-		if (! file.exists(simu_file)){
-			print(paste('/!\ ', simu_file, 'does not exist.'))			
-			next
-		}
-	
-		simudat <- read.csv(simu_file, header=T,row.names = NULL)
+	print(paste('Reading ', simunum, ' / ', tot_num_simu))	
 
-		# qnorm works with natural log (and not base 10)
-		simudat$lnp <- -simudat$minuslog10P*log(10)
+	simu_file = paste(study_dir, study_dirs[simunum], 'simu.csv', sep="/")
+	print(simu_file)
 
-		# It is easier to work with the equiv z stat
-		simudat$equivz <- qnorm(simudat$lnp, lower.tail = FALSE, log.p = TRUE)
+	if (! file.exists(simu_file)){
+		print(paste('/!\ ', simu_file, 'does not exist.'))			
+		next
+	}
 
-		# Get confidence interval on observed p
-		obs_p_upper <- simudat$P + simudat$stderr_P*1.96
-		obs_p_lower <- simudat$P - simudat$stderr_P*1.96
-		minuslog10P_upper <- -log10(obs_p_upper)
-		minuslog10P_lower <- -log10(obs_p_lower)
+	simudat <- read.csv(simu_file, header=T,row.names = NULL)
 
-		simudat$lnp_upper <- -minuslog10P_upper*log(10)
-		simudat$lnp_lower <- -minuslog10P_lower*log(10)
+	# qnorm works with natural log (and not base 10)
+	simudat$lnp <- -simudat$minuslog10P*log(10)
 
-		simudat$equivz_upper <- qnorm(simudat$lnp_upper, lower.tail = FALSE, log.p = TRUE)
-		simudat$equivz_lower <- qnorm(simudat$lnp_lower, lower.tail = FALSE, log.p = TRUE)
+	# It is easier to work with the equiv z stat
+	simudat$equivz <- qnorm(simudat$lnp, lower.tail = FALSE, log.p = TRUE)
+
+	# Get confidence interval on observed p
+	obs_p_upper <- simudat$P + simudat$stderr_P*1.96
+	obs_p_lower <- simudat$P - simudat$stderr_P*1.96
+	minuslog10P_upper <- -log10(obs_p_upper)
+	minuslog10P_lower <- -log10(obs_p_lower)
+
+	simudat$lnp_upper <- -minuslog10P_upper*log(10)
+	simudat$lnp_lower <- -minuslog10P_lower*log(10)
+
+	simudat$equivz_upper <- qnorm(simudat$lnp_upper, lower.tail = FALSE, log.p = TRUE)
+	simudat$equivz_lower <- qnorm(simudat$lnp_lower, lower.tail = FALSE, log.p = TRUE)
 
 
-		simudat$allgroups <- paste(simudat$Between, simudat$Within, simudat$nStudies, simudat$nSimu, simudat$numSubjectScheme, simudat$varScheme, simudat$soft2, simudat$soft2Factor, as.character(simudat$unitMismastch))
+	simudat$allgroups <- paste(simudat$Between, simudat$Within, simudat$nStudies, simudat$nSimu, simudat$numSubjectScheme, simudat$varScheme, simudat$soft2, simudat$soft2Factor, as.character(simudat$unitMismastch))
 
-		# newsimudat$expectedp <- newsimudat$rankp/newsimudat$nSimu
-		simudat$expectedz <- qnorm(simudat$expectedP, lower.tail = FALSE)
+	# newsimudat$expectedp <- newsimudat$rankp/newsimudat$nSimu
+	simudat$expectedz <- qnorm(simudat$expectedP, lower.tail = FALSE)
 
-		if (! exists("thissimudat"))
-		{
-			thissimudat <- simudat
-		} else
-		{
-			thissimudat <-rbind(thissimudat,simudat)
-		}
+	if (! exists("thissimudat"))
+	{
+		thissimudat <- simudat
+	} else
+	{
+		thissimudat <-rbind(thissimudat,simudat)
 	}
 	# Append to the csv file after each simulation is computed
 	# thissimudat$expectedz <- qnorm(thissimudat$expectedp, lower.tail=FALSE)
