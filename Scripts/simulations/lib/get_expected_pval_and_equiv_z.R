@@ -13,6 +13,7 @@ tot_num_simu = length(study_dirs)
 
 print(paste(tot_num_simu, "simulations"))
 
+first = T
 for (simunum in seq(tot_num_simu, 1, -1)){
 	remove(thissimudat)
 	
@@ -71,7 +72,15 @@ for (simunum in seq(tot_num_simu, 1, -1)){
 		allsimudat <-rbind(allsimudat, thissimudat)
 	}	
 
-	write.table(thissimudat,file=csv_file,row.names=F,append=TRUE,sep=",")
+	if (first){
+		col_names = T
+		app = F
+		first = F
+	} else{
+		col_names = F
+		app = T
+	}
+	write.table(thissimudat,file=csv_file,row.names=F,append=app,sep=",",col.names=col_names)
 	print(paste("saved in", csv_file))
 }
 
