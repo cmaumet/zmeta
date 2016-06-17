@@ -34,19 +34,6 @@ for (simunum in seq(tot_num_simu, 1, -1)){
 	# It is easier to work with the equiv z stat
 	simudat$equivz <- qnorm(simudat$lnp, lower.tail = FALSE, log.p = TRUE)
 
-	# Get confidence interval on observed p
-	obs_p_upper <- simudat$P + simudat$stderr_P*1.96
-	obs_p_lower <- simudat$P - simudat$stderr_P*1.96
-	minuslog10P_upper <- -log10(obs_p_upper)
-	minuslog10P_lower <- -log10(obs_p_lower)
-
-	simudat$lnp_upper <- -minuslog10P_upper*log(10)
-	simudat$lnp_lower <- -minuslog10P_lower*log(10)
-
-	simudat$equivz_upper <- qnorm(simudat$lnp_upper, lower.tail = FALSE, log.p = TRUE)
-	simudat$equivz_lower <- qnorm(simudat$lnp_lower, lower.tail = FALSE, log.p = TRUE)
-
-
 	simudat$allgroups <- paste(simudat$Between, simudat$Within, simudat$nStudies, simudat$nSimu, simudat$numSubjectScheme, simudat$varScheme, simudat$soft2, simudat$soft2Factor, as.character(simudat$unitMismastch))
 
 	# newsimudat$expectedp <- newsimudat$rankp/newsimudat$nSimu
