@@ -13,7 +13,7 @@ function export_full_simulations(simuDir, redo, downs_tot)
     donws_pos = [];
     
 %     simuDirs = find_dirs('^(two_|two_unb_|)nStudy', simuDir);
-    simuDirs = dir(fullfile(simuDir, 'nStudy50_subNumidentical_varidentical_Betw0_*softFactor2'));
+    simuDirs = dir(fullfile(simuDir, 'nStudy50_subNumidentical_varidentical_Betw1_*'));
 
     % p-value and stat file names for each method
     methods(1) = struct( 'name', 'fishers', ...
@@ -51,7 +51,9 @@ function export_full_simulations(simuDir, redo, downs_tot)
     num_simu = numel(simuDirs);
     disp([num2str(num_simu) ' simulations']);
     
-    for s = 1:numel(simuDirs)
+    for s = numel(simuDirs):-1:1
+        skip = false;
+        
         iter_dirs = dir(fullfile(simuDir, simuDirs(s).name, '0*'));
         
         num_iter = numel(iter_dirs);
@@ -101,6 +103,7 @@ function export_full_simulations(simuDir, redo, downs_tot)
                                 ['^' regexptranslate('escape', methods(m).pValueFile) '(\.gz)?$']);
                             if isempty(pValueFile)
                                 warning('pValueFile not found')
+                                skip = true;
                                 continue;
                             end
 
@@ -109,6 +112,10 @@ function export_full_simulations(simuDir, redo, downs_tot)
                             pvalues = [pvalues iter_pval(:)];
                         end
                 end
+                if skip
+                    continue;
+                end
+                
                 disp([num2str(num_simu-s+1, '%03d') ...
                      '.' methods(m).name ' Exporting ' main_simu_dir])
                 % Combine all iterations of this method for this simulation
@@ -116,7 +123,11 @@ function export_full_simulations(simuDir, redo, downs_tot)
                 sample_size = numel(pvalues(:));
                 if exist('prev_sample_size', 'var') && ...
                         sample_size ~= prev_sample_size
-                    error('Different sample size for this simulation');
+                    if sample_size < prev_sample_size
+                        warning(['Incomplete simulation: ' simu_file])
+                    end
+                    warning('Different sample size for this simulation');
+                    continue;
                 else
                     prev_sample_size = sample_size;
                 end

@@ -85,9 +85,7 @@ for (i in 1:4){
 	# subpl[[i]] <- subpl[[i]] + geom_ribbon(aes(x=expectedz, ymin=z_lower-expectedz, ymax=z_upper-expectedz), fill="grey", alpha=.2, colour=NA) + facet_grid(Between + methods + nStudies + glm ~ unitMismatch+soft2Factor+ soft2, labeller=facet_labeller) + theme(strip.text.x = element_text(size = 16)) + ylab("Difference between estimated and reference z-statistic") + xlab("Reference z-statistic") + geom_line(aes(x=expectedz, y=0), colour="black") + geom_line() + geom_point(size=1) 
 }
 
-subpl[[3]]
-
-# multiplot(subpl[[1]], subpl[[2]], subpl[[3]], subpl[[4]], cols=2)
+multiplot(subpl[[1]], subpl[[2]], subpl[[3]], subpl[[4]], cols=2)
 
 
 # # To be able to do boxplots we need to store all values... otherwise as digits -> infinity we get smaller and smaller box plots...
