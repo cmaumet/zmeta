@@ -99,17 +99,9 @@ function export_full_simulations(simuDir, redo)
                                 warning('pValueFile not found')
                                 continue;
                             end
-                            statFile = spm_select('FPList', methodDir, ...
-                                ['^' regexptranslate('escape', methods(m).statFile) '(\.gz)?$']);
-                            if isempty(statFile)
-                                warning('statFile not found')
-                                continue;
-                            end
 
-                            iter_stat = spm_read_vols(spm_vol(statFile));
                             iter_pval = spm_read_vols(spm_vol(pValueFile));
                             
-                            statistic = [statistic iter_stat(:)];
                             pvalues = [pvalues iter_pval(:)];
                         end
                 end
@@ -117,7 +109,7 @@ function export_full_simulations(simuDir, redo)
                      '.' methods(m).name ' Exporting ' main_simu_dir])
                 % Combine all iterations of this method for this simulation
                 mystr = print_pvalues(mystr, methods(m).name, ...
-                    pvalues, statistic, info, num_iter);
+                    pvalues, info, num_iter);
             end
             
             % A single file combining all iterations for this simulation
@@ -129,7 +121,7 @@ function export_full_simulations(simuDir, redo)
 end
 
 function mystr = print_pvalues(mystr, methodName, minuslog10pvalues, ...
-    statValues, info, num_iter)
+    info, num_iter)
     minuslog10pvalues = minuslog10pvalues(:);
 
     check_pvalues(methodName, minuslog10pvalues)
