@@ -5,7 +5,7 @@ cd('/Users/cmaumet/Projects/Meta-analysis/Results/2014-06-23 Z-meta')
 simulations(fullfile(pwd, 'data'))
 
 % Export p-values into csv file
-export_full_simulations('/Volumes/camille/MBIA_buster')
+export_full_simulations('/Volumes/camille/MBIA_buster', true, 1000)
 
 // In R
 get_expected_pval_and_equiv_z.R
