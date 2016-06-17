@@ -117,7 +117,7 @@ function export_full_simulations(simuDir, redo)
                      '.' methods(m).name ' Exporting ' main_simu_dir])
                 % Combine all iterations of this method for this simulation
                 mystr = print_pvalues(mystr, methods(m).name, ...
-                    pvalues, statistic, info);
+                    pvalues, statistic, info, num_iter);
             end
             
             % A single file combining all iterations for this simulation
@@ -128,7 +128,8 @@ function export_full_simulations(simuDir, redo)
     
 end
 
-function mystr = print_pvalues(mystr, methodName, minuslog10pvalues, statValues, info)
+function mystr = print_pvalues(mystr, methodName, minuslog10pvalues, ...
+    statValues, info, num_iter)
     minuslog10pvalues = minuslog10pvalues(:);
 
     check_pvalues(methodName, minuslog10pvalues)
@@ -218,7 +219,7 @@ function mystr = print_pvalues(mystr, methodName, minuslog10pvalues, statValues,
             ',' mat2str(info.nStudiesWithSoftware2) ...
             ',' mat2str(info.sigmaFactorWithSoftware2) ...
             ',' mat2str(info.unitMismatch) ...
-            ',' mat2str(info.nSimuOneDir^3) ',%i,%i,%i,%i,%i\n'], ...            
+            ',' mat2str(info.nSimuOneDir^3*num_iter) ',%i,%i,%i,%i,%i\n'], ...            
             data_to_export{:} )];
 %             ',' mat2str(info.nSimuOneDir^3) ',%i,%i,%i,%i,%i\n'], ...
           
