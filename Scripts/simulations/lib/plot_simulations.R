@@ -34,7 +34,7 @@ selected_methods <- c("megaMFX","megaRFX","permutCon")
 
 # expectedz is minus infinity if expected p is 1 which happens when rank = sample_size
 # we look only at positive effect (expectedz>0), supposedly this should be more or less symmetric...?
-data_subset <- subset(allsimudat, is.finite(expectedz) & expectedz>0)
+data_subset <- subset(allsimudat, is.finite(expectedz) & expectedz>0 &  (allsimudat$methods %in% selected_methods) )
 
 subplot=list()
 titles=list()
