@@ -4,7 +4,7 @@ suffix <- "tom"
 remove(allsimudat)
 
 study_dir = '/Volumes/camille/MBIA_buster/'
-study_dirs = dir(study_dir, pattern="^nStudy.*")
+study_dirs = dir(study_dir, pattern="^nStudy50.*")
 
 csv_file = paste(getwd(), '/../../../data/allsimudat_', suffix,'.csv', sep="")
 file.remove(csv_file)
