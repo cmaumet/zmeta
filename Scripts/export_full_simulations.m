@@ -109,7 +109,7 @@ function export_full_simulations(simuDir, redo)
                      '.' methods(m).name ' Exporting ' main_simu_dir])
                 % Combine all iterations of this method for this simulation
                 mystr = print_pvalues(mystr, methods(m).name, ...
-                    pvalues, info, num_iter);
+                    pvalues, info);
             end
             
             % A single file combining all iterations for this simulation
@@ -120,33 +120,18 @@ function export_full_simulations(simuDir, redo)
     
 end
 
-function mystr = print_pvalues(mystr, methodName, minuslog10pvalues, ...
-    info, num_iter)
+function mystr = print_pvalues(mystr, methodName, minuslog10pvalues, info)
+
     minuslog10pvalues = minuslog10pvalues(:);
 
+    % Return an error if null of infinite p-value is found
     check_pvalues(methodName, minuslog10pvalues)
+    
+    % Get p-values from -log10(p-values)
     pvalues = 10.^(-minuslog10pvalues);
-    
-    % All of this is needed instead of using just rank produced by 'order'
-    % function because we need to deal with duplicate values and take
-    % max(rank)
-    % Need to be done on -statValue rather than pvalues to avoid scale effect
-    % that should not be present in expected pvalues
-%     orderByValue = pvalues(:);%-statValues(:); %
-%     [~, ~, statValuesIdx] = unique(orderByValue(:));
-%     uniqueStatValuesRank = cumsum(accumarray(statValuesIdx, ones(size(orderByValue(:)))));
-%     pvalues_rank = uniqueStatValuesRank(statValuesIdx);
-%     
-%     ranks = get_rank_max(orderByValue);
-    
-%     [~, ~, pvalues_rank] = unique(orderByValue);
-    
-%     if ~all(pvalues_rank'==ranks)
-%         error('error in ranks')
-%     end
 
+    % Sorted p-values
     pvalues = sort(pvalues);
-    minuslog10pvalues = -log10(pvalues(:));
     
     sample_size = numel(pvalues);
     
@@ -211,7 +196,7 @@ function mystr = print_pvalues(mystr, methodName, minuslog10pvalues, ...
             ',' mat2str(info.nStudiesWithSoftware2) ...
             ',' mat2str(info.sigmaFactorWithSoftware2) ...
             ',' mat2str(info.unitMismatch) ...
-            ',' mat2str(info.nSimuOneDir^3*num_iter) ',%i,%i,%i,%i,%i\n'], ...            
+            ',' mat2str(sample_size) ',%i,%i,%i,%i,%i\n'], ...            
             data_to_export{:} )];
 %             ',' mat2str(info.nSimuOneDir^3) ',%i,%i,%i,%i,%i\n'], ...
           
@@ -221,6 +206,7 @@ function mystr = print_pvalues(mystr, methodName, minuslog10pvalues, ...
     end
 end
 
+% Return an error if null of infinite p-value is found
 function check_pvalues(methodName, pvalues)
     pvalues = 10.^(-pvalues);
     errmsg = '';
