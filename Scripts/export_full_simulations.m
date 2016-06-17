@@ -1,9 +1,12 @@
 % Compute xx from the simulation results
 %   simuDir: full path to the directory storing the simulations
 %   redo: if true, overwrite previous export (default: false)
-function export_full_simulations(simuDir, redo)
+function export_full_simulations(simuDir, redo, keep_one_in)
     if nargin < 2
         redo = false;
+    end
+    if nargin < 3
+        keep_one_in = 10000;
     end
 
 %     simuDirs = find_dirs('^(two_|two_unb_|)nStudy', simuDir);
@@ -109,7 +112,7 @@ function export_full_simulations(simuDir, redo)
                      '.' methods(m).name ' Exporting ' main_simu_dir])
                 % Combine all iterations of this method for this simulation
                 mystr = print_pvalues(mystr, methods(m).name, ...
-                    pvalues, info);
+                    pvalues, info, keep_one_in);
             end
             
             % A single file combining all iterations for this simulation
@@ -120,7 +123,8 @@ function export_full_simulations(simuDir, redo)
     
 end
 
-function mystr = print_pvalues(mystr, methodName, minuslog10pvalues, info)
+function mystr = print_pvalues(mystr, methodName, minuslog10pvalues, ...
+    info, keep_one_in)
 
     minuslog10pvalues = minuslog10pvalues(:);
 
@@ -140,7 +144,6 @@ function mystr = print_pvalues(mystr, methodName, minuslog10pvalues, info)
      
     % Downsampling pvalues_rank so that we keep more precision for smaller
     % p-values
-    keep_one_in = 10;
     downs_pvalues_rank = pvalues_rank(1:keep_one_in:end);
     downs_expected_p = expected_p(1:keep_one_in:end);
     downs_pvalues = pvalues(1:keep_one_in:end);
@@ -153,7 +156,7 @@ function mystr = print_pvalues(mystr, methodName, minuslog10pvalues, info)
     if ~isfield(info, 'nStudies')
         info.nStudies = info.nStudiesInGroup1;
     end
-
+  
     mystr = [mystr sprintf([methodName ',' mat2str(info.analysisType) ',' mat2str(info.nStudies) ',' ...
                 mat2str(info.sigmaBetweenStudies) ',' mat2str(info.sigmaSquare) ...
             ',' info.nSubjectsScheme ...
