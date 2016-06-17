@@ -71,7 +71,7 @@ allsimudat$unitMismatch[allsimudat$unitMismatch=="0"]=FALSE
 allsimudat$unitMismatch[allsimudat$unitMismatch=="false"]=FALSE
 allsimudat$unitMismatch[allsimudat$unitMismatch=="true"]=TRUE
 
-csv_file = paste(getwd(), '/../../../allsimudat_', suffix,'.csv', sep="")
+csv_file = paste(getwd(), '/../../../data/allsimudat_', suffix,'.csv', sep="")
 write.table(allsimudat,file=csv_file,row.names=F)
 print(paste("saved in", csv_file))
 
