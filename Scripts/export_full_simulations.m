@@ -1,14 +1,17 @@
 % Compute xx from the simulation results
 %   simuDir: full path to the directory storing the simulations
 %   redo: if true, overwrite previous export (default: false)
-function export_full_simulations(simuDir, redo, keep_one_in)
+%   downs_tot: Number of points to keep after downsampling
+function export_full_simulations(simuDir, redo, downs_tot)
     if nargin < 2
         redo = false;
     end
     if nargin < 3
-        keep_one_in = 10000;
+        downs_tot = 10;
     end
 
+    donws_pos = [];
+    
 %     simuDirs = find_dirs('^(two_|two_unb_|)nStudy', simuDir);
     simuDirs = dir(fullfile(simuDir, 'nStudy50_subNumidentical_varidentical_Betw0_*softFactor2'));
 
@@ -47,6 +50,7 @@ function export_full_simulations(simuDir, redo, keep_one_in)
 %     saveSimuCsvDir = fullfile(simuDir, 'csv_tom');
     num_simu = numel(simuDirs);
     disp([num2str(num_simu) ' simulations']);
+    
     for s = 1:numel(simuDirs)
         iter_dirs = dir(fullfile(simuDir, simuDirs(s).name, '0*'));
         
@@ -108,8 +112,29 @@ function export_full_simulations(simuDir, redo, keep_one_in)
                 disp([num2str(num_simu-s+1, '%03d') ...
                      '.' methods(m).name ' Exporting ' main_simu_dir])
                 % Combine all iterations of this method for this simulation
+                
+                sample_size = numel(pvalues(:));
+                if exist('prev_sample_size', 'var') && ...
+                        sample_size ~= prev_sample_size
+                    error('Different sample size for this simulation');
+                else
+                    prev_sample_size = sample_size;
+                end
+                
+                % We want to keep the same downsampling for all simulations
+                % and methods
+                if isempty(donws_pos)
+                    if downs_tot > sample_size
+                        error(['can''t downsize to ' num2str(downs_tot)])
+                    end
+                    % downsample in log-space so that we keep more values 
+                    % corresponding to smaller ranks/p-values                    
+                    donws_pos = round(...
+                        logspace(0,log10(sample_size), downs_tot));
+                end
+                
                 mystr = print_pvalues(mystr, methods(m).name, ...
-                    pvalues, info, keep_one_in);
+                    pvalues, info, donws_pos);
             end
             
             % A single file combining all iterations for this simulation
@@ -121,7 +146,7 @@ function export_full_simulations(simuDir, redo, keep_one_in)
 end
 
 function mystr = print_pvalues(mystr, methodName, minuslog10pvalues, ...
-    info, keep_one_in)
+    info, donws_pos)
 
     minuslog10pvalues = minuslog10pvalues(:);
 
@@ -141,9 +166,10 @@ function mystr = print_pvalues(mystr, methodName, minuslog10pvalues, ...
      
     % Downsampling pvalues_rank so that we keep more precision for smaller
     % p-values
-    downs_pvalues_rank = pvalues_rank(1:keep_one_in:end);
-    downs_expected_p = expected_p(1:keep_one_in:end);
-    downs_pvalues = pvalues(1:keep_one_in:end);
+       
+    downs_pvalues_rank = pvalues_rank(donws_pos);
+    downs_expected_p = expected_p(donws_pos);
+    downs_pvalues = pvalues(donws_pos);
     
     downs_minuslog10pvalues = -log10(downs_pvalues);
        
