@@ -51,7 +51,7 @@ subplot[[4]] <- subset(data_subset, soft2==0 & unitMismatch=="TRUE")
 
 methods=="megaRFX")
 
-allsimusdat$Within <- factor(allsimusdat$Within)
+allsimudat$Within <- factor(allsimudat$Within)
 
 
  # 
