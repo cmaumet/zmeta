@@ -7,7 +7,7 @@ function export_full_simulations(simuDir, redo)
     end
 
 %     simuDirs = find_dirs('^(two_|two_unb_|)nStudy', simuDir);
-    simuDirs = dir(fullfile(simuDir, 'nStudy50_subNumidentical_varidentical*'));
+    simuDirs = dir(fullfile(simuDir, 'nStudy50_subNumidentical_varidentical_Betw0_*softFactor2'));
 
     % p-value and stat file names for each method
     methods(1) = struct( 'name', 'fishers', ...
