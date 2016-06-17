@@ -84,7 +84,7 @@ for (simunum in seq(tot_num_simu, 1, -1)){
 		allsimudat <-rbind(allsimudat, thissimudat)
 	}	
 
-	write.table(thissimudat,file=csv_file,row.names=F,append=TRUE)
+	write.table(thissimudat,file=csv_file,row.names=F,append=TRUE,sep=",")
 	print(paste("saved in", csv_file))
 }
 
