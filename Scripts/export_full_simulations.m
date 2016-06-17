@@ -57,9 +57,9 @@ function export_full_simulations(simuDir, redo)
             fid = fopen(simu_file, 'w');
             fprintf(fid, ['methods, glm, nStudies, Between, Within, '...
                 'numSubjectScheme, varScheme, soft2, soft2Factor, ' ... 
-                'unitMismatch, nSimu, minuslog10P, P, stderr_P, rankP, '...
+                'unitMismatch, nSimu, minuslog10P, P, rankP, '...
                 'expectedP \n']);
-                ...'unitMismatch, nSimu, minuslog10P, P, stderrP, rankP, '...            
+                ...'unitMismatch, nSimu, minuslog10P, P, rankP, '...            
             
             % For each method we combine all iterations            
             for m = 1:numel(methods)  
@@ -134,55 +134,20 @@ function mystr = print_pvalues(mystr, methodName, minuslog10pvalues, info)
     pvalues = sort(pvalues);
     
     sample_size = numel(pvalues);
-    
+      
     expected_p = [(1:sample_size)./sample_size]';
     pvalues_rank = [(1:sample_size)]';
+     
+    % Downsampling pvalues_rank so that we keep more precision for smaller
+    % p-values
+    keep_one_in = 10;
+    downs_pvalues_rank = pvalues_rank(1:keep_one_in:end);
+    downs_expected_p = expected_p(1:keep_one_in:end);
+    downs_pvalues = pvalues(1:keep_one_in:end);
     
-    
-%     expected_p = pvalues_rank./(info.nSimuOneDir^3);
-    
-    % Downsampling expected p
-    digits=2;
-    roundedlog10expectedp = round(-log10(expected_p)*10^digits)/(10^digits);
-    % Look at this, maybe it poses a pb for permut where the same expected_p can have different obs_p     
-    [~, uniquePositions, pvalue_group] = unique(roundedlog10expectedp);
-    
-%     pvalues = pvalues(uniquePositions);
-    original_pvalues = pvalues;
-    pvalues = accumarray(pvalue_group, original_pvalues, [], @mean);
-    
-    pvalue_count = accumarray(pvalue_group,1);
-    pvalues_stderr = accumarray(pvalue_group, original_pvalues, [], @std)./sqrt(pvalue_count);
-    
-    % This is to cope with Matlab behaviour where std(x) = 0 (when x is a 
-    % vector of a single number)     
-    pvalues_stderr(pvalue_count==1) = Inf;
-    % We also ignore stderr when only 2 observations    
-    pvalues_stderr(pvalue_count==2) = Inf;
-    
-    if any(pvalues_stderr==0) && ~(strcmp(methodName, 'permutZ') ||strcmp(methodName, 'permutCon'))
-        error('null standard error')
-    end
-
-%     minuslog10pvalues = minuslog10pvalues(uniquePositions);
-%     pvalues_origin = pvalues;
-    
-%     pvalues_stderr = uniquePositions*NaN;
-%     pvalues = uniquePositions*NaN;
-%     for pos = 1:numel(uniquePositions)
-%         pvalue_positions = find(pvalue_group==pos);
-%         numpos = numel(pvalue_positions);
-%         if numpos > 1
-%             pvalues_stderr(pos,1) = std(pvalues_origin(pvalue_positions))./sqrt(numpos);
-%             pvalues(pos) = mean(pvalues_origin(pvalue_positions));
-%         end
-%     end
-    minuslog10pvalues = -log10(pvalues);
-    
-    pvalues_rank = accumarray(pvalue_group, pvalues_rank, [], @mean);%pvalues_rank(uniquePositions);
-    expected_p = accumarray(pvalue_group, expected_p, [], @mean);%expected_p(uniquePositions);
-    
-    data_to_export = num2cell([minuslog10pvalues, pvalues, pvalues_stderr, pvalues_rank, expected_p], 2);
+    downs_minuslog10pvalues = -log10(downs_pvalues);
+       
+    data_to_export = num2cell([downs_minuslog10pvalues, downs_pvalues, downs_pvalues_rank, downs_expected_p], 2);
 %     data_to_export = num2cell([minuslog10pvalues, pvalues, pvalues_rank expected_p], 2);
     
     if ~isfield(info, 'nStudies')
