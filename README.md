@@ -6,3 +6,8 @@ Code to be used on buster to run the zmeta simulations
 cd /storage/wmsmfe/zmeta_buster
 qsub CamilleEx.sh 
 ```
+
+##### Check status
+```
+qstat
+```
