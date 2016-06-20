@@ -1,6 +1,6 @@
 #!/bin/bash
 #$ -S /bin/bash
-#$ -l h_rt=12:00:00
+#$ -l h_rt=2:00:00
 #$ -l h_vmem=4G
 #$ -t 1:38
 #$ -o log/betw1_$JOB_NAME.o$JOB_ID.$TASK_ID
