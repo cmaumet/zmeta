@@ -1,13 +1,17 @@
 # Load first simulation
 
-suffix <- "tom"
+
 remove(allsimudat)
 
 study_dir = '/Volumes/camille/MBIA_buster/'
-study_dirs = dir(study_dir, pattern="^nStudy50_subNumidentical_varidentical_Betw1_.*")
+pattern <- '^nStudy25_subNumidentical_varidentical_Betw1_'
+suffix <- gsub('^', '', pattern)
+study_dirs = dir(study_dir, pattern=paste(pattern, ".*", sep=''))
 
 csv_file = paste(getwd(), '/../../../data/allsimudat_', suffix,'.csv', sep="")
-file.remove(csv_file)
+if (file.exists(csv_file)){
+	file.remove(csv_file)
+}
 
 tot_num_simu = length(study_dirs)
 

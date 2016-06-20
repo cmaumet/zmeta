@@ -2,7 +2,8 @@ library('ggplot2')
 # allsimudat_pval <- read.csv('../../../allsimudat_pval.csv', header=T, sep=" ")
 # allsimudat_pval_rank <- read.csv('../../../allsimudat_pval_rank.csv', header=T, sep=" ")
 # allsimudat_tval <- read.csv('../../../allsimudat_nopval.csv', header=T, sep=" ")
-allsimudat_tom <- read.csv('../../../data/allsimudat_tom.csv', header=T, sep=",")
+allsimudat_tom <- read.csv('../../../data/allsimudat_nStudy25_subNumidentical_varidentical_Betw1_.csv', header=T, sep=",")
+
 
 allsimudat <- allsimudat_tom
 
