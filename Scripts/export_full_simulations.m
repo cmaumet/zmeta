@@ -2,18 +2,22 @@
 %   simuDir: full path to the directory storing the simulations
 %   redo: if true, overwrite previous export (default: false)
 %   downs_tot: Number of points to keep after downsampling
-function export_full_simulations(simuDir, redo, downs_tot)
+function export_full_simulations(simuDir, redo, downs_tot, pattern)
     if nargin < 2
         redo = false;
     end
     if nargin < 3
         downs_tot = 10;
     end
+    if nargin < 4
+        % Export all studies
+        pattern = '^(two_|two_unb_|)nStudy';
+    end    
 
     donws_pos = [];
     
-%     simuDirs = find_dirs('^(two_|two_unb_|)nStudy', simuDir);
-    simuDirs = dir(fullfile(simuDir, 'nStudy25_subNumidentical_varidentical_Betw1_*'));
+%     simuDirs = find_dirs(, simuDir);
+    simuDirs = dir(fullfile(simuDir, [pattern '*']));
 
     % p-value and stat file names for each method
     methods(1) = struct( 'name', 'fishers', ...
