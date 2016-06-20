@@ -98,6 +98,7 @@ function export_full_simulations(simuDir, redo, downs_tot, pattern)
                         end
                     catch
                         warning(['Skipped' this_simu_dir])
+                        delete(simu_file)
                         continue;
                     end             
                         methodDir = fullfile(this_simu_dir, methods(m).name);
@@ -106,8 +107,9 @@ function export_full_simulations(simuDir, redo, downs_tot, pattern)
                             pValueFile = spm_select('FPList', methodDir, ...
                                 ['^' regexptranslate('escape', methods(m).pValueFile) '(\.gz)?$']);
                             if isempty(pValueFile)
-                                warning('pValueFile not found')
+                                warning(['pValueFile not found for ' methodDir])
                                 skip = true;
+                                delete(simu_file)
                                 continue;
                             end
 
@@ -129,8 +131,10 @@ function export_full_simulations(simuDir, redo, downs_tot, pattern)
                         sample_size ~= prev_sample_size
                     if sample_size < prev_sample_size
                         warning(['Incomplete simulation: ' simu_file])
+                    else
+                        warning('Different sample size for this simulation');
                     end
-                    warning('Different sample size for this simulation');
+                    delete(simu_file)
                     continue;
                 else
                     prev_sample_size = sample_size;
