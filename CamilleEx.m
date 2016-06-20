@@ -5,10 +5,10 @@ function simulations(baseDir, redo)
     redo
 
     disp(['This is run ' getenv('SGE_TASK_ID')])
-    addpath(fullfile(pwd, 'code', 'spm12'))
-    disp(fullfile(pwd, 'code','spm12'))
-    addpath(fullfile(pwd, 'code','automri', 'commons', 'lib'))
-    addpath(fullfile(pwd, 'code','simu_lib'))
+    addpath(fullfile(pwd, '..', code', 'spm12'))
+    disp(fullfile(pwd, '..' 'code','spm12'))
+    addpath(fullfile(pwd, '..' 'code','automri', 'commons', 'lib'))
+    addpath(fullfile(pwd, '..' 'code','simu_lib'))
 
     spm_jobman('initcfg');
     set_fsl_env()
