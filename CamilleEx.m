@@ -23,20 +23,20 @@ function simulations(baseDir, redo)
     % Number of subject per study
 %     nSubjects = [25 400 100 25]; %[10, 15, 20, 25, 30, 10, 15, 20, 25, 30, 10, 15, 20, 25, 30];
 %     nStudies = numel(nSubjects);
-    nStudiesArray = [50]% 50];%[5 10 25 50];
+    nStudiesArray = [25]% 50];%[5 10 25 50];
     AVG_NUM_SUB = 20;
     NUM_SUB_DIFF = 15;
-    sigmaSquareArray = AVG_NUM_SUB*[0.25, 0.5, 1, 2, 4];%How to compute z with var = 0?
+    sigmaSquareArray = AVG_NUM_SUB*[0.25, 4] %, 0.5, 1, 2, 4];%How to compute z with var = 0?
     studyVarianceSchemes = {'identical'} %, 'different'}; don't know yet how to deal with uneq var (for FFX!?)
     
     % Between-studies variance (RFX?)
-    sigmaBetweenStudiesArray = [0]%  1];
+    sigmaBetweenStudiesArray = [1]%  1];
     
     % Number of subjects per studies     
     subjectPerStudiesScheme = {'identical'}%, 'different'};
     
     % Number of studies with software 2 (fraction)
-    nStudiesWithSoftware2 = [0 1/5 0.5];
+    nStudiesWithSoftware2 = [0] % 1/5 0.5];
     
     % Correction factor with software 2
     sigmaFactorWithSoftware2 = [1 2 100];
