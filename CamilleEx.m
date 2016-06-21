@@ -46,7 +46,7 @@ function simulations(baseDir, redo)
     
     % Type of analysis: one-sample (1), two-sample(2), two-sample
     % unbalanced (3)
-    analysisTypes = [1]% 2 3];
+    analysisTypes = [2]% [1 2 3];
     
     % Size of the simulation image (in 1 direction). Each voxel of the
     % simulation image is a simulation sample.
