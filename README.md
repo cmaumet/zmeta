@@ -22,6 +22,16 @@ job-ID  prior   name       user         state submit/start at     queue         
 $ qdel 296698
 ```
 
+###### Find non-empty error logs (replace `<job_id>`)
+```
+find log -type f -name "*CamilleEx.sh.<job_id>*" -not -empty -ls
+```
+
+###### Delete empty simulations directories
+```
+find ../simulations -empty -type d -delete
+```
+
 ##### Locally
 ###### Copy the data back
 Replace `<pattern>` by an optional pattern, e.g. `nStudy25_`.
