@@ -180,7 +180,7 @@ function export_full_simulations(simuDir, redo, downs_tot, pattern)
             % A single file combining all iterations for this simulation
             fprintf(fid, '%s', mystr);
             fclose(fid);
-            disp(['Written ' this_simu_dir])            
+            disp(['Written ' main_simu_dir])            
         end
     end
     
