@@ -4,8 +4,8 @@
 remove(allsimudat)
 
 study_dir = '/Volumes/camille/MBIA_buster/'
-pattern <- '^nStudy50_subNumidentical_varidentical_Betw1_'
-suffix <- gsub('[^a-zA-Z_]', '', pattern)
+pattern <- '^nStudy50_subNumidentical_varidentical_Betw1'
+suffix <- gsub('[^a-zA-Z_0-9]', '', pattern)
 study_dirs = dir(study_dir, pattern=paste(pattern, ".*", sep=''))
 
 csv_file = paste(getwd(), '/../../../data/allsimudat_', suffix,'.csv', sep="")
