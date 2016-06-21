@@ -8,7 +8,7 @@ function simulations(baseDir, redo)
     addpath(fullfile(pwd, '..', 'code', 'spm12'))
     disp(fullfile(pwd, '..', 'code','spm12'))
     addpath(fullfile(pwd, '..', 'code','automri', 'commons', 'lib'))
-    addpath(fullfile(pwd, '..', 'code','simu_lib'))
+    addpath(fullfile(pwd, '..', 'lib'))
 
     cluster_task_id = str2num(getenv('SGE_TASK_ID'))
     rng(cluster_task_id);
