@@ -1,7 +1,6 @@
-get_expected_pval_and_equiv_z <- function() {
+get_expected_pval_and_equiv_z <- function(pattern="^nStudy50_subNumidentical_varidentical_Betw1") {
 
 study_dir = '/Volumes/camille/MBIA_buster/'
-pattern <- '^nStudy50_subNumidentical_varidentical_Betw1'
 suffix <- gsub('[^a-zA-Z_0-9]', '', pattern)
 study_dirs = dir(study_dir, pattern=paste(pattern, ".*", sep=''))
 
@@ -73,7 +72,5 @@ for (simunum in seq(tot_num_simu, 1, -1)){
 }
 
 }
-
-get_expected_pval_and_equiv_z()
 
 
