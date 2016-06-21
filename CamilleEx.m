@@ -10,6 +10,9 @@ function simulations(baseDir, redo)
     addpath(fullfile(pwd, '..', 'code','automri', 'commons', 'lib'))
     addpath(fullfile(pwd, '..', 'code','simu_lib'))
 
+    cluster_task_id = str2num(getenv('SGE_TASK_ID'))
+    rng(cluster_task_id);
+
     spm_jobman('initcfg');
     set_fsl_env()
 % SIMULATIONS    Perform simulations based on IBMA toolbox. 
@@ -196,7 +199,7 @@ function simulations(baseDir, redo)
                                         currSimuDirName = [analysisPrefix 'nStudy' num2str(nStudies) '_subNum' subjectNumberScheme '_var' studyVarianceScheme '_Betw' num2str(sigmaBetweenStudies) ...
                                             '_Within' num2str(sigmaSquare/AVG_NUM_SUB) '_nSimuOneDir' num2str(nSimuOneDir), '_unitmis' num2str(iUnitMisMatch) '_numStudySoft'...
                                             num2str(iStudiesWithSoftware2) '_softFactor' num2str(iSigmaFactorSoftware)];
-                                        simulationDir = fullfile(baseSimulationDir, currSimuDirName, num2str(str2num(getenv('SGE_TASK_ID')), '%04d'));
+                                        simulationDir = fullfile(baseSimulationDir, currSimuDirName, num2str(cluster_task_id, '%04d'));
 
                                         disp(simulationDir)
                                         
