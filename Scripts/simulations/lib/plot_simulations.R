@@ -2,7 +2,15 @@ library('ggplot2')
 # allsimudat_pval <- read.csv('../../../allsimudat_pval.csv', header=T, sep=" ")
 # allsimudat_pval_rank <- read.csv('../../../allsimudat_pval_rank.csv', header=T, sep=" ")
 # allsimudat_tval <- read.csv('../../../allsimudat_nopval.csv', header=T, sep=" ")
-allsimudat_tom <- read.csv('../../../data/allsimudat_nStudy50_subNumidentical_varidentical_Betw1_.csv', header=T, sep=",")
+pattern = "^nStudy25_subNumidentical_varidentical_Betw1"
+suffix <- gsub('[^a-zA-Z_0-9]', '', pattern)
+csv_file = paste(getwd(), '/../../../data/allsimudat_', suffix,'.csv', sep="")
+
+if (! file.exists(csv_file)){
+	get_expected_pval_and_equiv_z(pattern)
+}
+
+allsimudat_tom <- read.csv(csv_file, header=T, sep=",")
 
 
 allsimudat <- allsimudat_tom
