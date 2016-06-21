@@ -24,6 +24,7 @@ $ qdel 296698
 
 ##### Locally
 ###### Copy the data back
+Replace `<pattern>` by an optional pattern, e.g. `nStudy25_`.
 ```
-rsync -avzhe ssh --remove-source-files wmsmfe@buster.stats.warwick.ac.uk:/storage/wmsmfe/simulations/two_unb_nStudy25* /Volumes/camille/MBIA_buster/
+rsync -avzhe ssh --remove-source-files wmsmfe@buster.stats.warwick.ac.uk:/storage/wmsmfe/simulations/<pattern>* /Volumes/camille/MBIA_buster/
 ```
