@@ -1,7 +1,8 @@
+
+
 # Load first simulation
 
-
-remove(allsimudat)
+get_expected_pval_and_equiv_z <- function(){
 
 study_dir = '/Volumes/camille/MBIA_buster/'
 pattern <- '^nStudy50_subNumidentical_varidentical_Betw1'
@@ -88,6 +89,8 @@ for (simunum in seq(tot_num_simu, 1, -1)){
 	print(paste("saved in", csv_file))
 }
 
+}
 
+get_expected_pval_and_equiv_z()
 
 
