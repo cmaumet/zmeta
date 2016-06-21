@@ -27,10 +27,10 @@ function prepare_fsl_data(datadir, wd, nSubjects, design)
             dof_file = fullfile(wd, ['dof_st' num2str(i, '%03d') '.nii']);
             delete(dof_file);
         end
-        
-        copyfile(fullfile(cwd, ['../../../../fsl_design/' design '.mat']), [design '.mat'])
-        copyfile(fullfile(cwd, ['../../../../fsl_design/' design '.grp']), [design '.grp'])
-        copyfile(fullfile(cwd, ['../../../../fsl_design/' design '.con']), [design '.con'])
+ 
+        copyfile(['/storage/wmsmfe/code/fsl_design/' design '.mat'], [design '.mat'])
+        copyfile(['/storage/wmsmfe/code/fsl_design/' design '.grp'], [design '.grp'])
+        copyfile(['/storage/wmsmfe/code/fsl_design/' design '.con'], [design '.con'])
 
         cd(cwd)
     end
