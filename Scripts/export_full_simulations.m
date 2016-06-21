@@ -51,7 +51,7 @@ function export_full_simulations(simuDir, redo, downs_tot, pattern)
                     'pValueFile', 'mega_ffx_minus_log10_p.nii',...
                     'statFile', 'zstat1.nii');             
                 
-    methods = [one_sample_only_methods other_methods];
+    all_methods = [one_sample_only_methods other_methods];
     
 %     saveSimuCsvDir = fullfile(simuDir, 'csv_tom');
     num_simu = numel(simuDirs);
@@ -63,6 +63,7 @@ function export_full_simulations(simuDir, redo, downs_tot, pattern)
         iter_dirs = dir(fullfile(simuDir, simuDirs(s).name, '0*'));
         
         num_iter = numel(iter_dirs);
+        
         filename = 'simu.csv';
         
         main_simu_dir = fullfile(simuDir, simuDirs(s).name);
@@ -75,7 +76,19 @@ function export_full_simulations(simuDir, redo, downs_tot, pattern)
                 'numSubjectScheme, varScheme, soft2, soft2Factor, ' ... 
                 'unitMismatch, nSimu, minuslog10P, P, rankP, '...
                 'expectedP \n']);
-                ...'unitMismatch, nSimu, minuslog10P, P, rankP, '...            
+                ...'unitMismatch, nSimu, minuslog10P, P, rankP, '...     
+
+            % Read info from first analysis to check if one-sample
+            first_simu_dir = fullfile(main_simu_dir, iter_dirs(1).name);
+            first_simu_mat_file = fullfile(first_simu_dir, 'simu.mat');
+            first_info = load(first_simu_mat_file);
+            first_info = first_info.simu.config;
+           
+            if first_info.analysisType ~= 1
+                methods = other_methods;
+            else
+                methods = all_methods;
+            end            
             
             % For each method we combine all iterations
             for m = 1:numel(methods)  
@@ -121,22 +134,8 @@ function export_full_simulations(simuDir, redo, downs_tot, pattern)
 
                         pvalues = [pvalues iter_pval(:)];
                     else
-                        skip = true;
-                        warn = true;
-                        
-                        if info.analysisType ~= 1
-                            one_sample_only_method = any(ismember({one_sample_only_methods(:).name}, methods(1).name));
-                            if one_sample_only_method
-                                % It is normal for one-sample only methods 
-                                % to be missing for two-sample simulations
-                                warn = false;
-                            end
-                        end
-                        
-                        if warn
-                            warning(['Missing ' methods(m).name ...
+                        warning(['Missing ' methods(m).name ...
                                      ' for ' this_simu_dir])
-                        end
                     end
                 end
                 if skip
@@ -181,6 +180,7 @@ function export_full_simulations(simuDir, redo, downs_tot, pattern)
             % A single file combining all iterations for this simulation
             fprintf(fid, '%s', mystr);
             fclose(fid);
+            disp(['Written ' this_simu_dir])            
         end
     end
     
