@@ -2,6 +2,12 @@
 Code to be used on buster to run the zmeta simulations
 
 ##### Buster
+###### Installation
+```
+cd /storage/wmsmfe/
+git clone git@github.com:cmaumet/zmeta_buster.git
+```
+
 ###### Start the simulations
 ```
 cd /storage/wmsmfe/zmeta_buster
