@@ -20,36 +20,38 @@ function export_full_simulations(simuDir, redo, downs_tot, pattern)
     simuDirs = dir(fullfile(simuDir, [pattern '*']));
 
     % p-value and stat file names for each method
-    methods(1) = struct( 'name', 'fishers', ...
+    one_sample_only_methods(1) = struct( 'name', 'fishers', ...
                     'pValueFile', 'fishers_ffx_minus_log10_p.nii',...
                     'statFile', 'fishers_ffx_statistic.nii');
-    methods(2) = struct( 'name', 'megaRFX', ...
+    other_methods(1) = struct( 'name', 'megaRFX', ...
                     'pValueFile', 'mega_rfx_minus_log10_p.nii',...
                     'statFile', 'spmT_0001.nii');
-    methods(3) = struct( 'name', 'permutZ', ...
+    other_methods(2) = struct( 'name', 'permutZ', ...
                     'pValueFile', 'lP+.img',...
                     'statFile', 'snpmT+.hdr');
-    methods(4) = struct( 'name', 'permutCon', ...
+    other_methods(3) = struct( 'name', 'permutCon', ...
                     'pValueFile', 'lP+.img',...
                     'statFile', 'snpmT+.img');
 %             methods(5) = struct( 'name', 'megaFFX', ...
 %                             'pValueFile', 'mega_ffx_ffx_minus_log10_p.nii',...
 %                             'statFile', 'mega_ffx_statistic.nii');                    
-    methods(5) = struct( 'name', 'stouffers', ...
+    one_sample_only_methods(2) = struct( 'name', 'stouffers', ...
                     'pValueFile', 'stouffers_ffx_minus_log10_p.nii',...
                     'statFile', 'stouffers_ffx_statistic.nii');                      
-    methods(6) = struct( 'name', 'stouffersMFX', ...
+    one_sample_only_methods(3) = struct( 'name', 'stouffersMFX', ...
                     'pValueFile', 'stouffers_rfx_minus_log10_p.nii',...
                     'statFile', 'spmT_0001.nii');                      
-    methods(7) = struct( 'name', 'weightedZ', ...
+    one_sample_only_methods(4) = struct( 'name', 'weightedZ', ...
                     'pValueFile', 'weightedz_ffx_minus_log10_p.nii',...
                     'statFile', 'weightedz_ffx_statistic.nii');                      
-    methods(8) = struct( 'name', 'megaMFX', ...
+    other_methods(4) = struct( 'name', 'megaMFX', ...
                     'pValueFile', 'mega_mfx_minus_log10_p.nii',...
                     'statFile', 'zstat1.nii');                      
-    methods(9) = struct( 'name', 'megaFFX_FSL', ...
+    other_methods(5) = struct( 'name', 'megaFFX_FSL', ...
                     'pValueFile', 'mega_ffx_minus_log10_p.nii',...
-                    'statFile', 'zstat1.nii');                    
+                    'statFile', 'zstat1.nii');             
+                
+    methods = [one_sample_only_methods other_methods];
     
 %     saveSimuCsvDir = fullfile(simuDir, 'csv_tom');
     num_simu = numel(simuDirs);
@@ -75,7 +77,7 @@ function export_full_simulations(simuDir, redo, downs_tot, pattern)
                 'expectedP \n']);
                 ...'unitMismatch, nSimu, minuslog10P, P, rankP, '...            
             
-            % For each method we combine all iterations            
+            % For each method we combine all iterations
             for m = 1:numel(methods)  
                 statistic = [];
                 pvalues = [];
@@ -101,22 +103,39 @@ function export_full_simulations(simuDir, redo, downs_tot, pattern)
                         delete(simu_file)
                         continue;
                     end             
-                        methodDir = fullfile(this_simu_dir, methods(m).name);
+                    methodDir = fullfile(this_simu_dir, methods(m).name);
 
-                        if isdir(methodDir)
-                            pValueFile = spm_select('FPList', methodDir, ...
-                                ['^' regexptranslate('escape', methods(m).pValueFile) '(\.gz)?$']);
-                            if isempty(pValueFile)
-                                warning(['pValueFile not found for ' methodDir])
-                                skip = true;
-                                delete(simu_file)
-                                continue;
-                            end
-
-                            iter_pval = spm_read_vols(spm_vol(pValueFile));
-                            
-                            pvalues = [pvalues iter_pval(:)];
+                    if isdir(methodDir)
+                        pValueFile = spm_select('FPList', methodDir, ...
+                            ['^' regexptranslate('escape', methods(m).pValueFile) '(\.gz)?$']);
+                        if isempty(pValueFile)
+                            warning(['pValueFile not found for ' methodDir])
+                            skip = true;
+                            delete(simu_file)
+                            continue;
                         end
+
+                        iter_pval = spm_read_vols(spm_vol(pValueFile));
+
+                        pvalues = [pvalues iter_pval(:)];
+                    else
+                        skip = true;
+                        warn = true;
+                        
+                        if info.analysisType ~= 1
+                            one_sample_only_method = any(ismember({one_sample_only_methods(:).name}, methods(1).name));
+                            if one_sample_only_method
+                                % It is normal for one-sample only methods 
+                                % to be missing for two-sample simulations
+                                warn = false;
+                            end
+                        end
+                        
+                        if warn
+                            warning(['Missing ' methods(m).name ...
+                                     ' for ' this_simu_dir])
+                        end
+                    end
                 end
                 if skip
                     continue;
@@ -144,7 +163,8 @@ function export_full_simulations(simuDir, redo, downs_tot, pattern)
                 % and methods
                 if isempty(donws_pos)
                     if downs_tot > sample_size
-                        error(['can''t downsize to ' num2str(downs_tot)])
+                        error(['can''t downsize to ' num2str(downs_tot) ...
+                            '(sample size is ' num2str(sample_size) ')'])
                     end
                     % downsample in log-space so that we keep more values 
                     % corresponding to smaller ranks/p-values                    
