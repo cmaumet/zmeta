@@ -30,7 +30,7 @@ $ qdel 296698
 
 ###### Find non-empty error logs (replace `<job_id>`)
 ```
-find log -type f -name "*CamilleEx.sh.<job_id>*" -not -empty -ls
+find log -type f -name "*CamilleEx.sh.e<job_id>*" -not -empty -ls
 ```
 
 ###### Delete empty simulations directories
