@@ -5,7 +5,10 @@
  2. Export p-values into csv file in Matlab
 
  ```
- export_full_simulations('/Volumes/camille/MBIA_buster', true, 1000)
+ addpath('~/Projects/Meta-analysis/dev/zmeta/Scripts/')
+ addpath('~/Softs/external/spm/spm12/')
+ # Replace <pattern> by optional pattern, e.g. 'nStudy25_subNumidentical_varidentical_Betw1_'
+ export_full_simulations('/Volumes/camille/MBIA_buster', false, 1000, <pattern>)
  ```
  3. Get the 95% CI and plot results in R
 
