@@ -111,7 +111,9 @@ function export_full_simulations(simuDir, redo, downs_tot, pattern)
                         if isempty(pValueFile)
                             warning(['pValueFile not found for ' methodDir])
                             skip = true;
-                            delete(simu_file)
+                            if exist(simu_file, 'file')
+                                delete(simu_file)
+                            end
                             continue;
                         end
 
