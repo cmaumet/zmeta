@@ -263,7 +263,10 @@ function simulations(baseDir, redo)
                                         permutConDir = fullfile(simulationDir, 'permutCon');
                                         permutZDir = fullfile(simulationDir, 'permutZ');
 
-                                        if exist_simu_dir
+                                        last_data = fullfile(dataDir, ['varcon_st' num2str((numStudyInGroup1+numStudyInGroup2), '%03d') '.nii'])
+                                        exist_data = exist(last_data, 'file');
+
+                                        if exist_data
                                             for iStudy = 1:(numStudyInGroup1+numStudyInGroup2)
                                                 [~, conFiles{iStudy}] = find_file_nii_or_gz(fullfile(dataDir, ['con_st' num2str(iStudy, '%03d') '.nii']));
                                                 [~, varConFiles{iStudy}] = find_file_nii_or_gz(fullfile(dataDir, ['varcon_st' num2str(iStudy, '%03d') '.nii']));
