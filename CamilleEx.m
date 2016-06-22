@@ -39,7 +39,7 @@ function simulations(baseDir, redo)
     subjectPerStudiesScheme = {'identical'}%, 'different'};
     
     % Number of studies with software 2 (fraction)
-    nStudiesWithSoftware2 = [0 1/5 0.5];
+    nStudiesWithSoftware2 = [0] %[0 1/5 0.5];
     
     % Correction factor with software 2
     sigmaFactorWithSoftware2 = [1 2 100];
