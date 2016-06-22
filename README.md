@@ -38,6 +38,11 @@ find log -type f -name "*CamilleEx.sh.e<job_id>*" -not -empty -ls
 find ../simulations -empty -type d -delete
 ```
 
+###### Count number of iterations done for each simulation folder
+```
+find ../simulations/ -mindepth 1 -maxdepth 1 -type d | xargs -I folder sh -c 'find folder -mindepth 1 -maxdepth 1 -type d | wc -l'
+```
+
 ##### Locally
 ###### Copy the data back
 Replace `<pattern>` by an optional pattern, e.g. `nStudy25_`.
