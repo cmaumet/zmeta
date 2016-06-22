@@ -11,7 +11,7 @@ function simulations(baseDir, redo)
     addpath(fullfile(pwd, 'lib'))
 
     cluster_task_id = str2num(getenv('SGE_TASK_ID'))
-    rng(cluster_task_id);
+    rng('shuffle');
 
     spm_jobman('initcfg');
     set_fsl_env()
@@ -196,7 +196,7 @@ function simulations(baseDir, redo)
 
 
                                         % Directory to store the simulation data and results.
-                                        currSimuDirName = [analysisPrefix 'rng_taskid_nStudy' num2str(nStudies) '_Betw' num2str(sigmaBetweenStudies) ...
+                                        currSimuDirName = [analysisPrefix 'rng_shuffle_nStudy' num2str(nStudies) '_Betw' num2str(sigmaBetweenStudies) ...
                                             '_Within' num2str(sigmaSquare/AVG_NUM_SUB) '_nOneDir' num2str(nSimuOneDir), '_unitmis' num2str(iUnitMisMatch) '_numStudySoft'...
                                             num2str(iStudiesWithSoftware2) '_softFactor' num2str(iSigmaFactorSoftware)];
                                         simulationDir = fullfile(baseSimulationDir, currSimuDirName, num2str(cluster_task_id, '%04d'));
