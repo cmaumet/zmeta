@@ -6,6 +6,7 @@ function simulations(baseDir, redo)
 
     task_id = getenv('SGE_TASK_ID')
     job_id = getenv('JOB_ID')
+    queue = getenv('QUEUE')
 
     disp(['This is run ' task_id])
     disp(['This is job ' job_id])
@@ -251,6 +252,7 @@ function simulations(baseDir, redo)
                                         simu.config.analysisType = analysisType;
                                         simu.sge.job_id = job_id;
                                         simu.sge.task_id = task_id;
+                                        simu.sge.queue = queue;
                                         simu.config.timing = toc;
 
                                         save(fullfile(simulationDir, 'simu.mat'), 'simu')
