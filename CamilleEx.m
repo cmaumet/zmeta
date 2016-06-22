@@ -42,10 +42,10 @@ function simulations(baseDir, redo)
     nStudiesWithSoftware2 = [0] %[0 1/5 0.5];
     
     % Correction factor with software 2
-    sigmaFactorWithSoftware2 = [1 2 100];
+    sigmaFactorWithSoftware2 = [1] %[1 2 100];
     
     % Study-specific bias due to units mismatch
-    unitMismatch = [false, true];
+    unitMismatch = [false] %[false, true];
     
     % Type of analysis: one-sample (1), two-sample(2), two-sample
     % unbalanced (3)
