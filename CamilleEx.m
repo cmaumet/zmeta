@@ -33,7 +33,7 @@ function simulations(baseDir, redo)
     studyVarianceSchemes = {'identical'} %, 'different'}; don't know yet how to deal with uneq var (for FFX!?)
     
     % Between-studies variance (RFX?)
-    sigmaBetweenStudiesArray = [1]%  1];
+    sigmaBetweenStudiesArray = [0]%  1];
     
     % Number of subjects per studies     
     subjectPerStudiesScheme = {'identical'}%, 'different'};
