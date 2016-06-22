@@ -7,17 +7,35 @@ function check_identical_data
     num_simu = numel(simuDirs);
     disp([num2str(num_simu) ' simulations'])
 
+    num_identical = 0;
     for i = 1:num_simu
-        iter_1 = fullfile(simuDir, simuDirs(i).name, '0001', 'data', 'con_st001.nii');
-        iter_2 = fullfile(simuDir, simuDirs(i).name, '0002', 'data', 'con_st001.nii');
+        go_next_simu = false;
+        
+        for it_1 = 1:38
+            iter_1 = fullfile(simuDir, simuDirs(i).name, sprintf('%04d',it_1), 'data', 'con_st001.nii');    
+            for it_2 = (it_1+1):38
+                iter_2 = fullfile(simuDir, simuDirs(i).name, sprintf('%04d',it_2), 'data', 'con_st001.nii');
 
-        nifti1 = nifti(iter_1);
-        nifti2 = nifti(iter_2);
+                nifti1 = nifti(iter_1);
+                nifti2 = nifti(iter_2);
 
-        if all(nifti1.dat(:) == nifti2.dat(:))
-            disp(['Same data for: ' simuDirs(i).name])
-%         else
-%             disp(['Good data for: ' simuDirs(i).name])
+                if all(nifti1.dat(:) == nifti2.dat(:))
+                    disp(['Same data for: ' simuDirs(i).name ...
+                          ' between ' num2str(it_1) ' and ' ...
+                          num2str(it_2)])
+                    num_identical = num_identical + 1;
+                    
+                    go_next_simu = true;
+                    break;
+        %         else
+        %             disp(['Good data for: ' simuDirs(i).name])
+                end
+            end
+            if go_next_simu
+                break;
+            end
         end
     end
+    
+    disp([num2str(num_identical) ' identical'])
 end
