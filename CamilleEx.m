@@ -5,7 +5,7 @@ function simulations(baseDir, redo)
     redo
 
     task_id = getenv('SGE_TASK_ID')
-    job_id = getenv('SGE_JOB_ID')
+    job_id = getenv('JOB_ID')
 
     disp(['This is run ' task_id])
     disp(['This is job ' job_id])
