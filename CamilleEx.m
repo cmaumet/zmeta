@@ -4,14 +4,17 @@ function simulations(baseDir, redo)
     end
     redo
 
-    disp(['This is run ' getenv('SGE_TASK_ID')])
+    task_id = getenv('SGE_TASK_ID')
+    job_id = getenv('SGE_JOB_ID')
+
+    disp(['This is run ' task_id])
+    disp(['This is job ' job_id])
     addpath(fullfile(pwd, '..', 'code', 'spm12'))
     disp(fullfile(pwd, '..', 'code','spm12'))
     addpath(fullfile(pwd, '..', 'code','automri', 'commons', 'lib'))
     addpath(fullfile(pwd, 'lib'))
 
-    cluster_task_id = str2num(getenv('SGE_TASK_ID'))
-    disp(cluster_task_id)
+    cluster_task_id = str2num(task_id)
     rng(cluster_task_id);
 
     spm_jobman('initcfg');
@@ -246,6 +249,8 @@ function simulations(baseDir, redo)
                                         simu.config.unitFactorInGroup1 = unitFactorInGroup1;
                                         simu.config.unitFactorInGroup2 = unitFactorInGroup2;
                                         simu.config.analysisType = analysisType;
+                                        simu.sge.job_id = job_id;
+                                        simu.sge.task_id = task_id;
                                         simu.config.timing = toc;
 
                                         save(fullfile(simulationDir, 'simu.mat'), 'simu')
