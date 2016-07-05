@@ -36,13 +36,13 @@ function simulations(baseDir, redo)
     AVG_NUM_SUB = 20;
     NUM_SUB_DIFF = 15;
     sigmaSquareArray = AVG_NUM_SUB*[0.25 0.5 1 2 4];%How to compute z with var = 0?
-    studyVarianceSchemes = {'identical'} %, 'different'}; don't know yet how to deal with uneq var (for FFX!?)
+    studyVarianceSchemes = {'same'} %, 'diff'}; don't know yet how to deal with uneq var (for FFX!?)
     
     % Between-studies variance (RFX?)
     sigmaBetweenStudiesArray = [1]%  1];
     
     % Number of subjects per studies     
-    subjectPerStudiesScheme = {'identical'}%, 'different'};
+    subjectPerStudiesScheme = {'same'}%, 'diff'};
     
     % Number of studies with software 2 (fraction)
     nStudiesWithSoftware2 = [0 1/5 0.5];
@@ -151,10 +151,10 @@ function simulations(baseDir, redo)
                 %             nSubjects = get_n_subjects_per_studies(nStudies);
                             subjectNumberScheme = subjectPerStudiesScheme{iSubPerStudyScheme};
                             switch subjectNumberScheme
-                                case {'identical'}
+                                case {'same'}
                                     nSubjectsInGroup1 = ones(1, numStudyInGroup1)*AVG_NUM_SUB;
                                     nSubjectsInGroup2 = ones(1, numStudyInGroup2)*AVG_NUM_SUB;
-                                case {'different'}
+                                case {'diff'}
 
                                     % Uniformly distributed beween AVG_NUM_SUB-NUM_SUB_DIFF 
                                     % and AVG_NUM_SUB+NUM_SUB_DIFF included, so that 
@@ -176,10 +176,10 @@ function simulations(baseDir, redo)
                                         studyVarianceScheme = studyVarianceSchemes{iVariance};
 
                                         switch studyVarianceScheme
-                                            case {'identical'}
+                                            case {'same'}
                                                 varAlphaInGroup1 = ones(1, numStudyInGroup1);
                                                 varAlphaInGroup2 = ones(1, numStudyInGroup2);
-                                            case {'different'}
+                                            case {'diff'}
                                                 % Generate values from the uniform 
                                                 % distribution on the interval [a, b].
                                                 a = 1/2;
@@ -202,8 +202,8 @@ function simulations(baseDir, redo)
 
 
                                         % Directory to store the simulation data and results.
-                                        currSimuDirName = [analysisPrefix 'nStudy' num2str(nStudies) '_Betw' num2str(sigmaBetweenStudies) ...
-                                            '_Within' num2str(sigmaSquare/AVG_NUM_SUB) '_nOneDir' num2str(nSimuOneDir), '_unitmis' num2str(iUnitMisMatch) '_numStudySoft'...
+                                        currSimuDirName = [analysisPrefix 'nStudy' num2str(nStudies) '_btw' num2str(sigmaBetweenStudies) ...
+                                            '_wth' num2str(sigmaSquare/AVG_NUM_SUB) '_n' num2str(nSimuOneDir^3), '_unit' num2str(iUnitMisMatch) '_numSoft2'...
                                             num2str(iStudiesWithSoftware2) '_softFactor' num2str(iSigmaFactorSoftware)];
                                         simulationDir = fullfile(baseSimulationDir, currSimuDirName, num2str(cluster_task_id, '%04d'));
 
