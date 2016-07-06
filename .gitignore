@@ -2,3 +2,6 @@ log/
 simulations/
 
 *.m~
+
+fsl_designs/*.png
+fsl_designs/*/*.ppm
