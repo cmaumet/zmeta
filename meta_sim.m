@@ -174,7 +174,7 @@ function meta_sim(baseDir, redo)
                                         simu_name = [analysisPrefix 'k' num2str(k) '_btw' num2str(btw_sigma) ...
                                             '_wth' num2str(sigma_sq), '_unit' num2str(unit_mis) '_otherSoft'...
                                             num2str(soft_prop) '_' num2str(soft_factor)];
-                                        simu_dir = fullfile(allsimu_dir, simu_name, num2str(cluster_tasksid, '%04d'));
+                                        simu_dir = fullfile(allsimu_dir, simu_name, num2str(cluster_task_id, '%04d'));
                                         disp(simu_dir)
                                         
                                         exist_simu_dir = isdir(simu_dir);
