@@ -247,7 +247,7 @@ function meta_sim(baseDir, redo)
                                             simu.sge(1).job_id = job_id;
                                         end
                                         
-                                        simu.sge(end).tasksid = tasksid;
+                                        simu.sge(end).task_id = task_id;
                                         simu.sge(end).queue = queue;
                                         simu.sge(end).host = host;
                                         
