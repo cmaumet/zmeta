@@ -22,202 +22,177 @@ function meta_sim(baseDir, redo)
     addpath(fullfile(pwd, '..', 'code','automri', 'commons', 'lib'))
     addpath(fullfile(pwd, 'lib'))
 
+    % SPM and FSL initialisations    
+    spm_jobman('initcfg');
+    set_fsl_env()
+    
+    % Initialise random number generator using the task id
     cluster_task_id = str2num(task_id);
     rng(cluster_task_id);
 
-    spm_jobman('initcfg');
-    set_fsl_env()
-% SIMULATIONS    Perform simulations based on IBMA toolbox. 
-%
-%   simulations(baseDir)
-
-% Copyright (C) 2014 The University of Warwick
-% Id: ibma_test_stouffers.m  IBMA toolbox
-% Camille Maumet
-
-    % Number of subject per study
-%     nSubjects = [25 400 100 25]; %[10, 15, 20, 25, 30, 10, 15, 20, 25, 30, 10, 15, 20, 25, 30];
-%     nStudies = numel(nSubjects);
     load(simu_config)
-    
-    if nargin == 0
-        baseDir = '/storage/wmsmfe';
-    end
        
-    baseSimulationDir = fullfile(baseDir, 'simulations');
-    if ~isdir(baseSimulationDir)
-        mkdir(baseSimulationDir)
+    allsimu_dir = fullfile(baseDir, 'simulations');
+    if ~isdir(allsimu_dir)
+        mkdir(allsimu_dir)
     end
      
     % Number of studies per meta-analysis
-    for iStudies = 1:numel(nStudiesArray)
-        nStudies = nStudiesArray(iStudies);
+    for k = ks
         
         % One-sample, two-sample, two-sample unbalanced
-        for analysisType = analysisTypes
-            if analysisType == 1
+        for analysis_type = analysisTypes
+            if analysis_type == 1
                 analysisPrefix = '';
-                numStudyInGroup1 = nStudies;
-                numStudyInGroup2 = 0;
-            elseif analysisType == 2
+                k_group1 = k;
+                k_group2 = 0;
+            elseif analysis_type == 2
                 analysisPrefix = 'two_';
-                numStudyInGroup1 = nStudies;
-                numStudyInGroup2 = nStudies;
-            elseif analysisType == 3
+                k_group1 = k;
+                k_group2 = k;
+            elseif analysis_type == 3
                 analysisPrefix = 'two_unb_';
-                numStudyInGroup1 = nStudies*2*4/5;
-                numStudyInGroup2 = nStudies*2/5;
+                k_group1 = k*2*4/5;
+                k_group2 = k*2/5;
             end
 
             % Cross-studies unit mismatch
-            for iUnitMisMatch = unitMismatch
+            for unit_mis = units
 
                 % Cross-software unit mismatch
-                for iSigmaFactorSoftware = sigmaFactorWithSoftware2
-                    for iStudiesWithSoftware2 = nStudiesWithSoftware2
-                        if (iUnitMisMatch && iStudiesWithSoftware2~=0) || ...
-                           (iUnitMisMatch && iSigmaFactorSoftware~=1) || ...
-                           (~iUnitMisMatch && iStudiesWithSoftware2==0 && iSigmaFactorSoftware~=1) || ...
-                           (iSigmaFactorSoftware==1 && iStudiesWithSoftware2~=0) 
-                            warning(['Ignore: mismatch=' num2str(iUnitMisMatch) ...
-                                ' , studies with software 2=' num2str(iStudiesWithSoftware2) ...
-                                ', factor software=' num2str(iSigmaFactorSoftware) ...                            
+                for soft_factor = soft_factors
+                    
+                    % Proportion of studies analysed with software 2                    
+                    for soft_prop = soft_props
+                        if (unit_mis && soft_prop~=0) || ...
+                           (unit_mis && soft_factor~=1) || ...
+                           (~unit_mis && soft_prop==0 && soft_factor~=1) || ...
+                           (soft_factor==1 && soft_prop~=0) 
+                            warning(['Ignore: mismatch=' num2str(unit_mis) ...
+                                ' , studies with software 2=' num2str(soft_prop) ...
+                                ', factor software=' num2str(soft_factor) ...                            
                                 ])
                             continue;
                         end
 
-                        if iUnitMisMatch
-                            % Uniformly distributed beween 0.4 and 1.6 included, so that 
-                            % mean(unitFactor) = 1 and 1.6/0.4=4
-                            unitFactorInGroup1 = randi([1 4], 1, numStudyInGroup1)/2.5;%linspace(AVG_NUM_SUB/2,AVG_NUM_SUB*2,nStudies);
-                            unitFactorInGroup2 = randi([1 4], 1, numStudyInGroup2)/2.5;
+                        if unit_mis
+                            % Uniformly distributed beween 0.4 and 1.6 
+                            % included, so that mean(unitFactor) = 1 and 
+                            % 1.6/0.4=4
+                            factor_group1 = randi([1 4], 1, k_group1)/2.5;%linspace(avg_n/2,avg_n*2,k);
+                            factor_group2 = randi([1 4], 1, k_group2)/2.5;
                         else
-                            unitFactorInGroup1 = ones(1, numStudyInGroup1);
-                            unitFactorInGroup2 = ones(1, numStudyInGroup2);
+                            factor_group1 = ones(1, k_group1);
+                            factor_group2 = ones(1, k_group2);
                         end
 
-                        studiesWithSofwareInGroup1 = ones(numStudyInGroup1, 1);
-                        studiesWithSofwareInGroup1(1:numStudyInGroup1*iStudiesWithSoftware2) = 2;
+                        group1_soft = ones(k_group1, 1);
+                        group1_soft(1:k_group1*soft_prop) = 2;
 
-                        if analysisType > 1
-                            studiesWithSofwareInGroup2 = ones(numStudyInGroup2, 1);
-                            studiesWithSofwareInGroup2(1:numStudyInGroup2*iStudiesWithSoftware2) = 2;
+                        if analysis_type > 1
+                            group2_soft = ones(k_group2, 1);
+                            group2_soft(1:k_group2*soft_prop) = 2;
                         end
                         
-                        unitFactorInGroup1(studiesWithSofwareInGroup1==2) = unitFactorInGroup1(studiesWithSofwareInGroup1==2).*iSigmaFactorSoftware;
-                        
-                        if analysisType > 1
-                            unitFactorInGroup2(studiesWithSofwareInGroup2==2) = unitFactorInGroup2(studiesWithSofwareInGroup2==2).*iSigmaFactorSoftware;
+                        factor_group1(group1_soft==2) = factor_group1(group1_soft==2).*soft_factor;
+                        if analysis_type > 1
+                            factor_group2(group2_soft==2) = factor_group2(group2_soft==2).*soft_factor;
                         end
 
-                        for iSubPerStudyScheme = 1:numel(subjectPerStudiesScheme)
+                        for numsub_scheme = numsub_schemes
 
-                %             nSubjects = get_n_subjects_per_studies(nStudies);
-                            subjectNumberScheme = subjectPerStudiesScheme{iSubPerStudyScheme};
-                            switch subjectNumberScheme
+                            switch numsub_scheme
                                 case {'same'}
-                                    nSubjectsInGroup1 = ones(1, numStudyInGroup1)*AVG_NUM_SUB;
-                                    nSubjectsInGroup2 = ones(1, numStudyInGroup2)*AVG_NUM_SUB;
+                                    group1_n = ones(1, k_group1)*avg_n;
+                                    group2_n = ones(1, k_group2)*avg_n;
                                 case {'diff'}
 
-                                    % Uniformly distributed beween AVG_NUM_SUB-NUM_SUB_DIFF 
-                                    % and AVG_NUM_SUB+NUM_SUB_DIFF included, so that 
-                                    % mean(nSubjects) = AVG_NUM_SUB
-                                    nSubjectsInGroup1 = randi([AVG_NUM_SUB-NUM_SUB_DIFF AVG_NUM_SUB+NUM_SUB_DIFF], 1, numStudyInGroup1);%linspace(AVG_NUM_SUB/2,AVG_NUM_SUB*2,nStudies);
-                                    nSubjectsInGroup2 = randi([AVG_NUM_SUB-NUM_SUB_DIFF AVG_NUM_SUB+NUM_SUB_DIFF], 1, numStudyInGroup2);%linspace(AVG_NUM_SUB/2,AVG_NUM_SUB*2,nStudies);
+                                    % Uniformly distributed beween avg_n-diff_n 
+                                    % and avg_n+diff_n included, so that 
+                                    % mean(nsub) = avg_n
+                                    group1_n = randi([avg_n-diff_n avg_n+diff_n], 1, k_group1);%linspace(avg_n/2,avg_n*2,k);
+                                    group2_n = randi([avg_n-diff_n avg_n+diff_n], 1, k_group2);%linspace(avg_n/2,avg_n*2,k);
                                 otherwise
                                   error('')
                             end
-                            disp(nSubjectsInGroup1)
-                            disp(nSubjectsInGroup2)
+                            disp(group1_n)
+                            disp(group2_n)
 
-                            % Between-studies variance (RFX?)
-                            for iEffects = 1:numel(sigmaBetweenStudiesArray)
-                                sigmaBetweenStudies = sigmaBetweenStudiesArray(iEffects);
+                            % Between-studies variance
+                            for btw_sigma = btw_sigmas
 
-                                 for iSigmaSquare = 1:numel(sigmaSquareArray)
-                                    for iVariance = 1:numel(studyVarianceSchemes)
-                                        studyVarianceScheme = studyVarianceSchemes{iVariance};
+                                 % Within-study variance (ignoring sample
+                                 % size)
+                                 for sigma_sq = wth_sigmas
+                                    for wth_sigma_scheme = wth_sigma_schemes
 
-                                        switch studyVarianceScheme
+                                        switch wth_sigma_scheme
                                             case {'same'}
-                                                varAlphaInGroup1 = ones(1, numStudyInGroup1);
-                                                varAlphaInGroup2 = ones(1, numStudyInGroup2);
+                                                group1_wth_sigma_a = ones(1, k_group1);
+                                                group2_wth_sigma_a = ones(1, k_group2);
                                             case {'diff'}
                                                 % Generate values from the uniform 
                                                 % distribution on the interval [a, b].
                                                 a = 1/2;
                                                 b = 2;
-                                                varAlphaInGroup1 = a + (b-a).*rand(numStudyInGroup1,1);
-                                                varAlphaInGroup2 = a + (b-a).*rand(numStudyInGroup2,1);
+                                                group1_wth_sigma_a = a + (b-a).*rand(k_group1,1);
+                                                group2_wth_sigma_a = a + (b-a).*rand(k_group2,1);
                                             otherwise
                                               error('')
                                         end
 
-                                        tic;
-                                        % Common level of (intra-studies) variance (ignoring effect of sample 
-                                        % size).
-                                        sigmaSquare = sigmaSquareArray(iSigmaSquare);
-
-                        %                 % Study-specific variance (i.e. common study-variance divided by sample
-                        %                 % size).
-                        %                 sigmaSquareStudies = sigmaSquare./nSubjects + sigmaBetweenStudies;
-
-
-
                                         % Directory to store the simulation data and results.
-                                        currSimuDirName = [analysisPrefix 'k' num2str(nStudies) '_btw' num2str(sigmaBetweenStudies) ...
-                                            '_wth' num2str(sigmaSquare), '_unit' num2str(iUnitMisMatch) '_otherSoft'...
-                                            num2str(iStudiesWithSoftware2) '_' num2str(iSigmaFactorSoftware)];
-                                        simulationDir = fullfile(baseSimulationDir, currSimuDirName, num2str(cluster_task_id, '%04d'));
-
-                                        disp(simulationDir)
+                                        simu_name = [analysisPrefix 'k' num2str(k) '_btw' num2str(btw_sigma) ...
+                                            '_wth' num2str(sigma_sq), '_unit' num2str(unit_mis) '_otherSoft'...
+                                            num2str(soft_prop) '_' num2str(soft_factor)];
+                                        simu_dir = fullfile(allsimu_dir, simu_name, num2str(cluster_tasksid, '%04d'));
+                                        disp(simu_dir)
                                         
-                                        exist_simu_dir = isdir(simulationDir);
+                                        exist_simu_dir = isdir(simu_dir);
 
                                         if redo && exist_simu_dir
                                             % Move existing simulation directory
-                                            movefile(simulationDir, [simulationDir '_OLD'])
-                                            exist_simu_dir = false
+                                            movefile(simu_dir, [simu_dir '_OLD'])
+                                            exist_simu_dir = false;
                                         end
 
                                         if ~exist_simu_dir
-                                            if ~isdir(fullfile(baseSimulationDir, currSimuDirName))
-                                                mkdir(fullfile(baseSimulationDir, currSimuDirName))
+                                            if ~isdir(fullfile(allsimu_dir, simu_name))
+                                                mkdir(fullfile(allsimu_dir, simu_name))
                                             end
-                                            mkdir(simulationDir);
+                                            mkdir(simu_dir);
                                         end
                                         
-                                        simu.config.nSubjectsScheme = subjectNumberScheme;
-                                        if analysisType > 1
-                                            simu.config.nSubjectsInGroup1 = nSubjectsInGroup1;
-                                            simu.config.nSubjectsInGroup2 = nSubjectsInGroup2;
+                                        simu.config.numsub_scheme = numsub_scheme;
+                                        if analysis_type > 1
+                                            simu.config.group1_n = group1_n;
+                                            simu.config.group2_n = group2_n;
                                         else
-                                            simu.config.nSubjects = nSubjectsInGroup1;
+                                            simu.config.nsub = group1_n;
                                         end
-                                        simu.config.studyVarianceScheme = studyVarianceScheme;
+                                        simu.config.wth_sigma_scheme = wth_sigma_scheme;
                                         
-                                        if analysisType > 1
-                                            simu.config.nStudiesInGroup1 = numStudyInGroup1;
-                                            simu.config.nStudiesInGroup2 = numStudyInGroup2;
-                                            simu.config.varAlphaInGroup1 = varAlphaInGroup1;
-                                            simu.config.varAlphaInGroup2 = varAlphaInGroup2;
+                                        if analysis_type > 1
+                                            simu.config.k_group1 = k_group1;
+                                            simu.config.k_group2 = k_group2;
+                                            simu.config.group1_wth_sigma_a = group1_wth_sigma_a;
+                                            simu.config.group2_wth_sigma_a = group2_wth_sigma_a;
                                         else
-                                            simu.config.nStudies = numStudyInGroup1;
-                                            simu.config.varAlpha = varAlphaInGroup1;
+                                            simu.config.k = k_group1;
+                                            simu.config.wth_sigma_a = group1_wth_sigma_a;
                                         end
-                                        simu.config.sigmaSquare = sigmaSquare;
-                                        simu.config.sigmaBetweenStudies = sigmaBetweenStudies;
-                                        simu.config.nSimuOneDir = nSimuOneDir;
-                                        simu.config.nStudiesWithSoftware2 = iStudiesWithSoftware2;
-                                        simu.config.sigmaFactorWithSoftware2 = iSigmaFactorSoftware;
-                                        simu.config.unitMismatch = iUnitMisMatch;
-                                        simu.config.unitFactorInGroup1 = unitFactorInGroup1;
-                                        simu.config.unitFactorInGroup2 = unitFactorInGroup2;
-                                        simu.config.analysisType = analysisType;
+                                        simu.config.sigma_sq = sigma_sq;
+                                        simu.config.btw_sigma = btw_sigma;
+                                        simu.config.iter_onedir = iter_onedir;
+                                        simu.config.soft_prop = soft_prop;
+                                        simu.config.soft_factor = soft_factor;
+                                        simu.config.unit_mis = unit_mis;
+                                        simu.config.factor_group1 = factor_group1;
+                                        simu.config.factor_group2 = factor_group2;
+                                        simu.config.analysis_type = analysis_type;
 
                                         simucfg_file = fullfile( ...
-                                            simulationDir, 'simu.mat');
+                                            simu_dir, 'simu.mat');
                                         disp(simucfg_file)
 
                                         if exist(simucfg_file, 'file')
@@ -231,50 +206,50 @@ function meta_sim(baseDir, redo)
                                             if ~isequaln(simu.config, pre_simu.config)
                                                 disp(simu.config)
                                                 disp(pre_simu.config)
-                                                disp(simulationDir)
+                                                disp(simu_dir)
                                                 error('Different simulations config in the same folder')
                                             end 
                                             simu.sge = prev_simu.sge;
                                         end
 
                                         simu.sge(end+1).job_id = job_id;
-                                        simu.sge(end+1).task_id = task_id;
+                                        simu.sge(end+1).tasksid = tasksid;
                                         simu.sge(end+1).queue = queue;
                                         simu.sge(end+1).host = host;
                                         
                                         save(simucfg_file, 'simu')
                                         
-                                        % Simulate data only if simulationDir did not xist
+                                        % Simulate data only if simu_dir did not xist
                                         % before (helpful to re-run analysis on same data
-                                        dataDir = fullfile(simulationDir, 'data');
-                                        fisherDir = fullfile(simulationDir, 'fishers');
-                                        stoufferDir = fullfile(simulationDir, 'stouffers');
-                                        stoufferMFXDir = fullfile(simulationDir, 'stouffersMFX');
-                                        weightedZDir = fullfile(simulationDir, 'weightedZ');
-                                        megaRfxDir = fullfile(simulationDir, 'megaRFX');
-                                        megaFfxDir = fullfile(simulationDir, 'megaFFX');
-                                        megaFfxFslDir = fullfile(simulationDir, 'megaFFX_FSL');
-                                        megaMfxDir = fullfile(simulationDir, 'megaMFX');
-                                        permutConDir = fullfile(simulationDir, 'permutCon');
-                                        permutZDir = fullfile(simulationDir, 'permutZ');
+                                        data_dir = fullfile(simu_dir, 'data');
+                                        fisher_dir = fullfile(simu_dir, 'fishers');
+                                        stouffer_dir = fullfile(simu_dir, 'stouffers');
+                                        stoufferMFX_dir = fullfile(simu_dir, 'stouffersMFX');
+                                        weightedZ_dir = fullfile(simu_dir, 'weightedZ');
+                                        megaRFX_dir = fullfile(simu_dir, 'megaRFX');
+                                        megaFFX_dir = fullfile(simu_dir, 'megaFFX');
+                                        megaFFXFSL_dir = fullfile(simu_dir, 'megaFFX_FSL');
+                                        megaMFX_dir = fullfile(simu_dir, 'megaMFX');
+                                        permutcon_dir = fullfile(simu_dir, 'permutCon');
+                                        permutz_dir = fullfile(simu_dir, 'permutZ');
 
-                                        last_data = fullfile(dataDir, ['varcon_st' num2str((numStudyInGroup1+numStudyInGroup2), '%03d') '.nii']);
+                                        last_data = fullfile(data_dir, ['varcon_st' num2str((k_group1+k_group2), '%03d') '.nii']);
                                         exist_data = exist(last_data, 'file');
 
                                         if exist_data
-                                            for iStudy = 1:(numStudyInGroup1+numStudyInGroup2)
-                                                [~, conFiles{iStudy}] = find_file_nii_or_gz(fullfile(dataDir, ['con_st' num2str(iStudy, '%03d') '.nii']));
-                                                [~, varConFiles{iStudy}] = find_file_nii_or_gz(fullfile(dataDir, ['varcon_st' num2str(iStudy, '%03d') '.nii']));
-                                                [~, zFiles{iStudy}] = find_file_nii_or_gz(fullfile(dataDir, ['z_st' num2str(iStudy, '%03d') '.nii']));
+                                            for iStudy = 1:(k_group1+k_group2)
+                                                [~, conFiles{iStudy}] = find_file_nii_or_gz(fullfile(data_dir, ['con_st' num2str(iStudy, '%03d') '.nii']));
+                                                [~, varConFiles{iStudy}] = find_file_nii_or_gz(fullfile(data_dir, ['varcon_st' num2str(iStudy, '%03d') '.nii']));
+                                                [~, zFiles{iStudy}] = find_file_nii_or_gz(fullfile(data_dir, ['z_st' num2str(iStudy, '%03d') '.nii']));
                                             end
-%                                             load(fullfile(simulationDir, 'simu.mat'))
+%                                             load(fullfile(simu_dir, 'simu.mat'))
 %                                             fields = fieldnames(simu.config);
 %                                             for f = 1:numel(fields)
 %                                                 eval([fields{f} ' = ' simu.config.(fields{f})])
 %                                             end
                                         else
                                             % Directory to store the simulation data.
-                                            mkdir(dataDir);
+                                            mkdir(data_dir);
 
                                             % --- Simulated data ---
                                             subIdx = 0;
@@ -282,35 +257,35 @@ function meta_sim(baseDir, redo)
                                             % Generate simulated data
                                             [con_files, varcon_files, z_files] = simulate_data(simu.config);
 
-                                            if analysisType == 1
-                                                mkdir(fisherDir);
-                                                mkdir(stoufferDir);
-                                                mkdir(stoufferMFXDir);    
-                                                mkdir(weightedZDir);
+                                            if analysis_type == 1
+                                                mkdir(fisher_dir);
+                                                mkdir(stouffer_dir);
+                                                mkdir(stoufferMFX_dir);    
+                                                mkdir(weightedZ_dir);
                                             end
-                                            mkdir(megaRfxDir);
-%                                             mkdir(megaFfxDir);
-                                            mkdir(permutConDir);                            
-                                            mkdir(permutZDir);   
-                                            mkdir(megaMfxDir);   
-                                            mkdir(megaFfxFslDir);
+                                            mkdir(megaRFX_dir);
+%                                             mkdir(megaFFX_dir);
+                                            mkdir(permutcon_dir);                            
+                                            mkdir(permutz_dir);   
+                                            mkdir(megaMFX_dir);   
+                                            mkdir(megaFFXFSL_dir);
                                         end  
 
                                         % --- Compute meta-analysis ---
                                         matlabbatch = {};
                                         
-                                        if analysisType == 1
+                                        if analysis_type == 1
                                             % Fisher's
-                                            if ~find_file_nii_or_gz(fullfile(fisherDir, 'fishers_ffx_minus_log10_p.nii'))
-                                                matlabbatch{1}.spm.tools.ibma.fishers.dir = {fisherDir};
+                                            if ~find_file_nii_or_gz(fullfile(fisher_dir, 'fishers_ffx_minus_log10_p.nii'))
+                                                matlabbatch{1}.spm.tools.ibma.fishers.dir = {fisher_dir};
                                                 matlabbatch{1}.spm.tools.ibma.fishers.zimages = zFiles;
                                             else
                                                 disp('Fisher''s already computed')
                                             end
 
                                             % Stouffer's
-                                            if ~find_file_nii_or_gz(fullfile(stoufferDir, 'stouffers_ffx_minus_log10_p.nii'))
-                                                matlabbatch{end+1}.spm.tools.ibma.stouffers.dir = {stoufferDir};
+                                            if ~find_file_nii_or_gz(fullfile(stouffer_dir, 'stouffers_ffx_minus_log10_p.nii'))
+                                                matlabbatch{end+1}.spm.tools.ibma.stouffers.dir = {stouffer_dir};
                                                 matlabbatch{end}.spm.tools.ibma.stouffers.zimages = zFiles;
                                                 matlabbatch{end}.spm.tools.ibma.stouffers.rfx.RFX_no = 1;
                                             else
@@ -318,8 +293,8 @@ function meta_sim(baseDir, redo)
                                             end
 
                                             % Stouffer's MFX
-                                            if ~find_file_nii_or_gz(fullfile(stoufferMFXDir, 'stouffers_rfx_minus_log10_p.nii'))
-                                                matlabbatch{end+1}.spm.tools.ibma.stouffers.dir = {stoufferMFXDir};
+                                            if ~find_file_nii_or_gz(fullfile(stoufferMFX_dir, 'stouffers_rfx_minus_log10_p.nii'))
+                                                matlabbatch{end+1}.spm.tools.ibma.stouffers.dir = {stoufferMFX_dir};
                                                 matlabbatch{end}.spm.tools.ibma.stouffers.zimages = zFiles;
                                                 matlabbatch{end}.spm.tools.ibma.stouffers.rfx.RFX_yes = 0;
                                             else
@@ -327,36 +302,36 @@ function meta_sim(baseDir, redo)
                                             end
 
                                             % Optimally weighted z
-                                            if ~find_file_nii_or_gz(fullfile(weightedZDir, 'weightedz_ffx_minus_log10_p.nii'))
-                                                matlabbatch{end+1}.spm.tools.ibma.weightedz.dir = {weightedZDir};
+                                            if ~find_file_nii_or_gz(fullfile(weightedZ_dir, 'weightedz_ffx_minus_log10_p.nii'))
+                                                matlabbatch{end+1}.spm.tools.ibma.weightedz.dir = {weightedZ_dir};
                                                 matlabbatch{end}.spm.tools.ibma.weightedz.zimages = zFiles;
-                                                matlabbatch{end}.spm.tools.ibma.weightedz.nsubjects = nSubjectsInGroup1;
+                                                matlabbatch{end}.spm.tools.ibma.weightedz.nsub = group1_n;
                                             else
                                                 disp('Weighted Z already computed')
                                             end
                                         end
 
                                         % Mega-analysis RFX
-                                        if ~find_file_nii_or_gz(fullfile(megaRfxDir, 'mega_rfx_minus_log10_p.nii'))
-                                            if analysisType == 1
-                                                matlabbatch{end+1}.spm.tools.ibma.megarfx.dir = {megaRfxDir};
+                                        if ~find_file_nii_or_gz(fullfile(megaRFX_dir, 'mega_rfx_minus_log10_p.nii'))
+                                            if analysis_type == 1
+                                                matlabbatch{end+1}.spm.tools.ibma.megarfx.dir = {megaRFX_dir};
                                                 matlabbatch{end}.spm.tools.ibma.megarfx.confiles = conFiles;
                                             else
-                                                matlabbatch{end+1}.spm.stats.factorial_design.dir = {megaRfxDir};
-                                                matlabbatch{end}.spm.stats.factorial_design.des.t2.scans1 = conFiles(1:numStudyInGroup1)';
-                                                matlabbatch{end}.spm.stats.factorial_design.des.t2.scans2 = conFiles(numStudyInGroup1+(1:numStudyInGroup2))';
+                                                matlabbatch{end+1}.spm.stats.factorial_design.dir = {megaRFX_dir};
+                                                matlabbatch{end}.spm.stats.factorial_design.des.t2.scans1 = conFiles(1:k_group1)';
+                                                matlabbatch{end}.spm.stats.factorial_design.des.t2.scans2 = conFiles(k_group1+(1:k_group2))';
                                                 matlabbatch{end}.spm.stats.factorial_design.des.t2.variance = 0;
-                                                matlabbatch{end+1}.spm.stats.fmri_est.spmmat = {fullfile(megaRfxDir, 'SPM.mat')};
-                                                matlabbatch{end+1}.spm.stats.con.spmmat = {fullfile(megaRfxDir, 'SPM.mat')};
+                                                matlabbatch{end+1}.spm.stats.fmri_est.spmmat = {fullfile(megaRFX_dir, 'SPM.mat')};
+                                                matlabbatch{end+1}.spm.stats.con.spmmat = {fullfile(megaRFX_dir, 'SPM.mat')};
                                                 matlabbatch{end}.spm.stats.con.consess{1}.tcon.name = 'bewteen group effect';
                                                 matlabbatch{end}.spm.stats.con.consess{1}.tcon.convec = [1 -1];
                                                 
-                                                statFile = fullfile(megaRfxDir, 'spmT_0001.nii');
+                                                statFile = fullfile(megaRFX_dir, 'spmT_0001.nii');
                                                 matlabbatch{end+1}.spm.util.imcalc.input = {statFile};
                                                 matlabbatch{end}.spm.util.imcalc.output = 'mega_rfx_minus_log10_p.nii';
-                                                matlabbatch{end}.spm.util.imcalc.outdir = {megaRfxDir};
+                                                matlabbatch{end}.spm.util.imcalc.outdir = {megaRFX_dir};
                             
-                                                dof = numStudyInGroup1+numStudyInGroup2-2;
+                                                dof = k_group1+k_group2-2;
                                                 matlabbatch{end}.spm.util.imcalc.expression = ['-log10(cdf(''T'',-i1, ' num2str(dof) '))'];
                                                 matlabbatch{end}.spm.util.imcalc.options.dmtx = 0;
                                                 matlabbatch{end}.spm.util.imcalc.options.dtype = 64;
@@ -366,12 +341,12 @@ function meta_sim(baseDir, redo)
                                         end
 
     %                                     % Mega-analysis FFX
-    %                                     if ~exist(fullfile(megaFfxDir, 'mega_ffx_ffx_minus_log10_p.nii'), 'file')
-    %                                         matlabbatch{end+1}.spm.tools.ibma.megaffx.dir = {megaFfxDir};
-    %                                         if length(unique(nSubjects)) == 1
-    %                                             matlabbatch{end}.spm.tools.ibma.megaffx.samplesize.equal.nsubjects = unique(nSubjects);
+    %                                     if ~exist(fullfile(megaFFX_dir, 'mega_ffx_ffx_minus_log10_p.nii'), 'file')
+    %                                         matlabbatch{end+1}.spm.tools.ibma.megaffx.dir = {megaFFX_dir};
+    %                                         if length(unique(nsub)) == 1
+    %                                             matlabbatch{end}.spm.tools.ibma.megaffx.samplesize.equal.nsub = unique(nsub);
     %                                         else
-    %                                             matlabbatch{end}.spm.tools.ibma.megaffx.samplesize.unequal.nsubjects = nSubjects;
+    %                                             matlabbatch{end}.spm.tools.ibma.megaffx.samplesize.unequal.nsub = nsub;
     %                                         end
     %                                         matlabbatch{end}.spm.tools.ibma.megaffx.variances.equal = true;
     % 
@@ -382,19 +357,19 @@ function meta_sim(baseDir, redo)
     %                                     end
     if true
                                         % Permutation on conFiles
-                                        if ~exist(fullfile(permutConDir, 'lP+.img'), 'file')
+                                        if ~exist(fullfile(permutcon_dir, 'lP+.img'), 'file')
                                             conFiles = gunzip_if_gz(conFiles);
-                                            if analysisType == 1                                                
+                                            if analysis_type == 1                                                
                                                 matlabbatch{end+1}.spm.tools.snpm.des.OneSampT.DesignName = 'MultiSub: One Sample T test on diffs/contrasts';
                                                 matlabbatch{end}.spm.tools.snpm.des.OneSampT.DesignFile = 'snpm_bch_ui_OneSampT';
-                                                matlabbatch{end}.spm.tools.snpm.des.OneSampT.dir = {permutConDir};
+                                                matlabbatch{end}.spm.tools.snpm.des.OneSampT.dir = {permutcon_dir};
                                                 matlabbatch{end}.spm.tools.snpm.des.OneSampT.P = conFiles;
-                                                matlabbatch{end+1}.spm.tools.snpm.cp.snpmcfg = {fullfile(permutConDir, 'SnPMcfg.mat')};
+                                                matlabbatch{end+1}.spm.tools.snpm.cp.snpmcfg = {fullfile(permutcon_dir, 'SnPMcfg.mat')};
                                             else
-                                                matlabbatch{end+1}.spm.tools.snpm.des.TwoSampT.dir = {permutConDir};
-                                                matlabbatch{end}.spm.tools.snpm.des.TwoSampT.scans1 = conFiles(1:numStudyInGroup1)';
-                                                matlabbatch{end}.spm.tools.snpm.des.TwoSampT.scans2 = conFiles(numStudyInGroup1+(1:numStudyInGroup2))';
-                                                matlabbatch{end+1}.spm.tools.snpm.cp.snpmcfg = {fullfile(permutConDir, 'SnPMcfg.mat')};
+                                                matlabbatch{end+1}.spm.tools.snpm.des.TwoSampT.dir = {permutcon_dir};
+                                                matlabbatch{end}.spm.tools.snpm.des.TwoSampT.scans1 = conFiles(1:k_group1)';
+                                                matlabbatch{end}.spm.tools.snpm.des.TwoSampT.scans2 = conFiles(k_group1+(1:k_group2))';
+                                                matlabbatch{end+1}.spm.tools.snpm.cp.snpmcfg = {fullfile(permutcon_dir, 'SnPMcfg.mat')};
                                             end
                                         else
                                             disp('Permutation on contrast files already computed')
@@ -402,19 +377,19 @@ function meta_sim(baseDir, redo)
 
 
                                         % Permutation on zFiles
-                                        if ~exist(fullfile(permutZDir, 'lP+.img'), 'file')
+                                        if ~exist(fullfile(permutz_dir, 'lP+.img'), 'file')
                                             zFiles = gunzip_if_gz(zFiles);
-                                            if analysisType == 1
+                                            if analysis_type == 1
                                                 matlabbatch{end+1}.spm.tools.snpm.des.OneSampT.DesignName = 'MultiSub: One Sample T test on diffs/contrasts';
                                                 matlabbatch{end}.spm.tools.snpm.des.OneSampT.DesignFile = 'snpm_bch_ui_OneSampT';
-                                                matlabbatch{end}.spm.tools.snpm.des.OneSampT.dir = {permutZDir};
+                                                matlabbatch{end}.spm.tools.snpm.des.OneSampT.dir = {permutz_dir};
                                                 matlabbatch{end}.spm.tools.snpm.des.OneSampT.P = zFiles;
-                                                matlabbatch{end+1}.spm.tools.snpm.cp.snpmcfg = {fullfile(permutZDir, 'SnPMcfg.mat')};
+                                                matlabbatch{end+1}.spm.tools.snpm.cp.snpmcfg = {fullfile(permutz_dir, 'SnPMcfg.mat')};
                                             else
-                                                matlabbatch{end+1}.spm.tools.snpm.des.TwoSampT.dir = {permutZDir};
-                                                matlabbatch{end}.spm.tools.snpm.des.TwoSampT.scans1 = zFiles(1:numStudyInGroup1)';
-                                                matlabbatch{end}.spm.tools.snpm.des.TwoSampT.scans2 = zFiles(numStudyInGroup1+(1:numStudyInGroup2))';
-                                                matlabbatch{end+1}.spm.tools.snpm.cp.snpmcfg = {fullfile(permutZDir, 'SnPMcfg.mat')};
+                                                matlabbatch{end+1}.spm.tools.snpm.des.TwoSampT.dir = {permutz_dir};
+                                                matlabbatch{end}.spm.tools.snpm.des.TwoSampT.scans1 = zFiles(1:k_group1)';
+                                                matlabbatch{end}.spm.tools.snpm.des.TwoSampT.scans2 = zFiles(k_group1+(1:k_group2))';
+                                                matlabbatch{end+1}.spm.tools.snpm.cp.snpmcfg = {fullfile(permutz_dir, 'SnPMcfg.mat')};
                                             end
                                         else
                                             disp('Permutation on Z already computed')
@@ -437,22 +412,22 @@ function meta_sim(baseDir, redo)
                                         if true
                                             % GLM MFX
                                             redomfx = false;
-                                            if redomfx || ~find_file_nii_or_gz(fullfile(megaMfxDir,'mega_mfx_minus_log10_p.nii'))
-                                                if ~exist('nSubjects', 'var')
-                                                    nSubjects = nSubjectsInGroup1;
+                                            if redomfx || ~find_file_nii_or_gz(fullfile(megaMFX_dir,'mega_mfx_minus_log10_p.nii'))
+                                                if ~exist('nsub', 'var')
+                                                    nsub = group1_n;
                                                 end
-                                                run_fsl_mfx(dataDir, megaMfxDir, analysisType, nSubjects, nStudies)
+                                                run_fsl_mfx(data_dir, megaMFX_dir, analysis_type, nsub, k)
                                             else
                                                 disp('Mega MFX (FSL) already computed')
                                             end
                                         end
 
                                         % GLM FFX (via FSL)
-                                        if ~find_file_nii_or_gz(fullfile(megaFfxFslDir,'mega_ffx_minus_log10_p.nii'))
-                                            if ~exist('nSubjects', 'var')
-                                                    nSubjects = nSubjectsInGroup1;
+                                        if ~find_file_nii_or_gz(fullfile(megaFFXFSL_dir,'mega_ffx_minus_log10_p.nii'))
+                                            if ~exist('nsub', 'var')
+                                                    nsub = group1_n;
                                             end
-                                            run_fsl_ffx(dataDir, megaFfxFslDir, analysisType, nSubjects, nStudies)
+                                            run_fsl_ffx(data_dir, megaFFXFSL_dir, analysis_type, nsub, k)
                                         else
                                             disp('Mega FFX (FSL) already computed')
                                         end
@@ -468,44 +443,44 @@ function meta_sim(baseDir, redo)
 end
 
 function [con_files, varcon_files, z_files] = simulate_data(config)
-    num_studies = numStudyInGroup1+numStudyInGroup2;
+    num_studies = k_group1+k_group2;
     con_files = cell(num_studies, 1);
     varcon_files = cell(num_studies, 1);
     z_files = cell(num_studies, 1);
 
     for study_idx = 1:num_studies
-        if study_idx <= numStudyInGroup1
+        if study_idx <= k_group1
             % Group 1
             studyIndex = study_idx;
-            nSubjects = config.nSubjectsInGroup1;
-            unitFactor = config.unitFactorInGroup1;
-            varAlpha = config.varAlphaInGroup1;
+            nsub = config.group1_n;
+            unitFactor = config.factor_group1;
+            wth_sigma_a = config.group1_wth_sigma_a;
         else
             % Group 2
-            studyIndex = study_idx-config.numStudyInGroup1;
-            nSubjects = config.nSubjectsInGroup2;
-            unitFactor = config.unitFactorInGroup2;
-            varAlpha = config.varAlphaInGroup2;
+            studyIndex = study_idx-config.k_group1;
+            nsub = config.group2_n;
+            unitFactor = config.factor_group2;
+            wth_sigma_a = config.group2_wth_sigma_a;
         end
         
         % Degrees of freedom of the within-study variance estimate
-        dof = nSubjects(studyIndex)-1;
+        dof = nsub(studyIndex)-1;
 
         % Estimated paramater estimate.
-        estimatedContrast = normrnd(0, sqrt(sigmaSquare*varAlpha(studyIndex)./nSubjects(studyIndex)+sigmaBetweenStudies), [nSimuOneDir, nSimuOneDir, nSimuOneDir]);
+        estimatedContrast = normrnd(0, sqrt(sigma_sq*wth_sigma_a(studyIndex)./nsub(studyIndex)+btw_sigma), [iter_onedir, iter_onedir, iter_onedir]);
 
         % Estimated contrast variance (from chi square distribution)
-        estimatedSigmaSquare = chi2rnd(dof, [nSimuOneDir, nSimuOneDir, nSimuOneDir])*sigmaSquare*varAlpha(studyIndex)/dof;
-        estimatedVarContrast = estimatedSigmaSquare./nSubjects(studyIndex);
+        estimatedSigmaSquare = chi2rnd(dof, [iter_onedir, iter_onedir, iter_onedir])*sigma_sq*wth_sigma_a(studyIndex)/dof;
+        estimatedVarContrast = estimatedSigmaSquare./nsub(studyIndex);
 
         % units correction
         estimatedContrast = estimatedContrast*unitFactor(studyIndex);
         estimatedVarContrast = estimatedVarContrast*(unitFactor(studyIndex)^2);
 
         % Write out parameter estimates.      
-        con_files{study_idx} = fullfile(dataDir, ['con_st' num2str(study_idx, '%03d') '.nii']);
+        con_files{study_idx} = fullfile(data_dir, ['con_st' num2str(study_idx, '%03d') '.nii']);
         vol    = struct('fname',  conFiles{study_idx},...
-                   'dim',    [nSimuOneDir nSimuOneDir nSimuOneDir],...
+                   'dim',    [iter_onedir iter_onedir iter_onedir],...
                    'dt',     [spm_type('float32') spm_platform('bigend')],...
                    'mat',    eye(4),...
                    'pinfo',  [1 0 0]',...
@@ -514,19 +489,19 @@ function [con_files, varcon_files, z_files] = simulate_data(config)
         spm_write_vol(vol, estimatedContrast);
 
         % Write out estimated variance of parameter estimates.
-        varcon_files{study_idx} = fullfile(dataDir, ['varcon_st' num2str(study_idx, '%03d') '.nii']);
+        varcon_files{study_idx} = fullfile(data_dir, ['varcon_st' num2str(study_idx, '%03d') '.nii']);
         vol.fname =  varConFiles{study_idx};
         spm_write_vol(vol, estimatedVarContrast);
 
         % Write out corresponding z-values.
-        z_files{study_idx} = fullfile(dataDir, ['z_st' num2str(study_idx, '%03d') '.nii']);
+        z_files{study_idx} = fullfile(data_dir, ['z_st' num2str(study_idx, '%03d') '.nii']);
         vol.fname = zFiles{study_idx};
 
         % Z-transform of T-statistic
-        zData = norminv(cdf('T', estimatedContrast./sqrt(estimatedVarContrast), nSubjects(studyIndex)-1));
+        zData = norminv(cdf('T', estimatedContrast./sqrt(estimatedVarContrast), nsub(studyIndex)-1));
         infPos = find(isinf(zData(:)));
 
-        zData(infPos) = -norminv(cdf('T', -estimatedContrast(infPos)./sqrt(estimatedVarContrast(infPos)), nSubjects(studyIndex)-1));
+        zData(infPos) = -norminv(cdf('T', -estimatedContrast(infPos)./sqrt(estimatedVarContrast(infPos)), nsub(studyIndex)-1));
         spm_write_vol(vol, zData);   
     end 
 end
