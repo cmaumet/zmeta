@@ -243,8 +243,9 @@ function meta_sim(baseDir, redo)
 
                                         if exist(simucfg_file, 'file')
                                             pre_simu = load(simucfg_file);
-                                            pre_simu = rmfield(pre_simu,'timing');
-                                            simu = rmfield(simu,'timing');
+                                            if isfield(pre_simu.config, 'timing')
+                                                pre_simu.config = rmfield(pre_simu.config,'timing');
+                                            end
 
                                             if ~isequaln(simu.config, pre_simu.config)
                                                 disp(simu.config)
