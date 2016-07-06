@@ -4,10 +4,10 @@ function meta_sim(baseDir, redo)
     end
     redo
 
-    task_id = getenv('SGE_TASK_ID')
-    job_id = getenv('JOB_ID')
-    queue = getenv('QUEUE')
-    host = getenv('HOSTNAME')
+    task_id = getenv('SGE_TASK_ID');
+    job_id = getenv('JOB_ID');
+    queue = getenv('QUEUE');
+    host = getenv('HOSTNAME');
 
     disp(['This is run ' task_id])
     disp(['This is job ' job_id])
@@ -244,8 +244,10 @@ function meta_sim(baseDir, redo)
 
                                         if exist(simucfg_file, 'file')
                                             pre_simu = load(simucfg_file);
+                                            pre_simu = pre_simu.simu;
                                             if isfield(pre_simu.config, 'timing')
-                                                pre_simu.config = rmfield(pre_simu.config,'timing');
+                                                pre_simu.config = ...
+                                                    rmfield(pre_simu.config,'timing');
                                             end
 
                                             if ~isequaln(simu.config, pre_simu.config)
@@ -299,69 +301,9 @@ function meta_sim(baseDir, redo)
                                             % --- Simulated data ---
                                             subIdx = 0;
 
-                                            % For each study involved in the current meta-analysis
-                                            for iStudy = 1:(numStudyInGroup1+numStudyInGroup2)
-                                                
-                                                if iStudy <= numStudyInGroup1
-                                                    studyIndex = iStudy;
-                                                    nSubjects = nSubjectsInGroup1;
-                                                    unitFactor = unitFactorInGroup1;
-                                                    varAlpha = varAlphaInGroup1;
-                                                else
-                                                    studyIndex = iStudy-numStudyInGroup1;
-                                                    nSubjects = nSubjectsInGroup2;
-                                                    unitFactor = unitFactorInGroup2;
-                                                    varAlpha = varAlphaInGroup2;
-                                                end
-                                                % Degrees of freedom of the within-study variance estimate
-                                                dof = nSubjects(studyIndex)-1;
+                                            % Generate simulated data
+                                            [con_files, varcon_files, z_files] = simulate_data(simu.config);
 
-                                                % Estimated paramater estimate.
-                                                estimatedContrast = normrnd(0, sqrt(sigmaSquare*varAlpha(studyIndex)./nSubjects(studyIndex)+sigmaBetweenStudies), [nSimuOneDir, nSimuOneDir, nSimuOneDir]);
-
-                                                % Estimated variance (from chi square distribution)
-                                                estimatedSigmaSquare = chi2rnd(dof, [nSimuOneDir, nSimuOneDir, nSimuOneDir])*sigmaSquare*varAlpha(studyIndex)/dof;
-                                                estimatedVarContrast = estimatedSigmaSquare./nSubjects(studyIndex);
-
-                                                % units correction
-                                                estimatedContrast = estimatedContrast*unitFactor(studyIndex);
-                                                estimatedVarContrast = estimatedVarContrast*(unitFactor(studyIndex)^2);
-
-
-                    %                             estimatedSigmaSquare = estimatedSigmaSquare./nSubjects(iStudy);
-
-                                                % Write out parameter estimates.      
-                                                conFiles{iStudy} = fullfile(dataDir, ['con_st' num2str(iStudy, '%03d') '.nii']);
-                                                vol    = struct('fname',  conFiles{iStudy},...
-                                                           'dim',    [nSimuOneDir nSimuOneDir nSimuOneDir],...
-                                                           'dt',     [spm_type('float32') spm_platform('bigend')],...
-                                                           'mat',    eye(4),...
-                                                           'pinfo',  [1 0 0]',...
-                                                           'descrip','simulation');
-                                                vol    = spm_create_vol(vol);
-                                                spm_write_vol(vol, estimatedContrast);
-
-                                                % Write out estimated variance of parameter estimates.
-                                                varConFiles{iStudy} = fullfile(dataDir, ['varcon_st' num2str(iStudy, '%03d') '.nii']);
-                                                vol.fname =  varConFiles{iStudy};
-                                                spm_write_vol(vol, estimatedVarContrast);
-
-                                                % Write out corresponding z-values.
-                                                zFiles{iStudy} = fullfile(dataDir, ['z_st' num2str(iStudy, '%03d') '.nii']);
-                                                vol.fname = zFiles{iStudy};
-
-                                                % Z-transform of T-statistic
-                                                zData = norminv(cdf('T', estimatedContrast./sqrt(estimatedVarContrast), nSubjects(studyIndex)-1));
-                                                infPos = find(isinf(zData(:)));
-
-                                                zData(infPos) = -norminv(cdf('T', -estimatedContrast(infPos)./sqrt(estimatedVarContrast(infPos)), nSubjects(studyIndex)-1));
-                                                spm_write_vol(vol, zData);   
-                                                
-                                                clear studyIndex;
-                                                clear nSubjects;
-                                                clear unitFactor;
-                                                clear varAlpha;
-                                            end
                                             if analysisType == 1
                                                 mkdir(fisherDir);
                                                 mkdir(stoufferDir);
@@ -545,4 +487,68 @@ function meta_sim(baseDir, redo)
             end
         end
     end
+end
+
+function [con_files, varcon_files, z_files] = simulate_data(config)
+    num_studies = numStudyInGroup1+numStudyInGroup2;
+    con_files = cell(num_studies, 1);
+    varcon_files = cell(num_studies, 1);
+    z_files = cell(num_studies, 1);
+
+    for study_idx = 1:num_studies
+        if study_idx <= numStudyInGroup1
+            % Group 1
+            studyIndex = study_idx;
+            nSubjects = config.nSubjectsInGroup1;
+            unitFactor = config.unitFactorInGroup1;
+            varAlpha = config.varAlphaInGroup1;
+        else
+            % Group 2
+            studyIndex = study_idx-config.numStudyInGroup1;
+            nSubjects = config.nSubjectsInGroup2;
+            unitFactor = config.unitFactorInGroup2;
+            varAlpha = config.varAlphaInGroup2;
+        end
+        
+        % Degrees of freedom of the within-study variance estimate
+        dof = nSubjects(studyIndex)-1;
+
+        % Estimated paramater estimate.
+        estimatedContrast = normrnd(0, sqrt(sigmaSquare*varAlpha(studyIndex)./nSubjects(studyIndex)+sigmaBetweenStudies), [nSimuOneDir, nSimuOneDir, nSimuOneDir]);
+
+        % Estimated contrast variance (from chi square distribution)
+        estimatedSigmaSquare = chi2rnd(dof, [nSimuOneDir, nSimuOneDir, nSimuOneDir])*sigmaSquare*varAlpha(studyIndex)/dof;
+        estimatedVarContrast = estimatedSigmaSquare./nSubjects(studyIndex);
+
+        % units correction
+        estimatedContrast = estimatedContrast*unitFactor(studyIndex);
+        estimatedVarContrast = estimatedVarContrast*(unitFactor(studyIndex)^2);
+
+        % Write out parameter estimates.      
+        con_files{study_idx} = fullfile(dataDir, ['con_st' num2str(study_idx, '%03d') '.nii']);
+        vol    = struct('fname',  conFiles{study_idx},...
+                   'dim',    [nSimuOneDir nSimuOneDir nSimuOneDir],...
+                   'dt',     [spm_type('float32') spm_platform('bigend')],...
+                   'mat',    eye(4),...
+                   'pinfo',  [1 0 0]',...
+                   'descrip','simulation');
+        vol    = spm_create_vol(vol);
+        spm_write_vol(vol, estimatedContrast);
+
+        % Write out estimated variance of parameter estimates.
+        varcon_files{study_idx} = fullfile(dataDir, ['varcon_st' num2str(study_idx, '%03d') '.nii']);
+        vol.fname =  varConFiles{study_idx};
+        spm_write_vol(vol, estimatedVarContrast);
+
+        % Write out corresponding z-values.
+        z_files{study_idx} = fullfile(dataDir, ['z_st' num2str(study_idx, '%03d') '.nii']);
+        vol.fname = zFiles{study_idx};
+
+        % Z-transform of T-statistic
+        zData = norminv(cdf('T', estimatedContrast./sqrt(estimatedVarContrast), nSubjects(studyIndex)-1));
+        infPos = find(isinf(zData(:)));
+
+        zData(infPos) = -norminv(cdf('T', -estimatedContrast(infPos)./sqrt(estimatedVarContrast(infPos)), nSubjects(studyIndex)-1));
+        spm_write_vol(vol, zData);   
+    end 
 end
