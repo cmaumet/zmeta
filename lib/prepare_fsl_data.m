@@ -1,5 +1,7 @@
 function prepare_fsl_data(datadir, wd, nSubjects, design, designs_dir)
-    if ~exist(fullfile(wd, 'dof.nii.gz'), 'file')
+    out_file = fullfile(wd, 'zstat1.nii');
+
+    if ~exist(out_file, 'file')
         cwd = pwd;
         cd(datadir)
         system('fslmerge -t cope.nii.gz `ls | grep "^con_st"`')
