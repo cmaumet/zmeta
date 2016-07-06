@@ -136,7 +136,7 @@ function meta_sim(baseDir, redo)
 
                         for same_n = same_ns
 
-                            if same_ns
+                            if same_n
                                 group1_n = ones(1, k_group1)*avg_n;
                                 group2_n = ones(1, k_group2)*avg_n;
                             else
@@ -192,7 +192,7 @@ function meta_sim(baseDir, redo)
                                             mkdir(simu_dir);
                                         end
                                         
-                                        simu.config.numsub_scheme = numsub_scheme;
+                                        simu.config.same_n = same_n;
                                         if analysis_type > 1
                                             simu.config.group1_n = group1_n;
                                             simu.config.group2_n = group2_n;
