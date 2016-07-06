@@ -55,7 +55,7 @@ function meta_sim(base_dir, redo, path_to_spm)
             && isempty(host)
         disp('This simulation is run locally')
         cluster = false;
-        rng_seed = 1;
+        rng_seed = 'default';
     else
         cluster = true;
         task_id = str2num(task_id_str);
