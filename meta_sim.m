@@ -65,34 +65,11 @@ function meta_sim(baseDir, redo)
     if nargin == 0
         baseDir = '/storage/wmsmfe';
     end
-    
-    simuinfo.config.nSimuOneDir = nSimuOneDir;
-    simuinfo.config.nSimu = nSimu;
-    simuinfo.config.nStudies = nStudiesArray;
-    simuinfo.config.sigmaSquare = sigmaSquareArray;
-    simuinfo.config.sigmaBetweenStudies = sigmaBetweenStudiesArray;
-    simuinfo.config.nSimuOneDir = nSimuOneDir;
-    simuinfo.config.timing = tic;
-    simuinfo.config.average_number_subjects = AVG_NUM_SUB;
-    simuinfo.config.average_diff_num_subjects = NUM_SUB_DIFF;
-    simuinfo.config.nStudiesWithSoftware2 = nStudiesWithSoftware2;
-    simuinfo.config.sigmaFactorWithSoftware2 = sigmaFactorWithSoftware2;
-    simuinfo.config.unitMismatch = unitMismatch;
-    
+       
     baseSimulationDir = fullfile(baseDir, 'simulations');
     if ~isdir(baseSimulationDir)
         mkdir(baseSimulationDir)
     end
-    simuinfo_file = fullfile(baseSimulationDir, 'simuinfo.mat')
-    base_filename = simuinfo_file
-    sim = 2
-    while exist(simuinfo_file)
-        simuinfo_file = strrep(...
-            base_filename, '.mat', ['_' num2str(sim, '%02d')])
-        sim = sim + 1;
-    end
-    simuinfo_file
-    save(simuinfo_file, 'simuinfo');
      
     % Number of studies per meta-analysis
     for iStudies = 1:numel(nStudiesArray)
@@ -260,13 +237,40 @@ function meta_sim(baseDir, redo)
                                         simu.config.unitFactorInGroup1 = unitFactorInGroup1;
                                         simu.config.unitFactorInGroup2 = unitFactorInGroup2;
                                         simu.config.analysisType = analysisType;
-                                        simu.sge.job_id = job_id;
-                                        simu.sge.task_id = task_id;
-                                        simu.sge.queue = queue;
-                                        simu.sge.host = host;
-                                        simu.config.timing = toc;
 
-                                        save(fullfile(simulationDir, 'simu.mat'), 'simu')
+                                        simucfg_file = fullfile( ...
+                                            simulationDir, 'simu.mat')
+
+                                        if exist(simucfg_file)
+                                            pre_simu = load(simucfg_file)
+                                            pre_simu = rmfield(pre_simu,'timing')
+                                            simu = rmfield(simu,'timing')
+
+                                            if ~isequaln(simu.config, pre_simu.config)
+                                                disp(simu.config)
+                                                disp(pre_simu.config)
+                                                disp(simulationDir)
+                                                error('Different simulations config in the same folder')
+                                            end 
+                                            simu.sge = prev_simu.sge;
+                                        end
+
+                                        simu.sge(end+1).job_id = job_id;
+                                        simu.sge(end+1)task_id = task_id;
+                                        simu.sge(end+1).queue = queue;
+                                        simu.sge(end+1).host = host;
+                                        
+                                        base_cfgfilename = simucfg_file
+                                        sim = 2
+                                        while exist(simucfg_file)
+                                            simucfg_file = strrep(...
+                                                base_cfgfilename, '.mat', ...
+                                                ['_' num2str(sim, '%02d') ...
+                                                '.mat'])
+                                            sim = sim + 1;
+                                        end
+                                        simucfg_file
+                                        save(simucfg_file, 'simu')
                                         
                                         % Simulate data only if simulationDir did not xist
                                         % before (helpful to re-run analysis on same data
