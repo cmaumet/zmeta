@@ -1,14 +1,14 @@
 function meta_sim(baseDir, redo)
-    % ADDME  Add two values together.
-    %   C = ADDME(A) adds A to itself.
-    %   C = ADDME(A,B) adds A and B together.
-    %
-    %   See also SUM, PLUS.
+    % META_SIM  Simulate meta-analyses results under the null
+    %   META_SIM(BASEDIR, REDO) Create simulation results in a 
+    %       'simulations' folder under BASEDIR. Overwrite existing
+    %       simulations only if REDO is 'true'.
+    % 
     if ~exist('redo', 'var')
         redo = false;
     end
-    redo
-
+    
+    % Retreive information about current job on the cluster    
     task_id = getenv('SGE_TASK_ID');
     job_id = getenv('JOB_ID');
     queue = getenv('QUEUE');
@@ -16,8 +16,9 @@ function meta_sim(baseDir, redo)
 
     disp(['This is run ' task_id])
     disp(['This is job ' job_id])
+    
+    % SPM is required to write-out NIfTI images    
     addpath(fullfile(pwd, '..', 'code', 'spm12'))
-    disp(fullfile(pwd, '..', 'code','spm12'))
     addpath(fullfile(pwd, '..', 'code','automri', 'commons', 'lib'))
     addpath(fullfile(pwd, 'lib'))
 
