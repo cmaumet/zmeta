@@ -12,7 +12,5 @@
 module add matlab
 module add fsl
 
-# matlab -nodisplay -nojvm -r CamilleEx
 matlab -nojvm -nodisplay -r "meta_sim('/storage/wmsmfe',false);quit"
-#matlab -nodisplay -nojvm -r pwd
 
