@@ -1,7 +1,7 @@
-function meta_sim(baseDir, redo, path_to_spm)
+function meta_sim(base_dir, redo, path_to_spm)
     % META_SIM  Simulate meta-analyses results under the null
-    %   META_SIM(BASEDIR, REDO) Create simulation results in a 
-    %       'simulations' folder under BASEDIR. Overwrite existing
+    %   META_SIM(base_dir, REDO) Create simulation results in a 
+    %       'simulations' folder under base_dir. Overwrite existing
     %       simulations only if REDO is 'true'.
     % 
     if ~exist('redo', 'var')
@@ -79,7 +79,7 @@ function meta_sim(baseDir, redo, path_to_spm)
     % Initialise random number generator using the task id
     rng(rng_seed);
        
-    allsimu_dir = fullfile(baseDir, 'simulations');
+    allsimu_dir = fullfile(base_dir, 'simulations');
     if ~isdir(allsimu_dir)
         mkdir(allsimu_dir)
     end
