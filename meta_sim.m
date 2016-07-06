@@ -1,4 +1,4 @@
-function meta_sim(baseDir, redo)
+function meta_sim(baseDir, redo, path_to_spm)
     % META_SIM  Simulate meta-analyses results under the null
     %   META_SIM(BASEDIR, REDO) Create simulation results in a 
     %       'simulations' folder under BASEDIR. Overwrite existing
@@ -55,7 +55,9 @@ function meta_sim(baseDir, redo)
     disp(['This is job ' job_id])
     
     % SPM is required to write-out NIfTI images    
-    addpath(fullfile(pwd, '..', 'code', 'spm12'))
+    if isempty(which('spm'))
+        addpath(path_to_spm)
+    end
     addpath(fullfile(pwd, '..', 'code','automri', 'commons', 'lib'))
     addpath(fullfile(pwd, 'lib'))
 
