@@ -83,7 +83,16 @@ function meta_sim(baseDir, redo)
     if ~isdir(baseSimulationDir)
         mkdir(baseSimulationDir)
     end
-    save(fullfile(baseSimulationDir, 'simuinfo.mat'), 'simuinfo');
+    simuinfo_file = fullfile(baseSimulationDir, 'simuinfo.mat')
+    base_filename = simuinfo_file
+    sim = 2
+    while exist(simuinfo_file)
+        simuinfo_file = strrep(...
+            base_filename, '.mat', ['_' num2str(sim, '%02d')])
+        sim = sim + 1;
+    end
+    simuinfo_file
+    save(simuinfo_file, 'simuinfo');
      
     % Number of studies per meta-analysis
     for iStudies = 1:numel(nStudiesArray)
