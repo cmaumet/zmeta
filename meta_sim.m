@@ -8,6 +8,12 @@ function meta_sim(base_dir, redo, path_to_spm)
         redo = false;
     end
     
+    % SPM is required to write-out NIfTI images    
+    if isempty(which('spm'))
+        addpath(path_to_spm)
+    end
+    addpath(fullfile(pwd, 'lib'))    
+    
     script_dir = fileparts(mfilename('fullpath'));
     fsl_designs_dir = fullfile(script_dir, 'fsl_designs');
     
@@ -72,12 +78,6 @@ function meta_sim(base_dir, redo, path_to_spm)
         disp(['This is run ' task_id_str])
         disp(['This is job ' job_id])
     end
-    
-    % SPM is required to write-out NIfTI images    
-    if isempty(which('spm'))
-        addpath(path_to_spm)
-    end
-    addpath(fullfile(pwd, 'lib'))
 
     % SPM and FSL initialisations    
     spm_jobman('initcfg');
