@@ -12,37 +12,42 @@ function meta_sim(base_dir, redo, path_to_spm)
     avg_n = 20; % Average number of subjects per group
     diff_n = 15;
 
-    ks = [25]% 50];%[5 10 25 50];
-    wth_sigmas = avg_n*[0.25 0.5 1 2 4];%How to compute z with var = 0?
-    wth_sigma_sames = [true] %, 'diff'}; don't know yet how to deal with uneq var (for FFX!?)
+    settings.ks = [25];% 50];%[5 10 25 50];
+    settings.wth_sigmas = avg_n*[0.25 0.5 1 2 4];%How to compute z with var = 0?
+    settings.wth_sigma_sames = [true]; %, 'diff'}; don't know yet how to deal with uneq var (for FFX!?)
 
     % Between-studies variance (RFX?)
-    btw_sigmas = [1]%  1];
+    settings.btw_sigmas = [1];%  1];
 
     % Number of subjects per studies     
-    same_ns = [true]%[ true false];
+    settings.same_ns = [true];%[ true false];
 
     % Proportion of studies with software 2 (fraction)
-    soft_props = [0 1/5 0.5];
+    settings.soft_props = [0 1/5 0.5];
 
     % Correction factor with software 2
-    soft_factors = [1 2 100];
+    settings.soft_factors = [1 2 100];
 
     % Study-specific bias due to units mismatch
-    units = [false, true];
+    settings.unit_mismatches = [false, true];
 
     % Type of analysis: one-sample (1), two-sample(2), two-sample
     % unbalanced (3)
-    analysis_types = [1]% [1 2 3];
+    settings.analysis_types = [1];% [1 2 3];
 
     % Size of the simulation image (in 1 direction). Each voxel of the
     % simulation image is a simulation sample.
-    iter_onedir = 30;%100;
-    nSimu = iter_onedir^3;
+    settings.iter_onedir = 30;%100;
+    settings.nsimu = settings.iter_onedir^3;
 
     % Number of subject per study
     %     nSubjects = [25 400 100 25]; %[10, 15, 20, 25, 30, 10, 15, 20, 25, 30, 10, 15, 20, 25, 30];
     %     nStudies = numel(nSubjects);
+    
+    settings.nperm = 5000;
+    
+    display_settings(settings)
+    
     % -------------------------------------------
     
     % Retreive information about current job on the cluster    
@@ -84,10 +89,10 @@ function meta_sim(base_dir, redo, path_to_spm)
     end
      
     % Number of studies per meta-analysis
-    for k = ks
+    for k = settings.ks
         
         % One-sample, two-sample, two-sample unbalanced
-        for analysis_type = analysis_types
+        for analysis_type = settings.analysis_types
             if analysis_type == 1
                 analysisPrefix = '';
                 k_group1 = k;
@@ -103,13 +108,13 @@ function meta_sim(base_dir, redo, path_to_spm)
             end
 
             % Cross-studies unit mismatch
-            for unit_mis = units
+            for unit_mis = settings.unit_mismatches
 
                 % Cross-software unit mismatch
-                for soft_factor = soft_factors
+                for soft_factor = settings.soft_factors
                     
                     % Proportion of studies analysed with software 2                    
-                    for soft_prop = soft_props
+                    for soft_prop = settings.soft_props
                         if (unit_mis && soft_prop~=0) || ...
                            (unit_mis && soft_factor~=1) || ...
                            (~unit_mis && soft_prop==0 && soft_factor~=1) || ...
@@ -145,7 +150,7 @@ function meta_sim(base_dir, redo, path_to_spm)
                             factor_group2(group2_soft==2) = factor_group2(group2_soft==2).*soft_factor;
                         end
 
-                        for same_n = same_ns
+                        for same_n = settings.same_ns
 
                             if same_n
                                 group1_n = ones(1, k_group1)*avg_n;
@@ -158,16 +163,14 @@ function meta_sim(base_dir, redo, path_to_spm)
                                 group1_n = randi([avg_n-diff_n avg_n+diff_n], 1, k_group1);%linspace(avg_n/2,avg_n*2,k);
                                 group2_n = randi([avg_n-diff_n avg_n+diff_n], 1, k_group2);%linspace(avg_n/2,avg_n*2,k);
                             end
-                            disp(group1_n)
-                            disp(group2_n)
 
                             % Between-studies variance
-                            for btw_sigma = btw_sigmas
+                            for btw_sigma = settings.btw_sigmas
 
                                  % Within-study variance (ignoring sample
                                  % size)
-                                 for sigma_sq = wth_sigmas
-                                    for wth_sigma_same = wth_sigma_sames
+                                 for sigma_sq = settings.wth_sigmas
+                                    for wth_sigma_same = settings.wth_sigma_sames
 
                                         if wth_sigma_same
                                             group1_wth_sigma_a = ones(1, k_group1);
@@ -191,7 +194,6 @@ function meta_sim(base_dir, redo, path_to_spm)
                                         end
 
                                         disp(simu_dir)
-                                        
                                         exist_simu_dir = isdir(simu_dir);
 
                                         if redo && exist_simu_dir
@@ -231,7 +233,7 @@ function meta_sim(base_dir, redo, path_to_spm)
                                         end
                                         simu.config.sigma_sq = sigma_sq;
                                         simu.config.btw_sigma = btw_sigma;
-                                        simu.config.iter_onedir = iter_onedir;
+                                        simu.config.iter_onedir = settings.iter_onedir;
                                         simu.config.soft_prop = soft_prop;
                                         simu.config.soft_factor = soft_factor;
                                         simu.config.unit_mis = unit_mis;
@@ -241,7 +243,6 @@ function meta_sim(base_dir, redo, path_to_spm)
 
                                         simucfg_file = fullfile( ...
                                             simu_dir, 'simu.mat');
-                                        disp(simucfg_file)
 
                                         if exist(simucfg_file, 'file')
                                             prev_simu = load(simucfg_file);
@@ -310,8 +311,6 @@ function meta_sim(base_dir, redo, path_to_spm)
                                             end
 
                                             % --- Simulated data ---
-                                            subIdx = 0;
-
                                             % Generate simulated data
                                             [con_files, varcon_files, z_files] = simulate_data(simu.config, data_dir);
 
@@ -421,6 +420,7 @@ function meta_sim(base_dir, redo, path_to_spm)
                                                 matlabbatch{end}.spm.tools.snpm.des.OneSampT.DesignFile = 'snpm_bch_ui_OneSampT';
                                                 matlabbatch{end}.spm.tools.snpm.des.OneSampT.dir = {permutcon_dir};
                                                 matlabbatch{end}.spm.tools.snpm.des.OneSampT.P = con_files;
+                                                matlabbatch{end}.spm.tools.snpm.des.OneSampT.nPerm = settings.nperm;
                                                 matlabbatch{end+1}.spm.tools.snpm.cp.snpmcfg = {fullfile(permutcon_dir, 'SnPMcfg.mat')};
                                             else
                                                 matlabbatch{end+1}.spm.tools.snpm.des.TwoSampT.dir = {permutcon_dir};
@@ -440,6 +440,7 @@ function meta_sim(base_dir, redo, path_to_spm)
                                                 matlabbatch{end}.spm.tools.snpm.des.OneSampT.DesignFile = 'snpm_bch_ui_OneSampT';
                                                 matlabbatch{end}.spm.tools.snpm.des.OneSampT.dir = {permutz_dir};
                                                 matlabbatch{end}.spm.tools.snpm.des.OneSampT.P = z_files;
+                                                matlabbatch{end}.spm.tools.snpm.des.OneSampT.nPerm = settings.nperm;
                                                 matlabbatch{end+1}.spm.tools.snpm.cp.snpmcfg = {fullfile(permutz_dir, 'SnPMcfg.mat')};
                                             else
                                                 matlabbatch{end+1}.spm.tools.snpm.des.TwoSampT.dir = {permutz_dir};
