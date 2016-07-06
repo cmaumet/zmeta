@@ -241,10 +241,15 @@ function meta_sim(baseDir, redo)
                                             simu.sge = prev_simu.sge;
                                         end
 
-                                        simu.sge(end+1).job_id = job_id;
-                                        simu.sge(end+1).tasksid = tasksid;
-                                        simu.sge(end+1).queue = queue;
-                                        simu.sge(end+1).host = host;
+                                        if isfield(simu, 'sge')
+                                            simu.sge(end+1).job_id = job_id;
+                                        else
+                                            simu.sge(1).job_id = job_id;
+                                        end
+                                        
+                                        simu.sge(end).tasksid = tasksid;
+                                        simu.sge(end).queue = queue;
+                                        simu.sge(end).host = host;
                                         
                                         save(simucfg_file, 'simu')
                                         
