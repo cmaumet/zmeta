@@ -14,13 +14,13 @@ function meta_sim(baseDir, redo)
 
     ks = [25]% 50];%[5 10 25 50];
     wth_sigmas = avg_n*[0.25 0.5 1 2 4];%How to compute z with var = 0?
-    wth_sigma_schemes = {'same'} %, 'diff'}; don't know yet how to deal with uneq var (for FFX!?)
+    wth_sigma_sames = [true] %, 'diff'}; don't know yet how to deal with uneq var (for FFX!?)
 
     % Between-studies variance (RFX?)
     btw_sigmas = [1]%  1];
 
     % Number of subjects per studies     
-    numsub_schemes = {'same'}%, 'diff'};
+    same_ns = [true]%[ true false];
 
     % Proportion of studies with software 2 (fraction)
     soft_props = [0 1/5 0.5];
@@ -33,7 +33,7 @@ function meta_sim(baseDir, redo)
 
     % Type of analysis: one-sample (1), two-sample(2), two-sample
     % unbalanced (3)
-    analysisTypes = [1]% [1 2 3];
+    analysis_types = [1]% [1 2 3];
 
     % Size of the simulation image (in 1 direction). Each voxel of the
     % simulation image is a simulation sample.
@@ -76,7 +76,7 @@ function meta_sim(baseDir, redo)
     for k = ks
         
         % One-sample, two-sample, two-sample unbalanced
-        for analysis_type = analysisTypes
+        for analysis_type = analysis_types
             if analysis_type == 1
                 analysisPrefix = '';
                 k_group1 = k;
@@ -134,21 +134,18 @@ function meta_sim(baseDir, redo)
                             factor_group2(group2_soft==2) = factor_group2(group2_soft==2).*soft_factor;
                         end
 
-                        for numsub_scheme = numsub_schemes
+                        for same_n = same_ns
 
-                            switch numsub_scheme
-                                case {'same'}
-                                    group1_n = ones(1, k_group1)*avg_n;
-                                    group2_n = ones(1, k_group2)*avg_n;
-                                case {'diff'}
+                            if same_ns
+                                group1_n = ones(1, k_group1)*avg_n;
+                                group2_n = ones(1, k_group2)*avg_n;
+                            else
 
-                                    % Uniformly distributed beween avg_n-diff_n 
-                                    % and avg_n+diff_n included, so that 
-                                    % mean(nsub) = avg_n
-                                    group1_n = randi([avg_n-diff_n avg_n+diff_n], 1, k_group1);%linspace(avg_n/2,avg_n*2,k);
-                                    group2_n = randi([avg_n-diff_n avg_n+diff_n], 1, k_group2);%linspace(avg_n/2,avg_n*2,k);
-                                otherwise
-                                  error('')
+                                % Uniformly distributed beween avg_n-diff_n 
+                                % and avg_n+diff_n included, so that 
+                                % mean(nsub) = avg_n
+                                group1_n = randi([avg_n-diff_n avg_n+diff_n], 1, k_group1);%linspace(avg_n/2,avg_n*2,k);
+                                group2_n = randi([avg_n-diff_n avg_n+diff_n], 1, k_group2);%linspace(avg_n/2,avg_n*2,k);
                             end
                             disp(group1_n)
                             disp(group2_n)
@@ -159,21 +156,18 @@ function meta_sim(baseDir, redo)
                                  % Within-study variance (ignoring sample
                                  % size)
                                  for sigma_sq = wth_sigmas
-                                    for wth_sigma_scheme = wth_sigma_schemes
+                                    for wth_sigma_same = wth_sigma_sames
 
-                                        switch wth_sigma_scheme
-                                            case {'same'}
-                                                group1_wth_sigma_a = ones(1, k_group1);
-                                                group2_wth_sigma_a = ones(1, k_group2);
-                                            case {'diff'}
-                                                % Generate values from the uniform 
-                                                % distribution on the interval [a, b].
-                                                a = 1/2;
-                                                b = 2;
-                                                group1_wth_sigma_a = a + (b-a).*rand(k_group1,1);
-                                                group2_wth_sigma_a = a + (b-a).*rand(k_group2,1);
-                                            otherwise
-                                              error('')
+                                        if wth_sigma_same
+                                            group1_wth_sigma_a = ones(1, k_group1);
+                                            group2_wth_sigma_a = ones(1, k_group2);
+                                        else
+                                            % Generate values from the uniform 
+                                            % distribution on the interval [a, b].
+                                            a = 1/2;
+                                            b = 2;
+                                            group1_wth_sigma_a = a + (b-a).*rand(k_group1,1);
+                                            group2_wth_sigma_a = a + (b-a).*rand(k_group2,1);
                                         end
 
                                         % Directory to store the simulation data and results.
@@ -205,7 +199,7 @@ function meta_sim(baseDir, redo)
                                         else
                                             simu.config.nsub = group1_n;
                                         end
-                                        simu.config.wth_sigma_scheme = wth_sigma_scheme;
+                                        simu.config.wth_sigma_same = wth_sigma_same;
                                         
                                         if analysis_type > 1
                                             simu.config.k_group1 = k_group1;
