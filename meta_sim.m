@@ -69,7 +69,6 @@ function meta_sim(base_dir, redo, path_to_spm)
     if isempty(which('spm'))
         addpath(path_to_spm)
     end
-    addpath(fullfile(pwd, '..', 'code','automri', 'commons', 'lib'))
     addpath(fullfile(pwd, 'lib'))
 
     % SPM and FSL initialisations    
@@ -213,18 +212,22 @@ function meta_sim(base_dir, redo, path_to_spm)
                                             simu.config.group1_n = group1_n;
                                             simu.config.group2_n = group2_n;
                                         else
-                                            simu.config.nsub = group1_n;
+                                            simu.config.group1_n = group1_n;
+                                            simu.config.n = group1_n;
                                         end
                                         simu.config.wth_sigma_same = wth_sigma_same;
                                         
                                         if analysis_type > 1
                                             simu.config.k_group1 = k_group1;
                                             simu.config.k_group2 = k_group2;
+                                            simu.config.k = k_group1 + k_group2;
                                             simu.config.group1_wth_sigma_a = group1_wth_sigma_a;
                                             simu.config.group2_wth_sigma_a = group2_wth_sigma_a;
                                         else
                                             simu.config.k = k_group1;
+                                            simu.config.k_group1 = k_group1;
                                             simu.config.wth_sigma_a = group1_wth_sigma_a;
+                                            simu.config.group1_wth_sigma_a = group1_wth_sigma_a;
                                         end
                                         simu.config.sigma_sq = sigma_sq;
                                         simu.config.btw_sigma = btw_sigma;
@@ -241,16 +244,16 @@ function meta_sim(base_dir, redo, path_to_spm)
                                         disp(simucfg_file)
 
                                         if exist(simucfg_file, 'file')
-                                            pre_simu = load(simucfg_file);
-                                            pre_simu = pre_simu.simu;
-                                            if isfield(pre_simu.config, 'timing')
-                                                pre_simu.config = ...
-                                                    rmfield(pre_simu.config,'timing');
+                                            prev_simu = load(simucfg_file);
+                                            prev_simu = prev_simu.simu;
+                                            if isfield(prev_simu.config, 'timing')
+                                                prev_simu.config = ...
+                                                    rmfield(prev_simu.config,'timing');
                                             end
 
-                                            if ~isequaln(simu.config, pre_simu.config)
+                                            if ~isequaln(simu.config, prev_simu.config)
                                                 disp(simu.config)
-                                                disp(pre_simu.config)
+                                                disp(prev_simu.config)
                                                 disp(simu_dir)
                                                 error('Different simulations config in the same folder')
                                             end 
@@ -287,10 +290,13 @@ function meta_sim(base_dir, redo, path_to_spm)
                                         exist_data = exist(last_data, 'file');
 
                                         if exist_data
+                                            con_files = cell(k,1);
+                                            varcon_files = cell(k,1);
+                                            z_files = cell(k,1);
                                             for iStudy = 1:(k_group1+k_group2)
-                                                [~, conFiles{iStudy}] = find_file_nii_or_gz(fullfile(data_dir, ['con_st' num2str(iStudy, '%03d') '.nii']));
-                                                [~, varConFiles{iStudy}] = find_file_nii_or_gz(fullfile(data_dir, ['varcon_st' num2str(iStudy, '%03d') '.nii']));
-                                                [~, zFiles{iStudy}] = find_file_nii_or_gz(fullfile(data_dir, ['z_st' num2str(iStudy, '%03d') '.nii']));
+                                                [~, con_files{iStudy}] = exist_nii(fullfile(data_dir, ['con_st' num2str(iStudy, '%03d') '.nii']), true);
+                                                [~, varcon_files{iStudy}] = exist_nii(fullfile(data_dir, ['varcon_st' num2str(iStudy, '%03d') '.nii']), true);
+                                                [~, z_files{iStudy}] = exist_nii(fullfile(data_dir, ['z_st' num2str(iStudy, '%03d') '.nii']), true);
                                             end
 %                                             load(fullfile(simu_dir, 'simu.mat'))
 %                                             fields = fieldnames(simu.config);
@@ -299,13 +305,15 @@ function meta_sim(base_dir, redo, path_to_spm)
 %                                             end
                                         else
                                             % Directory to store the simulation data.
-                                            mkdir(data_dir);
+                                            if ~isdir(data_dir)
+                                                mkdir(data_dir);
+                                            end
 
                                             % --- Simulated data ---
                                             subIdx = 0;
 
                                             % Generate simulated data
-                                            [con_files, varcon_files, z_files] = simulate_data(simu.config);
+                                            [con_files, varcon_files, z_files] = simulate_data(simu.config, data_dir);
 
                                             if analysis_type == 1
                                                 mkdir(fisher_dir);
@@ -326,35 +334,35 @@ function meta_sim(base_dir, redo, path_to_spm)
                                         
                                         if analysis_type == 1
                                             % Fisher's
-                                            if ~find_file_nii_or_gz(fullfile(fisher_dir, 'fishers_ffx_minus_log10_p.nii'))
+                                            if ~exist_nii(fullfile(fisher_dir, 'fishers_ffx_minus_log10_p.nii'))
                                                 matlabbatch{1}.spm.tools.ibma.fishers.dir = {fisher_dir};
-                                                matlabbatch{1}.spm.tools.ibma.fishers.zimages = zFiles;
+                                                matlabbatch{1}.spm.tools.ibma.fishers.zimages = z_files;
                                             else
                                                 disp('Fisher''s already computed')
                                             end
 
                                             % Stouffer's
-                                            if ~find_file_nii_or_gz(fullfile(stouffer_dir, 'stouffers_ffx_minus_log10_p.nii'))
+                                            if ~exist_nii(fullfile(stouffer_dir, 'stouffers_ffx_minus_log10_p.nii'))
                                                 matlabbatch{end+1}.spm.tools.ibma.stouffers.dir = {stouffer_dir};
-                                                matlabbatch{end}.spm.tools.ibma.stouffers.zimages = zFiles;
+                                                matlabbatch{end}.spm.tools.ibma.stouffers.zimages = z_files;
                                                 matlabbatch{end}.spm.tools.ibma.stouffers.rfx.RFX_no = 1;
                                             else
                                                 disp('Stouffer''s already computed')
                                             end
 
                                             % Stouffer's MFX
-                                            if ~find_file_nii_or_gz(fullfile(stoufferMFX_dir, 'stouffers_rfx_minus_log10_p.nii'))
+                                            if ~exist_nii(fullfile(stoufferMFX_dir, 'stouffers_rfx_minus_log10_p.nii'))
                                                 matlabbatch{end+1}.spm.tools.ibma.stouffers.dir = {stoufferMFX_dir};
-                                                matlabbatch{end}.spm.tools.ibma.stouffers.zimages = zFiles;
+                                                matlabbatch{end}.spm.tools.ibma.stouffers.zimages = z_files;
                                                 matlabbatch{end}.spm.tools.ibma.stouffers.rfx.RFX_yes = 0;
                                             else
                                                 disp('Stouffer''s MFX already computed')
                                             end
 
                                             % Optimally weighted z
-                                            if ~find_file_nii_or_gz(fullfile(weightedZ_dir, 'weightedz_ffx_minus_log10_p.nii'))
+                                            if ~exist_nii(fullfile(weightedZ_dir, 'weightedz_ffx_minus_log10_p.nii'))
                                                 matlabbatch{end+1}.spm.tools.ibma.weightedz.dir = {weightedZ_dir};
-                                                matlabbatch{end}.spm.tools.ibma.weightedz.zimages = zFiles;
+                                                matlabbatch{end}.spm.tools.ibma.weightedz.zimages = z_files;
                                                 matlabbatch{end}.spm.tools.ibma.weightedz.nsub = group1_n;
                                             else
                                                 disp('Weighted Z already computed')
@@ -362,14 +370,14 @@ function meta_sim(base_dir, redo, path_to_spm)
                                         end
 
                                         % Mega-analysis RFX
-                                        if ~find_file_nii_or_gz(fullfile(megaRFX_dir, 'mega_rfx_minus_log10_p.nii'))
+                                        if ~exist_nii(fullfile(megaRFX_dir, 'mega_rfx_minus_log10_p.nii'))
                                             if analysis_type == 1
                                                 matlabbatch{end+1}.spm.tools.ibma.megarfx.dir = {megaRFX_dir};
-                                                matlabbatch{end}.spm.tools.ibma.megarfx.confiles = conFiles;
+                                                matlabbatch{end}.spm.tools.ibma.megarfx.con_files = con_files;
                                             else
                                                 matlabbatch{end+1}.spm.stats.factorial_design.dir = {megaRFX_dir};
-                                                matlabbatch{end}.spm.stats.factorial_design.des.t2.scans1 = conFiles(1:k_group1)';
-                                                matlabbatch{end}.spm.stats.factorial_design.des.t2.scans2 = conFiles(k_group1+(1:k_group2))';
+                                                matlabbatch{end}.spm.stats.factorial_design.des.t2.scans1 = con_files(1:k_group1)';
+                                                matlabbatch{end}.spm.stats.factorial_design.des.t2.scans2 = con_files(k_group1+(1:k_group2))';
                                                 matlabbatch{end}.spm.stats.factorial_design.des.t2.variance = 0;
                                                 matlabbatch{end+1}.spm.stats.fmri_est.spmmat = {fullfile(megaRFX_dir, 'SPM.mat')};
                                                 matlabbatch{end+1}.spm.stats.con.spmmat = {fullfile(megaRFX_dir, 'SPM.mat')};
@@ -400,25 +408,24 @@ function meta_sim(base_dir, redo, path_to_spm)
     %                                         end
     %                                         matlabbatch{end}.spm.tools.ibma.megaffx.variances.equal = true;
     % 
-    %                                         matlabbatch{end}.spm.tools.ibma.megaffx.confiles = conFiles;
-    %                                         matlabbatch{end}.spm.tools.ibma.megaffx.varconfiles = varConFiles;
+    %                                         matlabbatch{end}.spm.tools.ibma.megaffx.con_files = con_files;
+    %                                         matlabbatch{end}.spm.tools.ibma.megaffx.varcon_files = varcon_files;
     %                                     else
     %                                         disp('Mega FFX already computed')
     %                                     end
     if true
-                                        % Permutation on conFiles
+                                        % Permutation on con_files
                                         if ~exist(fullfile(permutcon_dir, 'lP+.img'), 'file')
-                                            conFiles = gunzip_if_gz(conFiles);
                                             if analysis_type == 1                                                
                                                 matlabbatch{end+1}.spm.tools.snpm.des.OneSampT.DesignName = 'MultiSub: One Sample T test on diffs/contrasts';
                                                 matlabbatch{end}.spm.tools.snpm.des.OneSampT.DesignFile = 'snpm_bch_ui_OneSampT';
                                                 matlabbatch{end}.spm.tools.snpm.des.OneSampT.dir = {permutcon_dir};
-                                                matlabbatch{end}.spm.tools.snpm.des.OneSampT.P = conFiles;
+                                                matlabbatch{end}.spm.tools.snpm.des.OneSampT.P = con_files;
                                                 matlabbatch{end+1}.spm.tools.snpm.cp.snpmcfg = {fullfile(permutcon_dir, 'SnPMcfg.mat')};
                                             else
                                                 matlabbatch{end+1}.spm.tools.snpm.des.TwoSampT.dir = {permutcon_dir};
-                                                matlabbatch{end}.spm.tools.snpm.des.TwoSampT.scans1 = conFiles(1:k_group1)';
-                                                matlabbatch{end}.spm.tools.snpm.des.TwoSampT.scans2 = conFiles(k_group1+(1:k_group2))';
+                                                matlabbatch{end}.spm.tools.snpm.des.TwoSampT.scans1 = con_files(1:k_group1)';
+                                                matlabbatch{end}.spm.tools.snpm.des.TwoSampT.scans2 = con_files(k_group1+(1:k_group2))';
                                                 matlabbatch{end+1}.spm.tools.snpm.cp.snpmcfg = {fullfile(permutcon_dir, 'SnPMcfg.mat')};
                                             end
                                         else
@@ -426,19 +433,18 @@ function meta_sim(base_dir, redo, path_to_spm)
                                         end
 
 
-                                        % Permutation on zFiles
+                                        % Permutation on z_files
                                         if ~exist(fullfile(permutz_dir, 'lP+.img'), 'file')
-                                            zFiles = gunzip_if_gz(zFiles);
                                             if analysis_type == 1
                                                 matlabbatch{end+1}.spm.tools.snpm.des.OneSampT.DesignName = 'MultiSub: One Sample T test on diffs/contrasts';
                                                 matlabbatch{end}.spm.tools.snpm.des.OneSampT.DesignFile = 'snpm_bch_ui_OneSampT';
                                                 matlabbatch{end}.spm.tools.snpm.des.OneSampT.dir = {permutz_dir};
-                                                matlabbatch{end}.spm.tools.snpm.des.OneSampT.P = zFiles;
+                                                matlabbatch{end}.spm.tools.snpm.des.OneSampT.P = z_files;
                                                 matlabbatch{end+1}.spm.tools.snpm.cp.snpmcfg = {fullfile(permutz_dir, 'SnPMcfg.mat')};
                                             else
                                                 matlabbatch{end+1}.spm.tools.snpm.des.TwoSampT.dir = {permutz_dir};
-                                                matlabbatch{end}.spm.tools.snpm.des.TwoSampT.scans1 = zFiles(1:k_group1)';
-                                                matlabbatch{end}.spm.tools.snpm.des.TwoSampT.scans2 = zFiles(k_group1+(1:k_group2))';
+                                                matlabbatch{end}.spm.tools.snpm.des.TwoSampT.scans1 = z_files(1:k_group1)';
+                                                matlabbatch{end}.spm.tools.snpm.des.TwoSampT.scans2 = z_files(k_group1+(1:k_group2))';
                                                 matlabbatch{end+1}.spm.tools.snpm.cp.snpmcfg = {fullfile(permutz_dir, 'SnPMcfg.mat')};
                                             end
                                         else
@@ -462,7 +468,7 @@ function meta_sim(base_dir, redo, path_to_spm)
                                         if true
                                             % GLM MFX
                                             redomfx = false;
-                                            if redomfx || ~find_file_nii_or_gz(fullfile(megaMFX_dir,'mega_mfx_minus_log10_p.nii'))
+                                            if redomfx || ~exist_nii(fullfile(megaMFX_dir,'mega_mfx_minus_log10_p.nii'))
                                                 if ~exist('nsub', 'var')
                                                     nsub = group1_n;
                                                 end
@@ -473,7 +479,7 @@ function meta_sim(base_dir, redo, path_to_spm)
                                         end
 
                                         % GLM FFX (via FSL)
-                                        if ~find_file_nii_or_gz(fullfile(megaFFXFSL_dir,'mega_ffx_minus_log10_p.nii'))
+                                        if ~exist_nii(fullfile(megaFFXFSL_dir,'mega_ffx_minus_log10_p.nii'))
                                             if ~exist('nsub', 'var')
                                                     nsub = group1_n;
                                             end
@@ -492,14 +498,14 @@ function meta_sim(base_dir, redo, path_to_spm)
     end
 end
 
-function [con_files, varcon_files, z_files] = simulate_data(config)
-    num_studies = k_group1+k_group2;
+function [con_files, varcon_files, z_files] = simulate_data(config, data_dir)
+    num_studies = config.k;
     con_files = cell(num_studies, 1);
     varcon_files = cell(num_studies, 1);
     z_files = cell(num_studies, 1);
 
     for study_idx = 1:num_studies
-        if study_idx <= k_group1
+        if study_idx <= config.k_group1
             % Group 1
             studyIndex = study_idx;
             nsub = config.group1_n;
@@ -514,14 +520,14 @@ function [con_files, varcon_files, z_files] = simulate_data(config)
         end
         
         % Degrees of freedom of the within-study variance estimate
-        dof = nsub(studyIndex)-1;
+        dof = config.n(studyIndex)-1;
 
         % Estimated paramater estimate.
-        estimatedContrast = normrnd(0, sqrt(sigma_sq*wth_sigma_a(studyIndex)./nsub(studyIndex)+btw_sigma), [iter_onedir, iter_onedir, iter_onedir]);
+        estimatedContrast = normrnd(0, sqrt(config.sigma_sq*config.wth_sigma_a(studyIndex)./config.n(studyIndex)+config.btw_sigma), [config.iter_onedir, config.iter_onedir, config.iter_onedir]);
 
         % Estimated contrast variance (from chi square distribution)
-        estimatedSigmaSquare = chi2rnd(dof, [iter_onedir, iter_onedir, iter_onedir])*sigma_sq*wth_sigma_a(studyIndex)/dof;
-        estimatedVarContrast = estimatedSigmaSquare./nsub(studyIndex);
+        estimatedSigmaSquare = chi2rnd(dof, [config.iter_onedir, config.iter_onedir, config.iter_onedir])*config.sigma_sq*config.wth_sigma_a(studyIndex)/dof;
+        estimatedVarContrast = estimatedSigmaSquare./config.n(studyIndex);
 
         % units correction
         estimatedContrast = estimatedContrast*unitFactor(studyIndex);
@@ -529,8 +535,8 @@ function [con_files, varcon_files, z_files] = simulate_data(config)
 
         % Write out parameter estimates.      
         con_files{study_idx} = fullfile(data_dir, ['con_st' num2str(study_idx, '%03d') '.nii']);
-        vol    = struct('fname',  conFiles{study_idx},...
-                   'dim',    [iter_onedir iter_onedir iter_onedir],...
+        vol    = struct('fname',  con_files{study_idx},...
+                   'dim',    [config.iter_onedir config.iter_onedir config.iter_onedir],...
                    'dt',     [spm_type('float32') spm_platform('bigend')],...
                    'mat',    eye(4),...
                    'pinfo',  [1 0 0]',...
@@ -540,12 +546,12 @@ function [con_files, varcon_files, z_files] = simulate_data(config)
 
         % Write out estimated variance of parameter estimates.
         varcon_files{study_idx} = fullfile(data_dir, ['varcon_st' num2str(study_idx, '%03d') '.nii']);
-        vol.fname =  varConFiles{study_idx};
+        vol.fname =  varcon_files{study_idx};
         spm_write_vol(vol, estimatedVarContrast);
 
         % Write out corresponding z-values.
         z_files{study_idx} = fullfile(data_dir, ['z_st' num2str(study_idx, '%03d') '.nii']);
-        vol.fname = zFiles{study_idx};
+        vol.fname = z_files{study_idx};
 
         % Z-transform of T-statistic
         zData = norminv(cdf('T', estimatedContrast./sqrt(estimatedVarContrast), nsub(studyIndex)-1));
@@ -554,4 +560,30 @@ function [con_files, varcon_files, z_files] = simulate_data(config)
         zData(infPos) = -norminv(cdf('T', -estimatedContrast(infPos)./sqrt(estimatedVarContrast(infPos)), nsub(studyIndex)-1));
         spm_write_vol(vol, zData);   
     end 
+end
+
+function [found, filepath] = exist_nii(filepath, uncompress)
+    % EXIST_NII  Check if NIfTI image exist (possibly compressed)
+    %   EXIST_NII(FILEPATH) returns true if the NIfTI image was found and 
+    %       the full path to the image.
+    %   EXIST_NII(FILEPATH, true) returns true if the NIfTI image was found 
+    %       and the full path to the image and uncompress the image.
+    % 
+    if nargin < 2
+        uncompress = false;
+    end
+    
+    if exist(filepath, 'file')
+        found = true;
+    elseif exist([filepath '.gz'], 'file')
+        found = true;
+        if uncompress
+            gunzip(filepath);
+        else
+            filepath = [filepath '.gz'];
+        end
+    else
+        found = false;
+        filepath = '';
+    end
 end
