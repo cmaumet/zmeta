@@ -66,8 +66,6 @@ function meta_sim(baseDir, redo)
     % Initialise random number generator using the task id
     cluster_task_id = str2num(task_id);
     rng(cluster_task_id);
-
-    load(simu_config)
        
     allsimu_dir = fullfile(baseDir, 'simulations');
     if ~isdir(allsimu_dir)
