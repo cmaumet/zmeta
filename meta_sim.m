@@ -240,6 +240,7 @@ function meta_sim(baseDir, redo)
 
                                         simucfg_file = fullfile( ...
                                             simulationDir, 'simu.mat');
+                                        disp(simucfg_file)
 
                                         if exist(simucfg_file, 'file')
                                             pre_simu = load(simucfg_file);
