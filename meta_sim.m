@@ -53,7 +53,7 @@ function meta_sim(base_dir, redo, path_to_spm)
     %     nSubjects = [25 400 100 25]; %[10, 15, 20, 25, 30, 10, 15, 20, 25, 30, 10, 15, 20, 25, 30];
     %     nStudies = numel(nSubjects);
     
-    settings.nperm = 5000;
+    settings.nperm = 20;
     
     display_settings(settings)
     
