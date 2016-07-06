@@ -21,18 +21,18 @@ function run_fsl_mfx(datadir, wd, analysisType, nSubjects, nStudies, ...
         '--dm=' design '.mat --cs=' design '.grp --tc=' design '.con '...
         ' --runmode=flame1'])
     
-    statFile = fullfile(wd, 'stats', 'zstat1.nii.gz');
-%     statFile = gunzip_if_gz(statFile);
-    system(['gunzip ' statFile])
-    statFile = strrep(statFile, '.gz', '');
+    stat_file = fullfile(wd, 'stats', 'zstat1.nii.gz');
+%     stat_file = gunzip_if_gz(stat_file);
+    gunzip(stat_file)
+    stat_file = strrep(stat_file, '.gz', '');
     
-    originalStatFile = statFile;
-    statFile = fullfile(wd, 'zstat1.nii');
-    copy_nii_image(originalStatFile, statFile);
-    statistic = spm_read_vols(spm_vol(statFile));
+    originalstat_file = stat_file;
+    stat_file = fullfile(wd, 'zstat1.nii');
+    copyfile(originalstat_file, stat_file);
+    statistic = spm_read_vols(spm_vol(stat_file));
     
-    pValueFile = fullfile(spm_file(statFile, 'path'), 'mega_mfx_minus_log10_p.nii');
-    copy_nii_image(statFile, pValueFile);
+    pValueFile = fullfile(spm_file(stat_file, 'path'), 'mega_mfx_minus_log10_p.nii');
+    copyfile(stat_file, pValueFile);
     pValueImg = nifti(pValueFile);
     pValueImg.dat(:) = -log10(normcdf(statistic(:), 'upper'));
     

@@ -27,11 +27,11 @@ function run_fsl_ffx(datadir, wd, analysisType, nSubjects, nStudies, ...
     
     originalStatFile = statFile;
     statFile = fullfile(wd, 'zstat1.nii');
-    copy_nii_image(originalStatFile, statFile);
+    copyfile(originalStatFile, statFile);
     statistic = spm_read_vols(spm_vol(statFile));
     
     pValueFile = fullfile(spm_file(statFile, 'path'), 'mega_ffx_minus_log10_p.nii');
-    copy_nii_image(statFile, pValueFile);
+    copyfile(statFile, pValueFile);
     pValueImg = nifti(pValueFile);
     pValueImg.dat(:) = -log10(normcdf(statistic(:), 'upper'));
     
