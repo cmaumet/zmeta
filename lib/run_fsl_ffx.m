@@ -1,4 +1,5 @@
-function run_fsl_ffx(datadir, wd, analysisType, nSubjects, nStudies)
+function run_fsl_ffx(datadir, wd, analysisType, nSubjects, nStudies, ...
+        designs_dir)
     cwd = pwd;
     
     if ~isdir(wd)
@@ -13,7 +14,7 @@ function run_fsl_ffx(datadir, wd, analysisType, nSubjects, nStudies)
     elseif analysisType == 3
         design = ['design_' num2str(nStudies*2, '%03d') 'studies_' num2str(nStudies*2/5, '%02d') '_equal'];
     end
-    prepare_fsl_data(datadir, wd, nSubjects, design)
+    prepare_fsl_data(datadir, wd, nSubjects, design, designs_dir)
     
     system(['flameo --cope=cope --vc=varcope ' ...
         '--dvc=dof --mask=mask --ld=stats '...

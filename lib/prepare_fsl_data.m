@@ -1,4 +1,4 @@
-function prepare_fsl_data(datadir, wd, nSubjects, design)
+function prepare_fsl_data(datadir, wd, nSubjects, design, designs_dir)
     if ~exist(fullfile(wd, 'dof.nii.gz'), 'file')
         cwd = pwd;
         cd(datadir)
@@ -28,12 +28,12 @@ function prepare_fsl_data(datadir, wd, nSubjects, design)
             delete(dof_file);
         end
  
-        copyfile(['/storage/wmsmfe/code/fsl_design/' design '.mat'], [design '.mat'])
-        copyfile(['/storage/wmsmfe/code/fsl_design/' design '.grp'], [design '.grp'])
-        copyfile(['/storage/wmsmfe/code/fsl_design/' design '.con'], [design '.con'])
+        copyfile(fullfile(designs_dir, [design '.mat']), [design '.mat'])
+        copyfile(fullfile(designs_dir, [design '.grp']), [design '.grp'])
+        copyfile(fullfile(designs_dir, [design '.con']), [design '.con'])
 
         % Delete previously halted results
-        stat_dir = fullfile(wd, 'stats')
+        stat_dir = fullfile(wd, 'stats');
         if isdir(stat_dir)
             rmdir(stat_dir,'s')
         end

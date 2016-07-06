@@ -8,6 +8,9 @@ function meta_sim(base_dir, redo, path_to_spm)
         redo = false;
     end
     
+    script_dir = fileparts(mfilename('fullpath'));
+    fsl_designs_dir = fullfile(script_dir, 'fsl_designs');
+    
     % ----- Simulation parameters --------
     avg_n = 20; % Average number of subjects per group
     diff_n = 15;
@@ -473,7 +476,7 @@ function meta_sim(base_dir, redo, path_to_spm)
                                                 if ~exist('nsub', 'var')
                                                     nsub = group1_n;
                                                 end
-                                                run_fsl_mfx(data_dir, megaMFX_dir, analysis_type, nsub, k)
+                                                run_fsl_mfx(data_dir, megaMFX_dir, analysis_type, nsub, k, fsl_designs_dir)
                                             else
                                                 disp('Mega MFX (FSL) already computed')
                                             end
@@ -484,7 +487,7 @@ function meta_sim(base_dir, redo, path_to_spm)
                                             if ~exist('nsub', 'var')
                                                     nsub = group1_n;
                                             end
-                                            run_fsl_ffx(data_dir, megaFFXFSL_dir, analysis_type, nsub, k)
+                                            run_fsl_ffx(data_dir, megaFFXFSL_dir, analysis_type, nsub, k, fsl_designs_dir)
                                         else
                                             disp('Mega FFX (FSL) already computed')
                                         end
