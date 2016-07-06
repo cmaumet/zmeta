@@ -11,7 +11,7 @@ git clone git@github.com:cmaumet/zmeta_buster.git
 ###### Start the simulations
 ```
 cd /storage/wmsmfe/zmeta_buster
-qsub CamilleEx.sh 
+qsub meta_sim.sh 
 ```
 
 ###### Check status
