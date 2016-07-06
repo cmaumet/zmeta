@@ -363,7 +363,7 @@ function meta_sim(base_dir, redo, path_to_spm)
                                             if ~exist_nii(fullfile(weightedZ_dir, 'weightedz_ffx_minus_log10_p.nii'))
                                                 matlabbatch{end+1}.spm.tools.ibma.weightedz.dir = {weightedZ_dir};
                                                 matlabbatch{end}.spm.tools.ibma.weightedz.zimages = z_files;
-                                                matlabbatch{end}.spm.tools.ibma.weightedz.nsub = group1_n;
+                                                matlabbatch{end}.spm.tools.ibma.weightedz.nsubjects = group1_n;
                                             else
                                                 disp('Weighted Z already computed')
                                             end
@@ -373,7 +373,7 @@ function meta_sim(base_dir, redo, path_to_spm)
                                         if ~exist_nii(fullfile(megaRFX_dir, 'mega_rfx_minus_log10_p.nii'))
                                             if analysis_type == 1
                                                 matlabbatch{end+1}.spm.tools.ibma.megarfx.dir = {megaRFX_dir};
-                                                matlabbatch{end}.spm.tools.ibma.megarfx.con_files = con_files;
+                                                matlabbatch{end}.spm.tools.ibma.megarfx.confiles = con_files;
                                             else
                                                 matlabbatch{end+1}.spm.stats.factorial_design.dir = {megaRFX_dir};
                                                 matlabbatch{end}.spm.stats.factorial_design.des.t2.scans1 = con_files(1:k_group1)';
