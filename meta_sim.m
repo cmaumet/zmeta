@@ -1,4 +1,4 @@
-function simulations(baseDir, redo)
+function meta_sim(baseDir, redo)
     if ~exist('redo', 'var')
         redo = false;
     end
