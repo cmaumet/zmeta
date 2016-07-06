@@ -32,6 +32,12 @@ function prepare_fsl_data(datadir, wd, nSubjects, design)
         copyfile(['/storage/wmsmfe/code/fsl_design/' design '.grp'], [design '.grp'])
         copyfile(['/storage/wmsmfe/code/fsl_design/' design '.con'], [design '.con'])
 
+        % Delete previously halted results
+        stat_dir = fullfile(wd, 'stats')
+        if isdir(stat_dir)
+            rmdir(stat_dir,'s')
+        end
+
         cd(cwd)
     end
 end
