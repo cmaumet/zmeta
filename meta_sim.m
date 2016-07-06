@@ -46,13 +46,24 @@ function meta_sim(baseDir, redo, path_to_spm)
     % -------------------------------------------
     
     % Retreive information about current job on the cluster    
-    task_id = getenv('SGE_TASK_ID');
+    task_id_str = getenv('SGE_TASK_ID');
     job_id = getenv('JOB_ID');
     queue = getenv('QUEUE');
     host = getenv('HOSTNAME');
 
-    disp(['This is run ' task_id])
-    disp(['This is job ' job_id])
+    if isempty(task_id_str) && isempty(job_id) && isempty(queue) ...
+            && isempty(host)
+        disp('This simulation is run locally')
+        cluster = false;
+        rng_seed = 1;
+    else
+        cluster = true;
+        task_id = str2num(task_id_str);
+        rng_seed = task_id;
+        disp('This simulation is run on a cluster')
+        disp(['This is run ' task_id_str])
+        disp(['This is job ' job_id])
+    end
     
     % SPM is required to write-out NIfTI images    
     if isempty(which('spm'))
@@ -66,8 +77,7 @@ function meta_sim(baseDir, redo, path_to_spm)
     set_fsl_env()
     
     % Initialise random number generator using the task id
-    cluster_task_id = str2num(task_id);
-    rng(cluster_task_id);
+    rng(rng_seed);
        
     allsimu_dir = fullfile(baseDir, 'simulations');
     if ~isdir(allsimu_dir)
@@ -176,7 +186,7 @@ function meta_sim(baseDir, redo, path_to_spm)
                                         simu_name = [analysisPrefix 'k' num2str(k) '_btw' num2str(btw_sigma) ...
                                             '_wth' num2str(sigma_sq), '_unit' num2str(unit_mis) '_otherSoft'...
                                             num2str(soft_prop) '_' num2str(soft_factor)];
-                                        simu_dir = fullfile(allsimu_dir, simu_name, num2str(cluster_task_id, '%04d'));
+                                        simu_dir = fullfile(allsimu_dir, simu_name, num2str(task_id, '%04d'));
                                         disp(simu_dir)
                                         
                                         exist_simu_dir = isdir(simu_dir);
@@ -249,7 +259,7 @@ function meta_sim(baseDir, redo, path_to_spm)
                                             simu.sge(1).job_id = job_id;
                                         end
                                         
-                                        simu.sge(end).task_id = task_id;
+                                        simu.sge(end).task_id_str = task_id_str;
                                         simu.sge(end).queue = queue;
                                         simu.sge(end).host = host;
                                         
