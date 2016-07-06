@@ -16,7 +16,7 @@ function meta_sim(baseDir, redo)
     addpath(fullfile(pwd, '..', 'code','automri', 'commons', 'lib'))
     addpath(fullfile(pwd, 'lib'))
 
-    cluster_task_id = str2num(task_id)
+    cluster_task_id = str2num(task_id);
     rng(cluster_task_id);
 
     spm_jobman('initcfg');
@@ -239,12 +239,12 @@ function meta_sim(baseDir, redo)
                                         simu.config.analysisType = analysisType;
 
                                         simucfg_file = fullfile( ...
-                                            simulationDir, 'simu.mat')
+                                            simulationDir, 'simu.mat');
 
-                                        if exist(simucfg_file)
-                                            pre_simu = load(simucfg_file)
-                                            pre_simu = rmfield(pre_simu,'timing')
-                                            simu = rmfield(simu,'timing')
+                                        if exist(simucfg_file, 'file')
+                                            pre_simu = load(simucfg_file);
+                                            pre_simu = rmfield(pre_simu,'timing');
+                                            simu = rmfield(simu,'timing');
 
                                             if ~isequaln(simu.config, pre_simu.config)
                                                 disp(simu.config)
@@ -256,20 +256,10 @@ function meta_sim(baseDir, redo)
                                         end
 
                                         simu.sge(end+1).job_id = job_id;
-                                        simu.sge(end+1)task_id = task_id;
+                                        simu.sge(end+1).task_id = task_id;
                                         simu.sge(end+1).queue = queue;
                                         simu.sge(end+1).host = host;
                                         
-                                        base_cfgfilename = simucfg_file
-                                        sim = 2
-                                        while exist(simucfg_file)
-                                            simucfg_file = strrep(...
-                                                base_cfgfilename, '.mat', ...
-                                                ['_' num2str(sim, '%02d') ...
-                                                '.mat'])
-                                            sim = sim + 1;
-                                        end
-                                        simucfg_file
                                         save(simucfg_file, 'simu')
                                         
                                         % Simulate data only if simulationDir did not xist
@@ -286,7 +276,7 @@ function meta_sim(baseDir, redo)
                                         permutConDir = fullfile(simulationDir, 'permutCon');
                                         permutZDir = fullfile(simulationDir, 'permutZ');
 
-                                        last_data = fullfile(dataDir, ['varcon_st' num2str((numStudyInGroup1+numStudyInGroup2), '%03d') '.nii'])
+                                        last_data = fullfile(dataDir, ['varcon_st' num2str((numStudyInGroup1+numStudyInGroup2), '%03d') '.nii']);
                                         exist_data = exist(last_data, 'file');
 
                                         if exist_data
