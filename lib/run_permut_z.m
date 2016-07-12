@@ -1,0 +1,28 @@
+function run_permut_z(out_dir, nperms, z_files, z_files2)
+%RUN_PERMUT_Z Run a permutation meta-analysis on the z statistic maps.
+%   RUN_PERMUT_Z(DIR, Z_FILES, Z_FILES2) Run one-sample meta-analysis on 
+%       Z_FILES, store the results in OUT_DIR.
+%   RUN_PERMUT_Z(DIR, Z_FILES, Z_FILES2) Run two-sample meta-analysis 
+%       on Z_FILES and Z_FILES2 store the results in OUT_DIR.
+% 
+    if ~exist(fullfile(out_dir, 'lP+.img'), 'file')
+        if nargin == 2
+            matlabbatch{end+1}.spm.tools.snpm.des.OneSampT.DesignName = 'MultiSub: One Sample T test on diffs/contrasts';
+            matlabbatch{end}.spm.tools.snpm.des.OneSampT.DesignFile = 'snpm_bch_ui_OneSampT';
+            matlabbatch{end}.spm.tools.snpm.des.OneSampT.dir = {permutz_dir};
+            matlabbatch{end}.spm.tools.snpm.des.OneSampT.P = z_files;
+            matlabbatch{end}.spm.tools.snpm.des.OneSampT.nPerm = nperms;
+            matlabbatch{end+1}.spm.tools.snpm.cp.snpmcfg = {fullfile(permutz_dir, 'SnPMcfg.mat')};
+        else
+            matlabbatch{end+1}.spm.tools.snpm.des.TwoSampT.dir = {permutz_dir};
+            matlabbatch{end}.spm.tools.snpm.des.TwoSampT.scans1 = z_files;
+            matlabbatch{end}.spm.tools.snpm.des.TwoSampT.scans2 = z_files2;
+            matlabbatch{end}.spm.tools.snpm.des.TwoSampT.nPerm = nperms;
+            matlabbatch{end+1}.spm.tools.snpm.cp.snpmcfg = {fullfile(permutz_dir, 'SnPMcfg.mat')};
+        end
+        spm_jobman('run', matlabbatch)
+    else
+        disp('Permutation on Z already computed')
+    end
+end
+

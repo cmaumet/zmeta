@@ -42,7 +42,7 @@ function meta_sim(base_dir, redo, path_to_spm)
 
     % Type of analysis: one-sample (1), two-sample(2), two-sample
     % unbalanced (3)
-    settings.analysis_types = [1];% [1 2 3];
+    settings.analysis_types = [1, 2, 3];% [1 2 3];
 
     % Size of the simulation image (in 1 direction). Each voxel of the
     % simulation image is a simulation sample.
@@ -216,6 +216,7 @@ function meta_sim(base_dir, redo, path_to_spm)
                                         if analysis_type > 1
                                             simu.config.group1_n = group1_n;
                                             simu.config.group2_n = group2_n;
+                                            simu.config.n = group1_n + group2_n;
                                         else
                                             simu.config.group1_n = group1_n;
                                             simu.config.n = group1_n;
@@ -332,165 +333,47 @@ function meta_sim(base_dir, redo, path_to_spm)
                                         end  
 
                                         % --- Compute meta-analysis ---
-                                        matlabbatch = {};
                                         
                                         if analysis_type == 1
                                             % Fisher's
-                                            if ~exist_nii(fullfile(fisher_dir, 'fishers_ffx_minus_log10_p.nii'))
-                                                matlabbatch{1}.spm.tools.ibma.fishers.dir = {fisher_dir};
-                                                matlabbatch{1}.spm.tools.ibma.fishers.zimages = z_files;
-                                            else
-                                                disp('Fisher''s already computed')
-                                            end
+                                            run_fishers(fisher_dir, z_files)
 
-                                            % Stouffer's
-                                            if ~exist_nii(fullfile(stouffer_dir, 'stouffers_ffx_minus_log10_p.nii'))
-                                                matlabbatch{end+1}.spm.tools.ibma.stouffers.dir = {stouffer_dir};
-                                                matlabbatch{end}.spm.tools.ibma.stouffers.zimages = z_files;
-                                                matlabbatch{end}.spm.tools.ibma.stouffers.rfx.RFX_no = 1;
-                                            else
-                                                disp('Stouffer''s already computed')
-                                            end
+                                            % FFX Stouffer's
+                                            run_stouffers(stouffer_dir, z_files, false)
 
                                             % Stouffer's MFX
-                                            if ~exist_nii(fullfile(stoufferMFX_dir, 'stouffers_rfx_minus_log10_p.nii'))
-                                                matlabbatch{end+1}.spm.tools.ibma.stouffers.dir = {stoufferMFX_dir};
-                                                matlabbatch{end}.spm.tools.ibma.stouffers.zimages = z_files;
-                                                matlabbatch{end}.spm.tools.ibma.stouffers.rfx.RFX_yes = 0;
-                                            else
-                                                disp('Stouffer''s MFX already computed')
-                                            end
+                                            run_stouffers(stouffer_dir, z_files, true)
 
                                             % Optimally weighted z
-                                            if ~exist_nii(fullfile(weightedZ_dir, 'weightedz_ffx_minus_log10_p.nii'))
-                                                matlabbatch{end+1}.spm.tools.ibma.weightedz.dir = {weightedZ_dir};
-                                                matlabbatch{end}.spm.tools.ibma.weightedz.zimages = z_files;
-                                                matlabbatch{end}.spm.tools.ibma.weightedz.nsubjects = group1_n;
-                                            else
-                                                disp('Weighted Z already computed')
-                                            end
+                                            run_weighted_z(weightedZ_dir, z_files, group1_n)
                                         end
 
-                                        % Mega-analysis RFX
-                                        if ~exist_nii(fullfile(megaRFX_dir, 'mega_rfx_minus_log10_p.nii'))
-                                            if analysis_type == 1
-                                                matlabbatch{end+1}.spm.tools.ibma.megarfx.dir = {megaRFX_dir};
-                                                matlabbatch{end}.spm.tools.ibma.megarfx.confiles = con_files;
-                                            else
-                                                matlabbatch{end+1}.spm.stats.factorial_design.dir = {megaRFX_dir};
-                                                matlabbatch{end}.spm.stats.factorial_design.des.t2.scans1 = con_files(1:k_group1)';
-                                                matlabbatch{end}.spm.stats.factorial_design.des.t2.scans2 = con_files(k_group1+(1:k_group2))';
-                                                matlabbatch{end}.spm.stats.factorial_design.des.t2.variance = 0;
-                                                matlabbatch{end+1}.spm.stats.fmri_est.spmmat = {fullfile(megaRFX_dir, 'SPM.mat')};
-                                                matlabbatch{end+1}.spm.stats.con.spmmat = {fullfile(megaRFX_dir, 'SPM.mat')};
-                                                matlabbatch{end}.spm.stats.con.consess{1}.tcon.name = 'bewteen group effect';
-                                                matlabbatch{end}.spm.stats.con.consess{1}.tcon.convec = [1 -1];
-                                                
-                                                statFile = fullfile(megaRFX_dir, 'spmT_0001.nii');
-                                                matlabbatch{end+1}.spm.util.imcalc.input = {statFile};
-                                                matlabbatch{end}.spm.util.imcalc.output = 'mega_rfx_minus_log10_p.nii';
-                                                matlabbatch{end}.spm.util.imcalc.outdir = {megaRFX_dir};
-                            
-                                                dof = k_group1+k_group2-2;
-                                                matlabbatch{end}.spm.util.imcalc.expression = ['-log10(cdf(''T'',-i1, ' num2str(dof) '))'];
-                                                matlabbatch{end}.spm.util.imcalc.options.dmtx = 0;
-                                                matlabbatch{end}.spm.util.imcalc.options.dtype = 64;
-                                            end
-                                        else
-                                            disp('Mega RFX already computed')
-                                        end
-
-    %                                     % Mega-analysis FFX
-    %                                     if ~exist(fullfile(megaFFX_dir, 'mega_ffx_ffx_minus_log10_p.nii'), 'file')
-    %                                         matlabbatch{end+1}.spm.tools.ibma.megaffx.dir = {megaFFX_dir};
-    %                                         if length(unique(nsub)) == 1
-    %                                             matlabbatch{end}.spm.tools.ibma.megaffx.samplesize.equal.nsub = unique(nsub);
-    %                                         else
-    %                                             matlabbatch{end}.spm.tools.ibma.megaffx.samplesize.unequal.nsub = nsub;
-    %                                         end
-    %                                         matlabbatch{end}.spm.tools.ibma.megaffx.variances.equal = true;
-    % 
-    %                                         matlabbatch{end}.spm.tools.ibma.megaffx.con_files = con_files;
-    %                                         matlabbatch{end}.spm.tools.ibma.megaffx.varcon_files = varcon_files;
-    %                                     else
-    %                                         disp('Mega FFX already computed')
-    %                                     end
-    if true
-                                        % Permutation on con_files
-                                        if ~exist(fullfile(permutcon_dir, 'lP+.img'), 'file')
-                                            if analysis_type == 1                                                
-                                                matlabbatch{end+1}.spm.tools.snpm.des.OneSampT.DesignName = 'MultiSub: One Sample T test on diffs/contrasts';
-                                                matlabbatch{end}.spm.tools.snpm.des.OneSampT.DesignFile = 'snpm_bch_ui_OneSampT';
-                                                matlabbatch{end}.spm.tools.snpm.des.OneSampT.dir = {permutcon_dir};
-                                                matlabbatch{end}.spm.tools.snpm.des.OneSampT.P = con_files;
-                                                matlabbatch{end}.spm.tools.snpm.des.OneSampT.nPerm = settings.nperm;
-                                                matlabbatch{end+1}.spm.tools.snpm.cp.snpmcfg = {fullfile(permutcon_dir, 'SnPMcfg.mat')};
-                                            else
-                                                matlabbatch{end+1}.spm.tools.snpm.des.TwoSampT.dir = {permutcon_dir};
-                                                matlabbatch{end}.spm.tools.snpm.des.TwoSampT.scans1 = con_files(1:k_group1)';
-                                                matlabbatch{end}.spm.tools.snpm.des.TwoSampT.scans2 = con_files(k_group1+(1:k_group2))';
-                                                matlabbatch{end+1}.spm.tools.snpm.cp.snpmcfg = {fullfile(permutcon_dir, 'SnPMcfg.mat')};
-                                            end
-                                        else
-                                            disp('Permutation on contrast files already computed')
-                                        end
-
-
-                                        % Permutation on z_files
-                                        if ~exist(fullfile(permutz_dir, 'lP+.img'), 'file')
-                                            if analysis_type == 1
-                                                matlabbatch{end+1}.spm.tools.snpm.des.OneSampT.DesignName = 'MultiSub: One Sample T test on diffs/contrasts';
-                                                matlabbatch{end}.spm.tools.snpm.des.OneSampT.DesignFile = 'snpm_bch_ui_OneSampT';
-                                                matlabbatch{end}.spm.tools.snpm.des.OneSampT.dir = {permutz_dir};
-                                                matlabbatch{end}.spm.tools.snpm.des.OneSampT.P = z_files;
-                                                matlabbatch{end}.spm.tools.snpm.des.OneSampT.nPerm = settings.nperm;
-                                                matlabbatch{end+1}.spm.tools.snpm.cp.snpmcfg = {fullfile(permutz_dir, 'SnPMcfg.mat')};
-                                            else
-                                                matlabbatch{end+1}.spm.tools.snpm.des.TwoSampT.dir = {permutz_dir};
-                                                matlabbatch{end}.spm.tools.snpm.des.TwoSampT.scans1 = z_files(1:k_group1)';
-                                                matlabbatch{end}.spm.tools.snpm.des.TwoSampT.scans2 = z_files(k_group1+(1:k_group2))';
-                                                matlabbatch{end+1}.spm.tools.snpm.cp.snpmcfg = {fullfile(permutz_dir, 'SnPMcfg.mat')};
-                                            end
-                                        else
-                                            disp('Permutation on Z already computed')
-                                        end
-    end
-
-                                        if ~isempty(matlabbatch)
-                                            try
-                                                spm_jobman('run', matlabbatch)
-                                            catch ME
-                                                switch ME.identifier
-                                                    case 'matlabbatch:run:jobfailederr'
-                                                        warning('One job failed.');
-                                                    otherwise
-                                                        rethrow(ME)
-                                                end
-                                            end
-                                        end
                                         
-                                        if true
-                                            % GLM MFX
-                                            redomfx = false;
-                                            if redomfx || ~exist_nii(fullfile(megaMFX_dir,'mega_mfx_minus_log10_p.nii'))
-                                                if ~exist('nsub', 'var')
-                                                    nsub = group1_n;
-                                                end
-                                                run_fsl_mfx(data_dir, megaMFX_dir, analysis_type, nsub, k, fsl_designs_dir)
-                                            else
-                                                disp('Mega MFX (FSL) already computed')
-                                            end
+                                        if analysis_type == 1
+                                            % Mega-analysis RFX
+                                            run_mega_rfx(megaRFX_dir, con_files)
+                                            
+                                            % Permutation on con_files
+                                            run_permut_con(permutcon_dir, con_files)
+                                            
+                                            % Permutation on z_files
+                                            run_permut_z(permutz_dir, settings.nperm, z_files)
+                                        else
+                                            % Mega-analysis RFX
+                                            run_mega_rfx(megaRFX_dir, con_files(1:k_group1)', con_files(k_group1+(1:k_group2))')
+                                            
+                                            % Permutation on con_files
+                                            run_permut_con(permutcon_dir, con_files(1:k_group1)', con_files(k_group1+(1:k_group2))')
+                                            
+                                            % Permutation on z_files
+                                            run_permut_z(permutz_dir, settings.nperm, z_files(1:k_group1)', z_files(k_group1+(1:k_group2))')
                                         end
 
+                                        % GLM MFX
+                                        run_mega_mfx(data_dir, megaMFX_dir, analysis_type, simu.config.n, k, fsl_designs_dir)
+                                        
                                         % GLM FFX (via FSL)
-                                        if ~exist_nii(fullfile(megaFFXFSL_dir,'mega_ffx_minus_log10_p.nii'))
-                                            if ~exist('nsub', 'var')
-                                                    nsub = group1_n;
-                                            end
-                                            run_fsl_ffx(data_dir, megaFFXFSL_dir, analysis_type, nsub, k, fsl_designs_dir)
-                                        else
-                                            disp('Mega FFX (FSL) already computed')
-                                        end
+                                        run_mega_ffx(data_dir, megaFFXFSL_dir, analysis_type, simu.config.n, k, fsl_designs_dir)
                                     end
                                 end
                             end
@@ -564,30 +447,4 @@ function [con_files, varcon_files, z_files] = simulate_data(config, data_dir)
         zData(infPos) = -norminv(cdf('T', -estimatedContrast(infPos)./sqrt(estimatedVarContrast(infPos)), nsub(studyIndex)-1));
         spm_write_vol(vol, zData);   
     end 
-end
-
-function [found, filepath] = exist_nii(filepath, uncompress)
-    % EXIST_NII  Check if NIfTI image exist (possibly compressed)
-    %   EXIST_NII(FILEPATH) returns true if the NIfTI image was found and 
-    %       the full path to the image.
-    %   EXIST_NII(FILEPATH, true) returns true if the NIfTI image was found 
-    %       and the full path to the image and uncompress the image.
-    % 
-    if nargin < 2
-        uncompress = false;
-    end
-    
-    if exist(filepath, 'file')
-        found = true;
-    elseif exist([filepath '.gz'], 'file')
-        found = true;
-        if uncompress
-            gunzip(filepath);
-        else
-            filepath = [filepath '.gz'];
-        end
-    else
-        found = false;
-        filepath = '';
-    end
 end
