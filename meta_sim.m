@@ -189,7 +189,7 @@ function meta_sim(base_dir, redo, path_to_spm)
 
                                         % Directory to store the simulation data and results.
                                         simu_name = [analysisPrefix 'k' num2str(k) '_btw' num2str(btw_sigma) ...
-                                            '_wth' num2str(sigma_sq, '%02.0f'), '_unit' num2str(unit_mis) '_otherSoft'...
+                                            '_wth' num2str(sigma_sq, '%02.0f'), '_unit' num2str(unit_mis) '_soft'...
                                             num2str(soft_prop*100, '%02.0f') '_' num2str(soft_factor, '%02.0f')];
                                         simu_dir = fullfile(allsimu_dir, simu_name);
                                         if cluster
@@ -303,11 +303,6 @@ function meta_sim(base_dir, redo, path_to_spm)
                                                 [~, varcon_files{iStudy}] = exist_nii(fullfile(data_dir, ['varcon_st' num2str(iStudy, '%03d') '.nii']), true);
                                                 [~, z_files{iStudy}] = exist_nii(fullfile(data_dir, ['z_st' num2str(iStudy, '%03d') '.nii']), true);
                                             end
-%                                             load(fullfile(simu_dir, 'simu.mat'))
-%                                             fields = fieldnames(simu.config);
-%                                             for f = 1:numel(fields)
-%                                                 eval([fields{f} ' = ' simu.config.(fields{f})])
-%                                             end
                                         else
                                             % Directory to store the simulation data.
                                             if ~isdir(data_dir)
@@ -397,13 +392,11 @@ function [con_files, varcon_files, z_files] = simulate_data(config, data_dir)
             studyIndex = study_idx;
             nsub = config.group1_n;
             unitFactor = config.factor_group1;
-            wth_sigma_a = config.group1_wth_sigma_a;
         else
             % Group 2
             studyIndex = study_idx-config.k_group1;
             nsub = config.group2_n;
             unitFactor = config.factor_group2;
-            wth_sigma_a = config.group2_wth_sigma_a;
         end
         
         % Degrees of freedom of the within-study variance estimate
