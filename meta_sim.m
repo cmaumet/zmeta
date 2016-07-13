@@ -189,8 +189,8 @@ function meta_sim(base_dir, redo, path_to_spm)
 
                                         % Directory to store the simulation data and results.
                                         simu_name = [analysisPrefix 'k' num2str(k) '_btw' num2str(btw_sigma) ...
-                                            '_wth' num2str(sigma_sq), '_unit' num2str(unit_mis) '_otherSoft'...
-                                            num2str(soft_prop) '_' num2str(soft_factor)];
+                                            '_wth' num2str(sigma_sq, '%02.0f'), '_unit' num2str(unit_mis) '_otherSoft'...
+                                            num2str(soft_prop*100, '%02.0f') '_' num2str(soft_factor, '%02.0f')];
                                         simu_dir = fullfile(allsimu_dir, simu_name);
                                         if cluster
                                             simu_dir = fullfile(simu_dir, num2str(task_id, '%04d'));
@@ -354,7 +354,7 @@ function meta_sim(base_dir, redo, path_to_spm)
                                             run_mega_rfx(megaRFX_dir, con_files)
                                             
                                             % Permutation on con_files
-                                            run_permut_con(permutcon_dir, con_files)
+                                            run_permut_con(permutcon_dir, settings.nperm, con_files)
                                             
                                             % Permutation on z_files
                                             run_permut_z(permutz_dir, settings.nperm, z_files)
@@ -363,7 +363,7 @@ function meta_sim(base_dir, redo, path_to_spm)
                                             run_mega_rfx(megaRFX_dir, con_files(1:k_group1)', con_files(k_group1+(1:k_group2))')
                                             
                                             % Permutation on con_files
-                                            run_permut_con(permutcon_dir, con_files(1:k_group1)', con_files(k_group1+(1:k_group2))')
+                                            run_permut_con(permutcon_dir, settings.nperm, con_files(1:k_group1)', con_files(k_group1+(1:k_group2))')
                                             
                                             % Permutation on z_files
                                             run_permut_z(permutz_dir, settings.nperm, z_files(1:k_group1)', z_files(k_group1+(1:k_group2))')

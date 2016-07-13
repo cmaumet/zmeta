@@ -14,7 +14,7 @@ function run_mega_rfx(out_dir, con_files, con_files2)
         end
         mkdir(out_dir)
         
-        if nargin == 2
+        if ~exist('con_files2', 'var')
             matlabbatch{1}.spm.tools.ibma.megarfx.dir = {out_dir};
             matlabbatch{1}.spm.tools.ibma.megarfx.model.one.confiles = con_files;
         else

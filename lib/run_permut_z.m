@@ -12,19 +12,19 @@ function run_permut_z(out_dir, nperms, z_files, z_files2)
         end
         mkdir(out_dir)
         
-        if nargin == 2
+        if ~exist('z_files2', 'var')
             matlabbatch{1}.spm.tools.snpm.des.OneSampT.DesignName = 'MultiSub: One Sample T test on diffs/contrasts';
             matlabbatch{1}.spm.tools.snpm.des.OneSampT.DesignFile = 'snpm_bch_ui_OneSampT';
-            matlabbatch{1}.spm.tools.snpm.des.OneSampT.dir = {permutz_dir};
+            matlabbatch{1}.spm.tools.snpm.des.OneSampT.dir = {out_dir};
             matlabbatch{1}.spm.tools.snpm.des.OneSampT.P = z_files;
             matlabbatch{1}.spm.tools.snpm.des.OneSampT.nPerm = nperms;
-            matlabbatch{2}.spm.tools.snpm.cp.snpmcfg = {fullfile(permutz_dir, 'SnPMcfg.mat')};
+            matlabbatch{2}.spm.tools.snpm.cp.snpmcfg = {fullfile(out_dir, 'SnPMcfg.mat')};
         else
-            matlabbatch{1}.spm.tools.snpm.des.TwoSampT.dir = {permutz_dir};
+            matlabbatch{1}.spm.tools.snpm.des.TwoSampT.dir = {out_dir};
             matlabbatch{1}.spm.tools.snpm.des.TwoSampT.scans1 = z_files;
             matlabbatch{1}.spm.tools.snpm.des.TwoSampT.scans2 = z_files2;
             matlabbatch{1}.spm.tools.snpm.des.TwoSampT.nPerm = nperms;
-            matlabbatch{2}.spm.tools.snpm.cp.snpmcfg = {fullfile(permutz_dir, 'SnPMcfg.mat')};
+            matlabbatch{2}.spm.tools.snpm.cp.snpmcfg = {fullfile(out_dir, 'SnPMcfg.mat')};
         end
         spm_jobman('run', matlabbatch)
     else
