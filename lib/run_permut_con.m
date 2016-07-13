@@ -6,18 +6,24 @@ function run_permut_con(out_dir, con_files, con_files2)
 %       on CON_FILES and CON_FILES2 store the results in OUT_DIR.
 
     if ~exist(fullfile(out_dir, 'lP+.img'), 'file')
-        if analysis_type == 1                                                
-            matlabbatch{end+1}.spm.tools.snpm.des.OneSampT.DesignName = 'MultiSub: One Sample T test on diffs/contrasts';
-            matlabbatch{end}.spm.tools.snpm.des.OneSampT.DesignFile = 'snpm_bch_ui_OneSampT';
-            matlabbatch{end}.spm.tools.snpm.des.OneSampT.dir = {out_dir};
-            matlabbatch{end}.spm.tools.snpm.des.OneSampT.P = con_files;
-            matlabbatch{end}.spm.tools.snpm.des.OneSampT.nPerm = settings.nperm;
-            matlabbatch{end+1}.spm.tools.snpm.cp.snpmcfg = {fullfile(permutcon_dir, 'SnPMcfg.mat')};
+        % Delete any halted analysis        
+        if isdir(out_dir)
+            rmdir(out_dir,'s')
+        end
+        mkdir(out_dir)
+        
+        if nargin == 2
+            matlabbatch{1}.spm.tools.snpm.des.OneSampT.DesignName = 'MultiSub: One Sample T test on diffs/contrasts';
+            matlabbatch{1}.spm.tools.snpm.des.OneSampT.DesignFile = 'snpm_bch_ui_OneSampT';
+            matlabbatch{1}.spm.tools.snpm.des.OneSampT.dir = {out_dir};
+            matlabbatch{1}.spm.tools.snpm.des.OneSampT.P = con_files;
+            matlabbatch{1}.spm.tools.snpm.des.OneSampT.nPerm = settings.nperm;
+            matlabbatch{2}.spm.tools.snpm.cp.snpmcfg = {fullfile(permutcon_dir, 'SnPMcfg.mat')};
         else
-            matlabbatch{end+1}.spm.tools.snpm.des.TwoSampT.dir = {out_dir};
-            matlabbatch{end}.spm.tools.snpm.des.TwoSampT.scans1 = con_files;
-            matlabbatch{end}.spm.tools.snpm.des.TwoSampT.scans2 = con_files2;
-            matlabbatch{end+1}.spm.tools.snpm.cp.snpmcfg = {fullfile(permutcon_dir, 'SnPMcfg.mat')};
+            matlabbatch{1}.spm.tools.snpm.des.TwoSampT.dir = {out_dir};
+            matlabbatch{1}.spm.tools.snpm.des.TwoSampT.scans1 = con_files;
+            matlabbatch{1}.spm.tools.snpm.des.TwoSampT.scans2 = con_files2;
+            matlabbatch{2}.spm.tools.snpm.cp.snpmcfg = {fullfile(permutcon_dir, 'SnPMcfg.mat')};
         end
         
         spm_jobman('run', matlabbatch)

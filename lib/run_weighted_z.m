@@ -4,9 +4,15 @@ function run_weighted_z(out_dir, z_files, n_per_study)
 %       Z_FILES using weighted-Z method, store the results in 
 %       OUT_DIR.
     if ~exist_nii(fullfile(out_dir, 'weightedz_ffx_minus_log10_p.nii'))
-        matlabbatch{end+1}.spm.tools.ibma.weightedz.dir = {out_dir};
-        matlabbatch{end}.spm.tools.ibma.weightedz.zimages = z_files;
-        matlabbatch{end}.spm.tools.ibma.weightedz.nsubjects = n_per_study;
+        % Delete any halted analysis        
+        if isdir(out_dir)
+            rmdir(out_dir,'s')
+        end
+        mkdir(out_dir)
+        
+        matlabbatch{1}.spm.tools.ibma.weightedz.dir = {out_dir};
+        matlabbatch{1}.spm.tools.ibma.weightedz.zimages = z_files;
+        matlabbatch{1}.spm.tools.ibma.weightedz.nsubjects = n_per_study;
         
         spm_jobman('run', matlabbatch)
     else

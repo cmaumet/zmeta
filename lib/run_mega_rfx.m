@@ -8,13 +8,19 @@ function run_mega_rfx(out_dir, con_files, con_files2)
 %       results in OUT_DIR.
 
     if ~exist_nii(fullfile(out_dir, 'mega_rfx_minus_log10_p.nii'))
+        % Delete any halted analysis        
+        if isdir(out_dir)
+            rmdir(out_dir,'s')
+        end
+        mkdir(out_dir)
+        
         if nargin == 2
-            matlabbatch{end+1}.spm.tools.ibma.megarfx.dir = {out_dir};
-            matlabbatch{end}.spm.tools.ibma.megarfx.model.one.confiles = con_files;
+            matlabbatch{1}.spm.tools.ibma.megarfx.dir = {out_dir};
+            matlabbatch{1}.spm.tools.ibma.megarfx.model.one.confiles = con_files;
         else
-            matlabbatch{end+1}.spm.tools.ibma.megarfx.dir = {out_dir};
-            matlabbatch{end}.spm.tools.ibma.megarfx.model.two.confiles1 = con_files;
-            matlabbatch{end}.spm.tools.ibma.megarfx.model.two.confiles2 = con_files2;
+            matlabbatch{1}.spm.tools.ibma.megarfx.dir = {out_dir};
+            matlabbatch{1}.spm.tools.ibma.megarfx.model.two.confiles1 = con_files;
+            matlabbatch{1}.spm.tools.ibma.megarfx.model.two.confiles2 = con_files2;
         end
         
         spm_jobman('run', matlabbatch)

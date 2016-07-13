@@ -8,9 +8,15 @@ function run_stouffers(out_dir, z_files, ffx)
 %       in OUT_DIR.
 
     if ~exist_nii(fullfile(out_dir, 'stouffers_ffx_minus_log10_p.nii'))
-        matlabbatch{end+1}.spm.tools.ibma.stouffers.dir = {out_dir};
-        matlabbatch{end}.spm.tools.ibma.stouffers.zimages = z_files;
-        matlabbatch{end}.spm.tools.ibma.stouffers.rfx.RFX_no = ffx;
+        % Delete any halted analysis        
+        if isdir(out_dir)
+            rmdir(out_dir,'s')
+        end
+        mkdir(out_dir)
+        
+        matlabbatch{1}.spm.tools.ibma.stouffers.dir = {out_dir};
+        matlabbatch{1}.spm.tools.ibma.stouffers.zimages = z_files;
+        matlabbatch{1}.spm.tools.ibma.stouffers.rfx.RFX_no = ffx;
         
         spm_jobman('run', matlabbatch)
     else

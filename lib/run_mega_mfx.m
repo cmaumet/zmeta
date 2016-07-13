@@ -4,9 +4,11 @@ function run_mega_mfx(data_dir, out_dir, analysis_type, nsub, k, fsl_designs_dir
 %       third level MFX GLM, store the results in OUT_DIR.
 
     if ~exist_nii(fullfile(out_dir,'mega_mfx_minus_log10_p.nii'))
-        if ~exist('nsub', 'var')
-            nsub = group1_n;
+        % Delete any halted analysis        
+        if isdir(out_dir)
+            rmdir(out_dir,'s')
         end
+        mkdir(out_dir)
         run_fsl_mfx(data_dir, out_dir, analysis_type, nsub, k, fsl_designs_dir)
     else
         disp('Mega MFX (FSL) already computed')
