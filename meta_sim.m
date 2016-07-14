@@ -278,10 +278,12 @@ function meta_sim(base_dir, redo, path_to_spm)
 
                                     simucfg_file = fullfile( ...
                                         simu_dir, 'simu.mat');
+                                    
+                                    simu.config = orderfields(simu.config);
 
                                     if exist(simucfg_file, 'file')
                                         prev_simu = load(simucfg_file);
-                                        prev_simu = prev_simu.simu;
+                                        prev_simu = orderfields(prev_simu.simu);
                                         if isfield(prev_simu.config, 'timing')
                                             prev_simu.config = ...
                                                 rmfield(prev_simu.config,'timing');
@@ -289,7 +291,9 @@ function meta_sim(base_dir, redo, path_to_spm)
 
                                         if ~isequaln(simu.config, prev_simu.config)
                                             disp(simu.config)
+                                            disp('---')
                                             disp(prev_simu.config)
+                                            disp('---')
                                             disp(simu_dir)
                                             error('Different simulations config in the same folder')
                                         end 
