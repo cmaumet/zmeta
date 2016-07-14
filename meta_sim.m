@@ -114,6 +114,7 @@ function meta_sim(base_dir, redo, path_to_spm)
             for unit_mis = settings.unit_mismatches
                 unit_mis = unit_mis{1};
                 
+                options = struct();
                 switch unit_mis
                     case {'nominal'}
                         options(1).none = 1;
@@ -147,11 +148,13 @@ function meta_sim(base_dir, redo, path_to_spm)
                         case {'data_sc'}
                             factor_group1 = ones(1, k_group1);
                             factor_group2 = ones(1, k_group2);
+                                                       
+                            soft_prop = options(opt).soft;
+                            soft_factor = options(opt).factor;
                             
-                            soft_prop = 0;
-                            soft_factor = 1;
-                            
-                            opt_str = '';
+                            opt_str = ['_soft' ...
+                                       num2str(soft_prop*100, '%02.0f') ...
+                                       '_' num2str(soft_factor, '%02.0f')];
                             
                         case {'con_sc'}
                             % Uniformly distributed beween 0.4 and 1.6 
@@ -160,11 +163,11 @@ function meta_sim(base_dir, redo, path_to_spm)
                             factor_group1 = randi([1 4], 1, k_group1)/2.5;%linspace(avg_n/2,avg_n*2,k);
                             factor_group2 = randi([1 4], 1, k_group2)/2.5;
                             
-                            soft_prop = options(opt).soft;
-                            soft_factor = options(opt).factor;
-                            opt_str = ['_soft' ...
-                                       num2str(soft_prop*100, '%02.0f') ...
-                                       '_' num2str(soft_factor, '%02.0f')];
+                            soft_prop = 0;
+                            soft_factor = 1;
+                            
+                            opt_str = '';
+
                         otherwise
                             error('Unknow unit mismatch')
                     end
