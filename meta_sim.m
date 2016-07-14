@@ -419,21 +419,23 @@ function [con_files, varcon_files, z_files] = simulate_data(config, data_dir)
             studyIndex = study_idx;
             nsub = config.group1_n;
             unitFactor = config.factor_group1;
+            wth_sigma_a = config.group1_wth_sigma_a;
         else
             % Group 2
             studyIndex = study_idx-config.k_group1;
             nsub = config.group2_n;
             unitFactor = config.factor_group2;
+            wth_sigma_a = config.group2_wth_sigma_a;            
         end
         
         % Degrees of freedom of the within-study variance estimate
         dof = config.n(studyIndex)-1;
 
         % Estimated paramater estimate.
-        estimatedContrast = normrnd(0, sqrt(config.sigma_sq*config.wth_sigma_a(studyIndex)./config.n(studyIndex)+config.btw_sigma), [config.iter_onedir, config.iter_onedir, config.iter_onedir]);
+        estimatedContrast = normrnd(0, sqrt(config.sigma_sq*wth_sigma_a(studyIndex)./config.n(studyIndex)+config.btw_sigma), [config.iter_onedir, config.iter_onedir, config.iter_onedir]);
 
         % Estimated contrast variance (from chi square distribution)
-        estimatedSigmaSquare = chi2rnd(dof, [config.iter_onedir, config.iter_onedir, config.iter_onedir])*config.sigma_sq*config.wth_sigma_a(studyIndex)/dof;
+        estimatedSigmaSquare = chi2rnd(dof, [config.iter_onedir, config.iter_onedir, config.iter_onedir])*config.sigma_sq*wth_sigma_a(studyIndex)/dof;
         estimatedVarContrast = estimatedSigmaSquare./config.n(studyIndex);
 
         % units correction
