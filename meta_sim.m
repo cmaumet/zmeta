@@ -149,12 +149,12 @@ function meta_sim(base_dir, redo, path_to_spm)
                             factor_group1 = ones(1, k_group1);
                             factor_group2 = ones(1, k_group2);
                                                        
-                            soft_prop = options(opt).soft;
+                            soft_prop = options(opt).prop;
                             soft_factor = options(opt).factor;
                             
                             opt_str = ['_soft' ...
                                        num2str(soft_prop*100, '%02.0f') ...
-                                       '_' num2str(soft_factor, '%02.0f')];
+                                       '_' num2str(soft_factor, '%03.0f')];
                             
                         case {'con_sc'}
                             % Uniformly distributed beween 0.4 and 1.6 
