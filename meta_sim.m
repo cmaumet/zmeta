@@ -69,7 +69,9 @@ function meta_sim(base_dir, redo, path_to_spm)
             && isempty(host)
         disp('This simulation is run locally')
         cluster = false;
-        rng_seed = 'default';
+        % We want the results to be replicable even locally (hence 1 and
+        % not 'default')
+        rng_seed = 1;
     else
         cluster = true;
         task_id = str2num(task_id_str);
