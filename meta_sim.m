@@ -175,7 +175,7 @@ function meta_sim(base_dir, redo, path_to_spm)
                     end
                     
                     group1_soft = ones(k_group1, 1);
-                    group1_soft(1:k_group1*soft_prop) = 2;
+                    group1_soft(1:floor(k_group1*soft_prop)) = 2;
 
                     if analysis_type > 1
                         group2_soft = ones(k_group2, 1);
