@@ -242,7 +242,9 @@ function meta_sim(base_dir, redo, path_to_spm)
                                         if ~isdir(fullfile(allsimu_dir, simu_name))
                                             mkdir(fullfile(allsimu_dir, simu_name))
                                         end
-                                        mkdir(simu_dir);
+                                        if ~isdir(simu_dir)
+                                            mkdir(simu_dir);
+                                        end
                                     end
 
                                     simu.config.same_n = same_n;
