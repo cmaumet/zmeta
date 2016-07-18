@@ -179,7 +179,7 @@ function meta_sim(base_dir, redo, path_to_spm)
 
                     if analysis_type > 1
                         group2_soft = ones(k_group2, 1);
-                        group2_soft(1:k_group2*soft_prop) = 2;
+                        group2_soft(1:floor(k_group2*soft_prop)) = 2;
                     end
 
                     factor_group1(group1_soft==2) = factor_group1(group1_soft==2).*soft_factor;
