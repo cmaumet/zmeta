@@ -157,11 +157,11 @@ function meta_sim(base_dir, redo, path_to_spm)
                                        '_' num2str(soft_factor, '%03.0f')];
                             
                         case {'con_sc'}
-                            % Uniformly distributed beween 0.4 and 1.6 
+                            % Linearly distributed beween 0.4 and 1.6 
                             % included, so that mean(unitFactor) = 1 and 
                             % 1.6/0.4=4
-                            factor_group1 = randi([1 4], 1, k_group1)/2.5;%linspace(avg_n/2,avg_n*2,k);
-                            factor_group2 = randi([1 4], 1, k_group2)/2.5;
+                            factor_group1 = linspace(1, 4, k_group1)/2.5;
+                            factor_group2 = linspace(1, 4, k_group2)/2.5;
                             
                             soft_prop = 0;
                             soft_factor = 1;
