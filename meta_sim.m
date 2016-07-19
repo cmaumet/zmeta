@@ -38,7 +38,7 @@ function meta_sim(base_dir, redo, path_to_spm)
     settings.soft_factors = [2 100];
 
     % Study-specific bias due to units mismatch
-    settings.unit_mismatches = {'nominal', 'data_sc', 'con_sc'};
+    settings.unit_mismatches = {'nominal', 'datascl', 'contscl'};
 
     % Type of analysis: one-sample (1), two-sample(2), two-sample
     % unbalanced (3)
@@ -120,7 +120,7 @@ function meta_sim(base_dir, redo, path_to_spm)
                 switch unit_mis
                     case {'nominal'}
                         options(1).none = 1;
-                    case {'data_sc'}
+                    case {'datascl'}
                         i = 1;
                         for factor = settings.soft_factors
                             for prop = settings.soft_props
@@ -129,7 +129,7 @@ function meta_sim(base_dir, redo, path_to_spm)
                                 i = i + 1;
                             end
                         end
-                    case {'con_sc'}
+                    case {'contscl'}
                         options(1).none = 1;
                     otherwise
                         error('Unknow unit mismatch')
@@ -147,7 +147,7 @@ function meta_sim(base_dir, redo, path_to_spm)
                             
                             opt_str = '';
                             
-                        case {'data_sc'}
+                        case {'datascl'}
                             factor_group1 = ones(1, k_group1);
                             factor_group2 = ones(1, k_group2);
                                                        
@@ -158,7 +158,7 @@ function meta_sim(base_dir, redo, path_to_spm)
                                        num2str(soft_prop*100, '%02.0f') ...
                                        '_' num2str(soft_factor, '%03.0f')];
                             
-                        case {'con_sc'}
+                        case {'contscl'}
                             % Linearly distributed beween 0.4 and 1.6 
                             % included, so that mean(unitFactor) = 1 and 
                             % 1.6/0.4=4
@@ -223,7 +223,7 @@ function meta_sim(base_dir, redo, path_to_spm)
 
                                     % Directory to store the simulation data and results.
                                     simu_name = [analysisPrefix 'k' num2str(k) '_btw' num2str(btw_sigma) ...
-                                        '_wth' num2str(sigma_sq, '%02.0f'), opt_str, '_', num2str(unit_mis)];
+                                        '_wth' num2str(sigma_sq, '%02.0f'), '_', num2str(unit_mis), opt_str];
                                     simu_dir = fullfile(allsimu_dir, simu_name);
                                     if cluster
                                         simu_dir = fullfile(simu_dir, num2str(task_id, '%04d'));
