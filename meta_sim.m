@@ -83,6 +83,10 @@ function meta_sim(base_dir, redo, path_to_spm)
 
     % SPM and FSL initialisations    
     spm_jobman('initcfg');
+    % Command line analysis (no figure displays)
+    global defaults;
+    defaults.cmdline = true;
+    
     set_fsl_env()
     
     % Initialise random number generator using the task id
