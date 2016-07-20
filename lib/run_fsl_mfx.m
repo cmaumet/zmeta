@@ -19,11 +19,11 @@ function run_fsl_mfx(datadir, wd, analysisType, nSubjects, nStudies, ...
     system(['flameo --cope=cope --vc=varcope ' ...
         '--dvc=dof --mask=mask --ld=stats '...
         '--dm=' design '.mat --cs=' design '.grp --tc=' design '.con '...
-        ' --runmode=flame1'])
+        ' --runmode=flame1']);
     
     stat_file = fullfile(wd, 'stats', 'zstat1.nii.gz');
 %     stat_file = gunzip_if_gz(stat_file);
-    gunzip(stat_file)
+    gunzip(stat_file);
     stat_file = strrep(stat_file, '.gz', '');
     
     originalstat_file = stat_file;

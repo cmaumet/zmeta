@@ -108,8 +108,8 @@ function meta_sim(base_dir, redo, path_to_spm)
                 k_group2 = k;
             elseif analysis_type == 3
                 analysisPrefix = 'test3_';
-                k_group1 = k*2*4/5;
-                k_group2 = k*2/5;
+                k_group1 = k*2/5;
+                k_group2 = k*2*4/5;
             end
 
             % Cross-studies unit mismatch
@@ -251,7 +251,6 @@ function meta_sim(base_dir, redo, path_to_spm)
                                     if analysis_type > 1
                                         simu.config.group1_n = group1_n;
                                         simu.config.group2_n = group2_n;
-                                        simu.config.n = group1_n + group2_n;
                                     else
                                         simu.config.group1_n = group1_n;
                                         simu.config.n = group1_n;
@@ -373,10 +372,10 @@ function meta_sim(base_dir, redo, path_to_spm)
                                         run_fishers(fisher_dir, z_files)
 
                                         % FFX Stouffer's
-                                        run_stouffers(stouffer_dir, z_files, false)
+                                        run_stouffers(stouffer_dir, z_files, true)
 
                                         % Stouffer's MFX
-                                        run_stouffers(stouffer_dir, z_files, true)
+                                        run_stouffers(stoufferMFX_dir, z_files, false)
 
                                         % Optimally weighted z
                                         run_weighted_z(weightedZ_dir, z_files, group1_n)
@@ -404,10 +403,10 @@ function meta_sim(base_dir, redo, path_to_spm)
                                     end
 
                                     % GLM MFX
-                                    run_mega_mfx(data_dir, megaMFX_dir, analysis_type, simu.config.n, k, fsl_designs_dir)
+                                    run_mega_mfx(data_dir, megaMFX_dir, analysis_type, [group1_n group2_n], k, fsl_designs_dir)
 
                                     % GLM FFX (via FSL)
-                                    run_mega_ffx(data_dir, megaFFXFSL_dir, analysis_type, simu.config.n, k, fsl_designs_dir)
+                                    run_mega_ffx(data_dir, megaFFXFSL_dir, analysis_type, [group1_n group2_n], k, fsl_designs_dir)
                                 end
                             end
                         end
@@ -440,14 +439,14 @@ function [con_files, varcon_files, z_files] = simulate_data(config, data_dir)
         end
         
         % Degrees of freedom of the within-study variance estimate
-        dof = config.n(studyIndex)-1;
+        dof = nsub(studyIndex)-1;
 
         % Estimated paramater estimate.
-        estimatedContrast = normrnd(0, sqrt(config.sigma_sq*wth_sigma_a(studyIndex)./config.n(studyIndex)+config.btw_sigma), [config.iter_onedir, config.iter_onedir, config.iter_onedir]);
+        estimatedContrast = normrnd(0, sqrt(config.sigma_sq*wth_sigma_a(studyIndex)./nsub(studyIndex)+config.btw_sigma), [config.iter_onedir, config.iter_onedir, config.iter_onedir]);
 
         % Estimated contrast variance (from chi square distribution)
         estimatedSigmaSquare = chi2rnd(dof, [config.iter_onedir, config.iter_onedir, config.iter_onedir])*config.sigma_sq*wth_sigma_a(studyIndex)/dof;
-        estimatedVarContrast = estimatedSigmaSquare./config.n(studyIndex);
+        estimatedVarContrast = estimatedSigmaSquare./nsub(studyIndex);
 
         % units correction
         estimatedContrast = estimatedContrast*unitFactor(studyIndex);

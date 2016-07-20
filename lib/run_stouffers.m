@@ -16,7 +16,11 @@ function run_stouffers(out_dir, z_files, ffx)
         
         matlabbatch{1}.spm.tools.ibma.stouffers.dir = {out_dir};
         matlabbatch{1}.spm.tools.ibma.stouffers.zimages = z_files;
-        matlabbatch{1}.spm.tools.ibma.stouffers.rfx.RFX_no = ffx;
+        if ffx
+            matlabbatch{1}.spm.tools.ibma.stouffers.rfx.RFX_no = 0;
+        else
+            matlabbatch{1}.spm.tools.ibma.stouffers.rfx.RFX_yes = 0;
+        end
         
         spm_jobman('run', matlabbatch)
     else
