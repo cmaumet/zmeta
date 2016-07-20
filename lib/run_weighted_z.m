@@ -14,6 +14,7 @@ function run_weighted_z(out_dir, z_files, n_per_study)
         matlabbatch{1}.spm.tools.ibma.weightedz.zimages = z_files;
         matlabbatch{1}.spm.tools.ibma.weightedz.nsubjects = n_per_study;
         
+        save('matlabbatch.mat', 'matlabbatch')
         spm_jobman('run', matlabbatch)
     else
         disp('Weighted Z already computed')

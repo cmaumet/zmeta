@@ -27,6 +27,7 @@ function run_permut_con(out_dir, nperms, con_files, con_files2)
             matlabbatch{2}.spm.tools.snpm.cp.snpmcfg = {fullfile(out_dir, 'SnPMcfg.mat')};
         end
         
+        save('matlabbatch.mat', 'matlabbatch')
         spm_jobman('run', matlabbatch)
     else
         disp('Permutation on contrast files already computed')

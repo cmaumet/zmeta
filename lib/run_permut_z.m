@@ -26,6 +26,8 @@ function run_permut_z(out_dir, nperms, z_files, z_files2)
             matlabbatch{1}.spm.tools.snpm.des.TwoSampT.nPerm = nperms;
             matlabbatch{2}.spm.tools.snpm.cp.snpmcfg = {fullfile(out_dir, 'SnPMcfg.mat')};
         end
+        
+        save('matlabbatch.mat', 'matlabbatch')
         spm_jobman('run', matlabbatch)
     else
         disp('Permutation on Z already computed')

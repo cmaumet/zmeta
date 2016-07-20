@@ -23,6 +23,7 @@ function run_mega_rfx(out_dir, con_files, con_files2)
             matlabbatch{1}.spm.tools.ibma.megarfx.model.two.confiles2 = con_files2;
         end
         
+        save('matlabbatch.mat', 'matlabbatch')
         spm_jobman('run', matlabbatch)
     else
         disp('Mega RFX already computed')

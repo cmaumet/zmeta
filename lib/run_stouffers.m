@@ -22,6 +22,7 @@ function run_stouffers(out_dir, z_files, ffx)
             matlabbatch{1}.spm.tools.ibma.stouffers.rfx.RFX_yes = 0;
         end
         
+        save('matlabbatch.mat', 'matlabbatch')
         spm_jobman('run', matlabbatch)
     else
         disp('Stouffer''s already computed')
