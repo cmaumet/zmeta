@@ -21,12 +21,12 @@ function meta_sim(base_dir, redo, path_to_spm)
     avg_n = 20; % Average number of subjects per group
     diff_n = 15;
 
-    settings.ks = [25];% 50];%[5 10 25 50];
+    settings.ks = [25 50];%[5 10 25 50];
     settings.wth_sigmas = avg_n*[0.25 0.5 1 2 4];%How to compute z with var = 0?
     settings.wth_sigma_sames = [true]; %, 'diff'}; don't know yet how to deal with uneq var (for FFX!?)
 
     % Between-studies variance (RFX?)
-    settings.btw_sigmas = [1];%  1];
+    settings.btw_sigmas = [0 1];%  1];
 
     % Number of subjects per studies     
     settings.same_ns = [true];%[ true false];
@@ -53,7 +53,7 @@ function meta_sim(base_dir, redo, path_to_spm)
     %     nSubjects = [25 400 100 25]; %[10, 15, 20, 25, 30, 10, 15, 20, 25, 30, 10, 15, 20, 25, 30];
     %     nStudies = numel(nSubjects);
     
-    settings.nperm = 20;
+    settings.nperm = 5000;
     
     display_settings(settings)
     
