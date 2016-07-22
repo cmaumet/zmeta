@@ -397,13 +397,13 @@ function meta_sim(base_dir, redo, path_to_spm)
                                         run_permut_z(permutz_dir, settings.nperm, z_files)
                                     else
                                         % Mega-analysis RFX
-                                        run_mega_rfx(megaRFX_dir, con_files(1:k_group1)', con_files(k_group1+(1:k_group2))')
+                                        run_mega_rfx(megaRFX_dir, con_files(1:k_group1), con_files(k_group1+(1:k_group2)))
 
                                         % Permutation on con_files
-                                        run_permut_con(permutcon_dir, settings.nperm, con_files(1:k_group1)', con_files(k_group1+(1:k_group2))')
+                                        run_permut_con(permutcon_dir, settings.nperm, con_files(1:k_group1), con_files(k_group1+(1:k_group2)))
 
                                         % Permutation on z_files
-                                        run_permut_z(permutz_dir, settings.nperm, z_files(1:k_group1)', z_files(k_group1+(1:k_group2))')
+                                        run_permut_z(permutz_dir, settings.nperm, z_files(1:k_group1), z_files(k_group1+(1:k_group2)))
                                     end
 
                                     % GLM MFX
