@@ -89,6 +89,10 @@ function meta_sim(base_dir, redo, path_to_spm)
     
     set_fsl_env()
     
+    % Disable SnPM random seed shuffling
+    global SnPMdefs;
+    SnPMdefs.shuffle_seed = false;
+    
     % Initialise random number generator using the task id
     rng(rng_seed);
        
