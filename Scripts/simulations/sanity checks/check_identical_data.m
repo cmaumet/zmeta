@@ -1,7 +1,7 @@
 function check_identical_data
     % Export all studies
     pattern = '*nStudy*';
-    simuDir = '/Volumes/camille/MBIA_buster/';
+    simuDir = '/Volumes/camille/test_rng_issue';
     simuDirs = dir(fullfile(simuDir, [pattern]));
 
     num_simu = numel(simuDirs);
@@ -25,15 +25,15 @@ function check_identical_data
                           num2str(it_2)])
                     num_identical = num_identical + 1;
                     
-                    go_next_simu = true;
-                    break;
+%                     go_next_simu = true;
+%                     break;
         %         else
         %             disp(['Good data for: ' simuDirs(i).name])
                 end
             end
-            if go_next_simu
-                break;
-            end
+%             if go_next_simu
+%                 break;
+%             end
         end
     end
     

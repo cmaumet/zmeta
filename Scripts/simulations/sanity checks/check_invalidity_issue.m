@@ -9,7 +9,7 @@ ncols = 7;
 figure()
 for i = 1:38
     clear ml10p;
-    folder = ['/Volumes/camille/MBIA_buster/nStudy25_subNumidentical_varidentical_Betw1_Within4_nSimuOneDir30_unitmis0_numStudySoft0_softFactor1' '/00' sprintf('%02d',i)];
+    folder = ['/Volumes/camille/MBIA_buster/nStudy25_subNumidentical_varidentical_Betw1_Within0.25_nSimuOneDir30_unitmis0_numStudySoft0_softFactor1' '/00' sprintf('%02d',i)];
     filename = fullfile(folder, '/megaMFX/mega_mfx_minus_log10_p.nii');
     ml10p=nifti(filename);
     disp(filename)
