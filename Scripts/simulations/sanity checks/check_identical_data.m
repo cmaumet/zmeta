@@ -1,7 +1,7 @@
 function check_identical_data
     % Export all studies
-    pattern = '*nStudy*';
-    simuDir = '/Volumes/camille/test_rng_issue';
+    pattern = 'test*';
+    simuDir = '/Volumes/camille/IBMA_simu';
     simuDirs = dir(fullfile(simuDir, [pattern]));
 
     num_simu = numel(simuDirs);
@@ -9,6 +9,8 @@ function check_identical_data
 
     num_identical = 0;
     for i = 1:num_simu
+        disp(['Checking simulation ' num2str(i)])
+        
         go_next_simu = false;
         
         for it_1 = 1:38
