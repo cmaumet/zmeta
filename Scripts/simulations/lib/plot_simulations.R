@@ -49,16 +49,16 @@ subplot=list()
 titles=list()
 
 titles[[1]] <- "Nominal"
-subplot[[1]] <- subset(data_subset, soft2==0 & unitMismatch=="FALSE")
+subplot[[1]] <- subset(data_subset, soft2==0 & unitMism=="nominal")
 
 titles[[2]] <- "Different scaling target"
-subplot[[2]] <- subset(data_subset, soft2Factor==100)
+subplot[[2]] <- subset(data_subset, unitMism=="datascl" & soft2Factor==100)
 
 titles[[3]] <- "Different scaling algorithm (same target)"
-subplot[[3]] <- subset(data_subset, soft2>0 & soft2Factor!=100)
+subplot[[3]] <- subset(data_subset, unitMism=="datascl" & soft2Factor!=100)
 
 titles[[4]] <- "Different contrast vector scaling"
-subplot[[4]] <- subset(data_subset, soft2==0 & unitMismatch=="TRUE")
+subplot[[4]] <- subset(data_subset, soft2==0 & unitMism=="contscl")
 
 
 

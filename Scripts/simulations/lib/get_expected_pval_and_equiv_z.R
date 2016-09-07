@@ -33,7 +33,7 @@ for (simunum in seq(tot_num_simu, 1, -1)){
 	# It is easier to work with the equiv z stat
 	simudat$equivz <- qnorm(simudat$lnp, lower.tail = FALSE, log.p = TRUE)
 
-	simudat$allgroups <- paste(simudat$Between, simudat$Within, simudat$nStudies, simudat$nSimu, simudat$numSubjectScheme, simudat$varScheme, simudat$soft2, simudat$soft2Factor, as.character(simudat$unitMismastch))
+	simudat$allgroups <- paste(simudat$Between, simudat$Within, simudat$nStudies, simudat$nSimu, simudat$numSubjectScheme, simudat$varScheme, simudat$soft2, simudat$soft2Factor, as.character(simudat$unitMism))
 
 	# newsimudat$expectedp <- newsimudat$rankp/newsimudat$nSimu
 	simudat$expectedz <- qnorm(simudat$expectedP, lower.tail = FALSE)
@@ -45,10 +45,7 @@ for (simunum in seq(tot_num_simu, 1, -1)){
 	simudat$p_lower <- qbeta(0.975, simudat$rankP, simudat$nSimu-simudat$rankP +1)
 	simudat$z_lower <- qnorm(simudat$p_lower, lower.tail=FALSE)
 
-	simudat$unitMismatch <- as.character(simudat$unitMismatch)
-	simudat$unitMismatch[simudat$unitMismatch=="0"]=FALSE
-	simudat$unitMismatch[simudat$unitMismatch=="false"]=FALSE
-	simudat$unitMismatch[simudat$unitMismatch=="true"]=TRUE
+	simudat$unitMism <- as.character(simudat$unitMism)
 	
 	# We want to keep the allsimudat variable (to be able to directly use it without re-reading from the file)
 	if (! exists("allsimudat"))
