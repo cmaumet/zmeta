@@ -13,6 +13,11 @@
 *.gz
 *.toc
 
+*.fls
+
+# For now ignore csv files
+*.csv
+
 .Rapp*
 
 # R
@@ -43,5 +48,4 @@ fsl_design/*.fsf
 # R autosaved files
 *(Autosaved).R
 
-# MAC files
 *.DS_Store
