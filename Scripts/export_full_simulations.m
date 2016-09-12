@@ -1,249 +1,224 @@
-function export_full_simulations(simuDir, redo)
+% Compute xx from the simulation results
+%   simuDir: full path to the directory storing the simulations
+%   redo: if true, overwrite previous export (default: false)
+%   downs_tot: Number of points to keep after downsampling
+function export_full_simulations(simuDir, redo, downs_tot, pattern)
     if nargin < 2
         redo = false;
     end
-
-    simuDirs = find_dirs('^(two_|two_unb_|)nStudy', simuDir);
-    
-    simuDirs_iter = '';
-    for s = 1:numel(simuDirs)
-        simuDirs_iter = strvcat(simuDirs_iter, find_dirs('\d*', fullfile(simuDir, simuDirs{s})));
-        disp(simuDirs_iter)
+    if nargin < 3
+        downs_tot = 10;
     end
-    disp(simuDirs_iter)
-    aa=1
-%     simuDirs = find_dirs('^two_nStudy', simuDir);
+    if nargin < 4
+        % Export all studies
+        pattern = '^(two_|two_unb_|)nStudy';
+    end    
+
+    donws_pos = [];
     
-%     saveSimuCsvDir = fullfile(simuDir, 'csv_tom');
-    numel(simuDirs)
-    for i = 1:numel(simuDirs)
-        disp(['Exporting ' simuDirs{i}])
-        filename = 'simu.csv';
-        simu_file = fullfile(simuDir, simuDirs{i}, filename);
-        
-        if redo || ~exist(simu_file, 'file')
-            fid = fopen(simu_file, 'w');
+%     simuDirs = find_dirs(, simuDir);
+    simuDirs = dir(fullfile(simuDir, [pattern '*']));
 
-            fprintf(fid, ['methods, glm, nStudies, Between, Within, '...
-                'numSubjectScheme, varScheme, soft2, soft2Factor, ' ... 
-                'unitMismatch, nSimu, minuslog10P, P, stderr_P, rankP, '...
-                'expectedP \n']);
-                ...'unitMismatch, nSimu, minuslog10P, P, stderrP, rankP, '...
-                
-    %         info = regexp(spm_file(simuDirs{i}, 'filename'), ...
-    %             'nStudy(?<nStudy>\d+)_Betw(?<Betw>\d+\.?\d*)_Within(?<Within>\d+\.?\d*)_nSimu(?<nSimu>\d+)','names');
-            try
-                simu_mat_file = fullfile(simuDir, simuDirs{i}, 'simu.mat');
-                disp(simu_mat_file)
-                info = load(simu_mat_file);
-                info = info.simu.config;
-
-                if ~isfield(info, 'nStudiesWithSoftware2')
-                    info.nStudiesWithSoftware2 = 0;
-                    info.sigmaFactorWithSoftware2 = 1;
-                    info.unitMismatch = false;
-                    info.unitFactor = ones(1, numel(info.nSubjects));
-                end
-            catch
-                warning(['Skipped' simuDirs{i}])
-                continue;
-            end
-
-            simuDirs{i} = fullfile(simuDir, simuDirs{i});
-
-            methods(1) = struct( 'name', 'fishers', ...
-                            'pValueFile', 'fishers_ffx_minus_log10_p.nii',...
-                            'statFile', 'fishers_ffx_statistic.nii');
-            methods(2) = struct( 'name', 'megaRFX', ...
-                            'pValueFile', 'mega_rfx_minus_log10_p.nii',...
-                            'statFile', 'spmT_0001.nii');
-            methods(3) = struct( 'name', 'permutZ', ...
-                            'pValueFile', 'lP+.hdr',...
-                            'statFile', 'snpmT+.hdr');
-            methods(4) = struct( 'name', 'permutCon', ...
-                            'pValueFile', 'lP+.hdr',...
-                            'statFile', 'snpmT+.hdr');
+    % p-value and stat file names for each method
+    one_sample_only_methods(1) = struct( 'name', 'fishers', ...
+                    'pValueFile', 'fishers_ffx_minus_log10_p.nii',...
+                    'statFile', 'fishers_ffx_statistic.nii');
+    other_methods(1) = struct( 'name', 'megaRFX', ...
+                    'pValueFile', 'mega_rfx_minus_log10_p.nii',...
+                    'statFile', 'spmT_0001.nii');
+    other_methods(2) = struct( 'name', 'permutZ', ...
+                    'pValueFile', 'lP+.img',...
+                    'statFile', 'snpmT+.hdr');
+    other_methods(3) = struct( 'name', 'permutCon', ...
+                    'pValueFile', 'lP+.img',...
+                    'statFile', 'snpmT+.img');
 %             methods(5) = struct( 'name', 'megaFFX', ...
 %                             'pValueFile', 'mega_ffx_ffx_minus_log10_p.nii',...
 %                             'statFile', 'mega_ffx_statistic.nii');                    
-            methods(5) = struct( 'name', 'stouffers', ...
-                            'pValueFile', 'stouffers_ffx_minus_log10_p.nii',...
-                            'statFile', 'stouffers_ffx_statistic.nii');                      
-            methods(6) = struct( 'name', 'stouffersMFX', ...
-                            'pValueFile', 'stouffers_rfx_minus_log10_p.nii',...
-                            'statFile', 'spmT_0001.nii');                      
-            methods(7) = struct( 'name', 'weightedZ', ...
-                            'pValueFile', 'weightedz_ffx_minus_log10_p.nii',...
-                            'statFile', 'weightedz_ffx_statistic.nii');                      
-            methods(8) = struct( 'name', 'megaMFX', ...
-                            'pValueFile', 'mega_mfx_minus_log10_p.nii',...
-                            'statFile', 'zstat1.nii');                      
-            methods(9) = struct( 'name', 'megaFFX_FSL', ...
-                            'pValueFile', 'mega_ffx_minus_log10_p.nii',...
-                            'statFile', 'zstat1.nii');                             
-                        
-            mystr = '';
-            for m = 1:numel(methods)
-
-                methodDir = fullfile(simuDirs{i}, methods(m).name);
+    one_sample_only_methods(2) = struct( 'name', 'stouffers', ...
+                    'pValueFile', 'stouffers_ffx_minus_log10_p.nii',...
+                    'statFile', 'stouffers_ffx_statistic.nii');                      
+    one_sample_only_methods(3) = struct( 'name', 'stouffersMFX', ...
+                    'pValueFile', 'stouffers_rfx_minus_log10_p.nii',...
+                    'statFile', 'spmT_0001.nii');                      
+    one_sample_only_methods(4) = struct( 'name', 'weightedZ', ...
+                    'pValueFile', 'weightedz_ffx_minus_log10_p.nii',...
+                    'statFile', 'weightedz_ffx_statistic.nii');                      
+    other_methods(4) = struct( 'name', 'megaMFX', ...
+                    'pValueFile', 'mega_mfx_minus_log10_p.nii',...
+                    'statFile', 'zstat1.nii');                      
+    other_methods(5) = struct( 'name', 'megaFFX_FSL', ...
+                    'pValueFile', 'mega_ffx_minus_log10_p.nii',...
+                    'statFile', 'zstat1.nii');             
                 
-                if isdir(methodDir)
-                    pValueFile = spm_select('FPList', methodDir, ...
-                        ['^' regexptranslate('escape', methods(m).pValueFile) '(\.gz)?$']);
-                    if isempty(pValueFile)
-                        error('pValueFile not found')
-                    end
-                    statFile = spm_select('FPList', methodDir, ...
-                        ['^' regexptranslate('escape', methods(m).statFile) '(\.gz)?$']);
-                    if isempty(statFile)
-                        error('statFile not found')
-                    end
+    all_methods = [one_sample_only_methods other_methods];
+    
+%     saveSimuCsvDir = fullfile(simuDir, 'csv_tom');
+    num_simu = numel(simuDirs);
+    disp([num2str(num_simu) ' simulations']);
+    
+    for s = numel(simuDirs):-1:1
+        skip = false;
+        
+        iter_dirs = dir(fullfile(simuDir, simuDirs(s).name, '0*'));
+        
+        num_iter = numel(iter_dirs);
+        
+        filename = 'simu.csv';
+        
+        main_simu_dir = fullfile(simuDir, simuDirs(s).name);
+        simu_file = fullfile(main_simu_dir, filename);
+        
+        if redo || ~exist(simu_file, 'file')
+            mystr = '';            
+            fid = fopen(simu_file, 'w');
+            fprintf(fid, ['methods, glm, nStudies, Between, Within, '...
+                'numSubjectScheme, varScheme, unitMism, soft2, soft2Factor, ' ... 
+                'nSimu, minuslog10P, P, rankP, '...
+                'expectedP \n']);
+                ...'unitMismatch, nSimu, minuslog10P, P, rankP, '...     
 
-                    statistic = spm_read_vols(spm_vol(statFile));
-%                     try
-                    pValues = spm_read_vols(spm_vol(pValueFile));
-                    
-%                     catch
-%                         
-%                         pValues = spm_read_vols(spm_vol(pValueFile));
-%                     end
+            % Read info from first analysis to check if one-sample
+            first_simu_dir = fullfile(main_simu_dir, iter_dirs(1).name);
+            first_simu_mat_file = fullfile(first_simu_dir, 'simu.mat');
+            first_info = load(first_simu_mat_file);
+            first_info = first_info.simu.config;
+           
+            if first_info.analysis_type ~= 1
+                methods = other_methods;
+            else
+                methods = all_methods;
+            end            
+            
+            % For each method we combine all iterations
+            for m = 1:numel(methods)  
+                statistic = [];
+                pvalues = [];
+                
+                for it = 1:num_iter   
+                    this_simu_dir = fullfile(main_simu_dir, iter_dirs(it).name);         
 
-                    mystr = print_pvalues(mystr, methods(m).name, pValues, statistic(:), info);
+            %         info = regexp(spm_file(this_simu_dir, 'filename'), ...
+            %             'nStudy(?<nStudy>\d+)_Betw(?<Betw>\d+\.?\d*)_Within(?<Within>\d+\.?\d*)_nSimu(?<nSimu>\d+)','names');
+                    try
+                        simu_mat_file = fullfile(this_simu_dir, 'simu.mat');
+                        info = load(simu_mat_file);
+                        info = info.simu.config;
+                    catch
+                        warning(['Skipped' this_simu_dir])
+                        delete(simu_file)
+                        continue;
+                    end             
+                    methodDir = fullfile(this_simu_dir, methods(m).name);
+
+                    if isdir(methodDir)
+                        pValueFile = spm_select('FPList', methodDir, ...
+                            ['^' regexptranslate('escape', methods(m).pValueFile) '(\.gz)?$']);
+                        if isempty(pValueFile)
+                            warning(['pValueFile not found for ' methodDir])
+                            skip = true;
+                            if exist(simu_file, 'file')
+                                delete(simu_file)
+                            end
+                            continue;
+                        end
+
+                        iter_pval = spm_read_vols(spm_vol(pValueFile));
+
+                        pvalues = [pvalues iter_pval(:)];
+                    else
+                        warning(['Missing ' methods(m).name ...
+                                     ' for ' this_simu_dir])
+                    end
                 end
+                if skip
+                    continue;
+                end
+                
+                disp([num2str(num_simu-s+1, '%03d') ...
+                     '.' methods(m).name ' Exporting ' main_simu_dir])
+                % Combine all iterations of this method for this simulation
+                
+                sample_size = numel(pvalues(:));
+                if exist('prev_sample_size', 'var') && ...
+                        sample_size ~= prev_sample_size
+                    if sample_size < prev_sample_size
+                        warning(['Incomplete simulation: ' simu_file])
+                    else
+                        warning('Different sample size for this simulation');
+                    end
+                    delete(simu_file)
+                    continue;
+                else
+                    prev_sample_size = sample_size;
+                end
+                
+                % We want to keep the same downsampling for all simulations
+                % and methods
+                if isempty(donws_pos)
+                    if downs_tot > sample_size
+                        error(['can''t downsize to ' num2str(downs_tot) ...
+                            '(sample size is ' num2str(sample_size) ')'])
+                    end
+                    % downsample in log-space so that we keep more values 
+                    % corresponding to smaller ranks/p-values                    
+                    donws_pos = round(...
+                        logspace(0,log10(sample_size), downs_tot));
+                end
+                
+                mystr = print_pvalues(mystr, methods(m).name, ...
+                    pvalues, info, donws_pos);
             end
-
-    %         fisherFile = spm_select('FPList', fullfile(simuDirs{i}, 'fishers'), '^fishers_ffx_minus_log10_p\.nii$');
-    % %         statVal.fishers = spm_read_vols(spm_vol(spm_select('FPList', fullfile(simuDirs{i}, 'fishers'), '^fishers_ffx_statistic.nii$')));
-    %         pVal.fishers = spm_read_vols(spm_vol(fisherFile));
-    %         mystr = print_pvalues('', 'fishers', pVal.fishers, info);
-    %         
-    %         pVal.GLMRFX = spm_read_vols(spm_vol(spm_select('FPList', fullfile(simuDirs{i}, 'megaRFX'), '^mega_rfx_minus_log10_p.nii$')));
-    % %         statVal.GLMRFX = spm_read_vols(spm_vol(spm_select('FPList', fullfile(simuDirs{i}, 'megaRFX'), '^spmT_0001.nii$')));
-    %         
-    %         mystr = print_pvalues(mystr, 'GLMRFX', pVal.GLMRFX, info);
-    %         
-    %         pVal.PermutZ = spm_read_vols(spm_vol(spm_select('FPList', fullfile(simuDirs{i}, 'permutZ'), '^lP\+\.hdr$')));
-    % %         statVal.PermutZ = spm_read_vols(spm_vol(spm_select('FPList', fullfile(simuDirs{i}, 'permutZ'), '^snpmT\+\.hdr$')));
-    %         mystr = print_pvalues(mystr, 'PermutZ', pVal.PermutZ, info);
-    %         
-    %         pVal.PermutCon = spm_read_vols(spm_vol(spm_select('FPList', fullfile(simuDirs{i}, 'permutCon'), '^lP\+\.hdr$')));
-    % %         statVal.PermutCon = spm_read_vols(spm_vol(spm_select('FPList', fullfile(simuDirs{i}, 'permutCon'), '^snpmT\+\.hdr$')));
-    %         mystr = print_pvalues(mystr, 'PermutCon', pVal.PermutCon, info);
-    %         
-    %         pVal.GLMFFX = spm_read_vols(spm_vol(spm_select('FPList', fullfile(simuDirs{i}, 'megaFFX'), '^mega_ffx_ffx_minus_log10_p\.nii$')));
-    % %         statVal.GLMFFX = spm_read_vols(spm_vol(spm_select('FPList', fullfile(simuDirs{i}, 'megaFFX'), '^mega_ffx_statistic\.nii$')));
-    %         mystr = print_pvalues(mystr, 'GLMFFX', pVal.GLMFFX, info);        
-    %         
-    %         pVal.Stouffers = spm_read_vols(spm_vol(spm_select('FPList', fullfile(simuDirs{i}, 'stouffers'), '^stouffers_ffx_minus_log10_p\.nii$')));
-    % %         statVal.Stouffers = spm_read_vols(spm_vol(spm_select('FPList', fullfile(simuDirs{i}, 'stouffers'), '^stouffers_ffx_statistic\.nii$')));
-    %         mystr = print_pvalues(mystr, 'Stouffers', pVal.Stouffers, info);                
-    %         
-    %         pVal.StouffersMFX = spm_read_vols(spm_vol(spm_select('FPList', fullfile(simuDirs{i}, 'stouffersMFX'), '^stouffers_rfx_minus_log10_p\.nii$')));
-    % %         statVal.StouffersMFX = spm_read_vols(spm_vol(spm_select('FPList', fullfile(simuDirs{i}, 'stouffersMFX'), '^spmT_0001\.nii$')));
-    %         mystr = print_pvalues(mystr, 'StouffersMFX', pVal.StouffersMFX, info);                
-    %         
-    %         pVal.WeightedZ = spm_read_vols(spm_vol(spm_select('FPList', fullfile(simuDirs{i}, 'weightedZ'), '^weightedz_ffx_minus_log10_p\.nii$')));
-    % %         statVal.WeightedZ = spm_read_vols(spm_vol(spm_select('FPList', fullfile(simuDirs{i}, 'weightedZ'), '^weightedz_ffx_statistic\.nii$')));        
-    %         mystr = print_pvalues(mystr, 'WeightedZ', pVal.WeightedZ, info);                        
-
+            
+            % A single file combining all iterations for this simulation
             fprintf(fid, '%s', mystr);
             fclose(fid);
+            disp(['Written ' main_simu_dir])            
         end
     end
     
 end
 
-function mystr = print_pvalues(mystr, methodName, minuslog10pvalues, statValues, info)
+function mystr = print_pvalues(mystr, methodName, minuslog10pvalues, ...
+    info, donws_pos)
+
     minuslog10pvalues = minuslog10pvalues(:);
 
+    % Return an error if null of infinite p-value is found
     check_pvalues(methodName, minuslog10pvalues)
+    
+    % Get p-values from -log10(p-values)
     pvalues = 10.^(-minuslog10pvalues);
-    
-    % All of this is needed instead of using just rank produced by 'order'
-    % function because we need to deal with duplicate values and take
-    % max(rank)
-    % Need to be done on -statValue rather than pvalues to avoid scale effect
-    % that should not be present in expected pvalues
-%     orderByValue = pvalues(:);%-statValues(:); %
-%     [~, ~, statValuesIdx] = unique(orderByValue(:));
-%     uniqueStatValuesRank = cumsum(accumarray(statValuesIdx, ones(size(orderByValue(:)))));
-%     pvalues_rank = uniqueStatValuesRank(statValuesIdx);
-%     
-%     ranks = get_rank_max(orderByValue);
-    
-%     [~, ~, pvalues_rank] = unique(orderByValue);
-    
-%     if ~all(pvalues_rank'==ranks)
-%         error('error in ranks')
-%     end
 
+    % Sorted p-values
     pvalues = sort(pvalues);
-    minuslog10pvalues = -log10(pvalues(:));
     
     sample_size = numel(pvalues);
-    
+      
     expected_p = [(1:sample_size)./sample_size]';
     pvalues_rank = [(1:sample_size)]';
+     
+    % Downsampling pvalues_rank so that we keep more precision for smaller
+    % p-values
+       
+    downs_pvalues_rank = pvalues_rank(donws_pos);
+    downs_expected_p = expected_p(donws_pos);
+    downs_pvalues = pvalues(donws_pos);
     
-    
-%     expected_p = pvalues_rank./(info.nSimuOneDir^3);
-    
-    % Downsampling expected p
-    digits=2;
-    roundedlog10expectedp = round(-log10(expected_p)*10^digits)/(10^digits);
-    % Look at this, maybe it poses a pb for permut where the same expected_p can have different obs_p     
-    [~, uniquePositions, pvalue_group] = unique(roundedlog10expectedp);
-    
-%     pvalues = pvalues(uniquePositions);
-    original_pvalues = pvalues;
-    pvalues = accumarray(pvalue_group, original_pvalues, [], @mean);
-    
-    pvalue_count = accumarray(pvalue_group,1);
-    pvalues_stderr = accumarray(pvalue_group, original_pvalues, [], @std)./sqrt(pvalue_count);
-    
-    % This is to cope with Matlab behaviour where std(x) = 0 (when x is a 
-    % vector of a single number)     
-    pvalues_stderr(pvalue_count==1) = Inf;
-    % We also ignore stderr when only 2 observations    
-    pvalues_stderr(pvalue_count==2) = Inf;
-    
-    if any(pvalues_stderr==0) && ~(strcmp(methodName, 'permutZ') ||strcmp(methodName, 'permutCon'))
-        error('null standard error')
-    end
-
-%     minuslog10pvalues = minuslog10pvalues(uniquePositions);
-%     pvalues_origin = pvalues;
-    
-%     pvalues_stderr = uniquePositions*NaN;
-%     pvalues = uniquePositions*NaN;
-%     for pos = 1:numel(uniquePositions)
-%         pvalue_positions = find(pvalue_group==pos);
-%         numpos = numel(pvalue_positions);
-%         if numpos > 1
-%             pvalues_stderr(pos,1) = std(pvalues_origin(pvalue_positions))./sqrt(numpos);
-%             pvalues(pos) = mean(pvalues_origin(pvalue_positions));
-%         end
-%     end
-    minuslog10pvalues = -log10(pvalues);
-    
-    pvalues_rank = accumarray(pvalue_group, pvalues_rank, [], @mean);%pvalues_rank(uniquePositions);
-    expected_p = accumarray(pvalue_group, expected_p, [], @mean);%expected_p(uniquePositions);
-    
-    data_to_export = num2cell([minuslog10pvalues, pvalues, pvalues_stderr, pvalues_rank, expected_p], 2);
+    downs_minuslog10pvalues = -log10(downs_pvalues);
+       
+    data_to_export = num2cell([downs_minuslog10pvalues, downs_pvalues, downs_pvalues_rank, downs_expected_p], 2);
 %     data_to_export = num2cell([minuslog10pvalues, pvalues, pvalues_rank expected_p], 2);
-    
-    if ~isfield(info, 'nStudies')
-        info.nStudies = info.nStudiesInGroup1;
-    end
-
-    mystr = [mystr sprintf([methodName ',' mat2str(info.analysisType) ',' mat2str(info.nStudies) ',' ...
-                mat2str(info.sigmaBetweenStudies) ',' mat2str(info.sigmaSquare) ...
-            ',' info.nSubjectsScheme ...
-            ',' info.studyVarianceScheme ...
-            ',' mat2str(info.nStudiesWithSoftware2) ...
-            ',' mat2str(info.sigmaFactorWithSoftware2) ...
-            ',' mat2str(info.unitMismatch) ...
-            ',' mat2str(info.nSimuOneDir^3) ',%i,%i,%i,%i,%i\n'], ...            
+     
+    mystr = [mystr sprintf([methodName ',' mat2str(info.analysis_type) ',' mat2str(info.k) ',' ...
+                mat2str(info.btw_sigma) ',' mat2str(info.sigma_sq) ...
+            ',' num2str(info.same_n) ...
+            ',' num2str(info.wth_sigma_same) ...
+            ',' info.unit_mis ...
+            ',' mat2str(info.soft_prop) ...
+            ',' mat2str(info.soft_factor) ...
+            ',' mat2str(sample_size) ...
+            ',%i,%i,%i,%i\n'], ...            
             data_to_export{:} )];
 %             ',' mat2str(info.nSimuOneDir^3) ',%i,%i,%i,%i,%i\n'], ...
           
@@ -253,6 +228,7 @@ function mystr = print_pvalues(mystr, methodName, minuslog10pvalues, statValues,
     end
 end
 
+% Return an error if null of infinite p-value is found
 function check_pvalues(methodName, pvalues)
     pvalues = 10.^(-pvalues);
     errmsg = '';

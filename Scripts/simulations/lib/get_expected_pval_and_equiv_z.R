@@ -1,74 +1,73 @@
-# Load first simulation
-suffix <- "tom"
-remove(allsimudat)
+get_expected_pval_and_equiv_z <- function(pattern="^nStudy50_subNumidentical_varidentical_Betw1") {
 
-study_dirs = dir('../../../data/simulations/', pattern="[two_|two_unb]?nStudy.*")
+study_dir = '/Volumes/camille/IBMA_simu/'
+suffix <- gsub('[^a-zA-Z_0-9]', '', pattern)
+study_dirs = dir(study_dir, pattern=paste(pattern, ".*", sep=''))
+
+csv_file = paste(getwd(), '/../../../data/allsimudat_', suffix,'.csv', sep="")
+if (file.exists(csv_file)){
+	file.remove(csv_file)
+}
 
 tot_num_simu = length(study_dirs)
 
 print(paste(tot_num_simu, "simulations"))
 
+first = T
 for (simunum in seq(tot_num_simu, 1, -1)){
 	print(paste('Reading ', simunum, ' / ', tot_num_simu))	
-	simu_file = paste('../../../data/simulations/', study_dirs[simunum],'/simu.csv',sep="")
+
+	simu_file = paste(study_dir, study_dirs[simunum], 'simu.csv', sep="/")
 	print(simu_file)
-	
+
 	if (! file.exists(simu_file)){
 		print(paste('/!\ ', simu_file, 'does not exist.'))			
 		next
 	}
+
+	simudat <- read.csv(simu_file, header=T,row.names = NULL)
+
+	# qnorm works with natural log (and not base 10)
+	simudat$lnp <- -simudat$minuslog10P*log(10)
+
+	# It is easier to work with the equiv z stat
+	simudat$equivz <- qnorm(simudat$lnp, lower.tail = FALSE, log.p = TRUE)
+
+	simudat$allgroups <- paste(simudat$Between, simudat$Within, simudat$nStudies, simudat$nSimu, simudat$numSubjectScheme, simudat$varScheme, simudat$soft2, simudat$soft2Factor, as.character(simudat$unitMism))
+
+	# newsimudat$expectedp <- newsimudat$rankp/newsimudat$nSimu
+	simudat$expectedz <- qnorm(simudat$expectedP, lower.tail = FALSE)
+
+	# We have downsampled so can't find rank using rank function but from pvalue expected we can retreive rank
+	# simudat$k = simudat$expectedp*simudat$nSimu^3
+	simudat$p_upper <- qbeta(0.025, simudat$rankP, simudat$nSimu-simudat$rankP +1)
+	simudat$z_upper <- qnorm(simudat$p_upper, lower.tail=FALSE)
+	simudat$p_lower <- qbeta(0.975, simudat$rankP, simudat$nSimu-simudat$rankP +1)
+	simudat$z_lower <- qnorm(simudat$p_lower, lower.tail=FALSE)
+
+	simudat$unitMism <- as.character(simudat$unitMism)
 	
-simudat <- read.csv(simu_file, header=T,row.names = NULL)
+	# We want to keep the allsimudat variable (to be able to directly use it without re-reading from the file)
+	if (! exists("allsimudat"))
+	{
+		allsimudat <- simudat
+	} else
+	{
+		allsimudat <-rbind(allsimudat, simudat)
+	}	
 
-# qnorm works with natural log (and not base 10)
-simudat$lnp <- -simudat$minuslog10P*log(10)
-
-# It is easier to work with the equiv z stat
-simudat$equivz <- qnorm(simudat$lnp, lower.tail = FALSE, log.p = TRUE)
-
-# Get confidence interval on observed p
-obs_p_upper <- simudat$P + simudat$stderr_P*1.96
-obs_p_lower <- simudat$P - simudat$stderr_P*1.96
-minuslog10P_upper <- -log10(obs_p_upper)
-minuslog10P_lower <- -log10(obs_p_lower)
-
-simudat$lnp_upper <- -minuslog10P_upper*log(10)
-simudat$lnp_lower <- -minuslog10P_lower*log(10)
-
-simudat$equivz_upper <- qnorm(simudat$lnp_upper, lower.tail = FALSE, log.p = TRUE)
-simudat$equivz_lower <- qnorm(simudat$lnp_lower, lower.tail = FALSE, log.p = TRUE)
-
-
-simudat$allgroups <- paste(simudat$Between, simudat$Within, simudat$nStudies, simudat$nSimu, simudat$numSubjectScheme, simudat$varScheme, simudat$soft2, simudat$soft2Factor, as.character(simudat$unitMismastch))
-
-# newsimudat$expectedp <- newsimudat$rankp/newsimudat$nSimu
-simudat$expectedz <- qnorm(simudat$expectedP, lower.tail = FALSE)
-
-if (! exists("allsimudat"))
-{
-	allsimudat <- simudat
-} else
-{
-	allsimudat <-rbind(allsimudat,simudat)
+	if (first){
+		col_names = T
+		app = F
+		first = F
+	} else{
+		col_names = F
+		app = T
+	}
+	write.table(simudat,file=csv_file,row.names=F,append=app,sep=",",col.names=col_names)
+	print(paste("saved in", csv_file))
 }
 
 }
-
-# allsimudat$expectedz <- qnorm(allsimudat$expectedp, lower.tail=FALSE)
-
-# We have downsampled so can't find rank using rank function but from pvalue expected we can retreive rank
-# allsimudat$k = allsimudat$expectedp*allsimudat$nSimu^3
-allsimudat$p_upper <- qbeta(0.025, allsimudat$rankP, allsimudat$nSimu-allsimudat$rankP +1)
-allsimudat$z_upper <- qnorm(allsimudat$p_upper, lower.tail=FALSE)
-allsimudat$p_lower <- qbeta(0.975, allsimudat$rankP, allsimudat$nSimu-allsimudat$rankP +1)
-allsimudat$z_lower <- qnorm(allsimudat$p_lower, lower.tail=FALSE)
-
-
-allsimudat$unitMismatch <- as.character(allsimudat$unitMismatch)
-allsimudat$unitMismatch[allsimudat$unitMismatch=="0"]=FALSE
-allsimudat$unitMismatch[allsimudat$unitMismatch=="false"]=FALSE
-allsimudat$unitMismatch[allsimudat$unitMismatch=="true"]=TRUE
-
-write.table(allsimudat,file=paste('../../../allsimudat_', suffix,'.csv', sep=""),row.names=F)
 
 

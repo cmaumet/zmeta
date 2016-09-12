@@ -2,7 +2,16 @@ library('ggplot2')
 # allsimudat_pval <- read.csv('../../../allsimudat_pval.csv', header=T, sep=" ")
 # allsimudat_pval_rank <- read.csv('../../../allsimudat_pval_rank.csv', header=T, sep=" ")
 # allsimudat_tval <- read.csv('../../../allsimudat_nopval.csv', header=T, sep=" ")
-allsimudat_tom <- read.csv('../../../allsimudat_tom.csv', header=T, sep=" ")
+pattern = "^test1_k25_btw1"
+suffix <- gsub('[^a-zA-Z_0-9]', '', pattern)
+csv_file = paste(getwd(), '/../../../data/allsimudat_', suffix,'.csv', sep="")
+
+if (! file.exists(csv_file)){
+	get_expected_pval_and_equiv_z(pattern)
+}
+
+allsimudat_tom <- read.csv(csv_file, header=T, sep=",")
+
 
 allsimudat <- allsimudat_tom
 
@@ -30,28 +39,32 @@ facet_labeller <- function(var, value){
 #selected_methods <- c("megaMFX","megaRFX","permutCon","permutZ","stouffersMFX")
 selected_methods <- c("megaMFX","megaRFX","permutCon")
 
-data_subset <- subset(allsimudat, expectedz>0 &  nStudies>10 & Between==1 &  (allsimudat$methods %in% selected_methods)  & !(allsimudat$methods %in% c("megaFFX")) & glm==2)
+# data_subset <- subset(allsimudat, expectedz>0 &  nStudies>10 & Between==0 &  (allsimudat$methods %in% selected_methods)  & !(allsimudat$methods %in% c("megaFFX")) & glm==1)
+
+# expectedz is minus infinity if expected p is 1 which happens when rank = sample_size
+# we look only at positive effect (expectedz>0), supposedly this should be more or less symmetric...?
+data_subset <- subset(allsimudat, is.finite(expectedz) & expectedz>0 &  (allsimudat$methods %in% selected_methods) )
 
 subplot=list()
 titles=list()
 
 titles[[1]] <- "Nominal"
-subplot[[1]] <- subset(data_subset, soft2==0 & unitMismatch=="FALSE")
+subplot[[1]] <- subset(data_subset, soft2==0 & unitMism=="nominal")
 
 titles[[2]] <- "Different scaling target"
-subplot[[2]] <- subset(data_subset, soft2Factor==100)
+subplot[[2]] <- subset(data_subset, unitMism=="datascl" & soft2Factor==100)
 
 titles[[3]] <- "Different scaling algorithm (same target)"
-subplot[[3]] <- subset(data_subset, soft2>0 & soft2Factor!=100)
+subplot[[3]] <- subset(data_subset, unitMism=="datascl" & soft2Factor!=100)
 
 titles[[4]] <- "Different contrast vector scaling"
-subplot[[4]] <- subset(data_subset, soft2==0 & unitMismatch=="TRUE")
+subplot[[4]] <- subset(data_subset, soft2==0 & unitMism=="contscl")
 
 
 
-methods=="megaRFX")
+#methods=="megaRFX")
 
-allsimusdat$Within <- factor(allsimusdat$Within)
+allsimudat$Within <- factor(allsimudat$Within)
 
 
  # 
@@ -60,11 +73,11 @@ allsimusdat$Within <- factor(allsimusdat$Within)
 #methods=="permutCon" & Between==1 & nStudies==50 & numSubjectScheme=="identical" & varScheme=="identical" & Within==5)
 #
 
-# With the plot below, we can check if things went wrong (i.e. expected z-stat not incremental)
-p <- ggplot(data_subset, aes(as.factor(equivz), expectedz, colour=factor(paste(Within))))
-p + geom_boxplot() + stat_summary(fun.y=mean, colour="red", geom="point", shape=18, size=3,show_guide = FALSE) + facet_grid(methods+Between ~ nStudies+ numSubjectScheme) 
+# # # With the plot below, we can check if things went wrong (i.e. expected z-stat not incremental)
+# p <- ggplot(data_subset, aes(as.factor(equivz), expectedz, colour=factor(paste(Within))))
+# p + geom_boxplot() + stat_summary(fun.y=mean, colour="red", geom="point", shape=18, size=3,show_guide = FALSE) + facet_grid(methods+Between ~ nStudies+ numSubjectScheme) 
 
-p <- ggplot(data_subset, aes(as.factor(equivz), equivz-expectedz, colour=factor(paste(Within))))
+# p <- ggplot(data_subset, aes(as.factor(equivz), equivz-expectedz, colour=factor(paste(Within))))
 
 
 # Bland-Altman like
@@ -81,96 +94,50 @@ for (i in 1:4){
 	# subpl[[i]] <- subpl[[i]] + geom_ribbon(aes(x=expectedz, ymin=z_lower-expectedz, ymax=z_upper-expectedz), fill="grey", alpha=.2, colour=NA) + facet_grid(Between + methods + nStudies + glm ~ unitMismatch+soft2Factor+ soft2, labeller=facet_labeller) + theme(strip.text.x = element_text(size = 16)) + ylab("Difference between estimated and reference z-statistic") + xlab("Reference z-statistic") + geom_line(aes(x=expectedz, y=0), colour="black") + geom_line() + geom_point(size=1) 
 }
 
-# subpl[[1]]
-
 multiplot(subpl[[1]], subpl[[2]], subpl[[3]], subpl[[4]], cols=2)
 
 
-# To be able to do boxplots we need to store all values... otherwise as digits -> infinity we get smaller and smaller box plots...
-# digits <- 1
-# + geom_boxplot(aes(x=(round(expectedz, digits)), y=equivz-expectedz, group=paste(allgroups,factor(round(expectedz, digits))) , colour=factor(paste(Within))))
+# # To be able to do boxplots we need to store all values... otherwise as digits -> infinity we get smaller and smaller box plots...
+# # digits <- 1
+# # + geom_boxplot(aes(x=(round(expectedz, digits)), y=equivz-expectedz, group=paste(allgroups,factor(round(expectedz, digits))) , colour=factor(paste(Within))))
 
-+ geom_smooth(method = "loess", fill=NA, size=1) + xlim(0, 3.4) + ylim(-0.05, 0.05)
-
-
-# estimated = f(reference) like on P
-p <- ggplot(data= data_subset, aes(x=-log10(expectedP), y=-log10(P), group=allgroups, colour=factor(paste(Within))))
-
-p + geom_line() + geom_point(size=1) + facet_grid(methods+Between ~ nStudies+ numSubjectScheme, scales = "free") + theme(strip.text.x = element_text(size = 16)) + ylab("Observed -log10(P)") + xlab("Expected -log10(P)") + geom_line(aes(x=expectedP, y=expectedP), colour="black") + geom_line(aes(x=expectedP, y=p_upper), colour="red") + geom_line(aes(x=expectedP, y=p_lower), colour="blue")
-
-# Bland-Altman like on P
-p <- ggplot(data=subset(allsimudat, expectedP<0.5 & !(allsimudat $methods %in% levels(allsimudat $methods)[c(3,4,5,7)])), aes(x=-log10(expectedP), y=(P-expectedP), group=allgroups, colour=factor(paste(Within))))
-
-p + geom_line() + geom_point(size=1) + facet_grid(Between~methods, scales = "free") + theme(strip.text.x = element_text(size = 16)) + ylab("Observed P minus expected P") + xlab("Expected -log10(P)") 
-
-p + geom_line() + geom_point(size=1) + facet_grid(methods~Between+Within+nStudies, scales = "free") + theme(strip.text.x = element_text(size = 16)) + ylab("Difference between estimated and reference z-statistic") + xlab("Reference z-statistic") + geom_abline(intercept=0, slope=1)
+# + geom_smooth(method = "loess", fill=NA, size=1) + xlim(0, 3.4) + ylim(-0.05, 0.05)
 
 
-p + geom_line() +  geom_abline(slope=1) +  geom_line(slope=1) + facet_grid(Between~methods, scales = "free") + theme(strip.text.x = element_text(size = 16)) + ylab("Estimated and z-statistic") + xlab("Reference z-statistic") 
+# # estimated = f(reference) like on P
+# p <- ggplot(data= data_subset, aes(x=-log10(expectedP), y=-log10(P), group=allgroups, colour=factor(paste(Within))))
 
-+ geom_ribbon(aes(ymin=equivz+1,ymax= equivz-1,alpha=0.1, group=methods))
+# p + geom_line() + geom_point(size=1) + facet_grid(methods+Between ~ nStudies+ numSubjectScheme, scales = "free") + theme(strip.text.x = element_text(size = 16)) + ylab("Observed -log10(P)") + xlab("Expected -log10(P)") + geom_line(aes(x=expectedP, y=expectedP), colour="black") + geom_line(aes(x=expectedP, y=p_upper), colour="red") + geom_line(aes(x=expectedP, y=p_lower), colour="blue")
 
-# # By doing this we accept a lower precison around p=1
-allsimudat$roundedlog10p_1 <- round(allsimudat $log10p, digits=1)
+# # Bland-Altman like on P
+# p <- ggplot(data=subset(allsimudat, expectedP<0.5 & !(allsimudat $methods %in% levels(allsimudat $methods)[c(3,4,5,7)])), aes(x=-log10(expectedP), y=(P-expectedP), group=allgroups, colour=factor(paste(Within))))
 
-newallsimudat <- as.data.frame(aggregate(cbind(p,original_p,log10p,lnp,equivz,expectedp,expectedz)  ~ allgroups + roundedlog10p_1 + methods, data=allsimudat, FUN=mean))
+# p + geom_line() + geom_point(size=1) + facet_grid(Between~methods, scales = "free") + theme(strip.text.x = element_text(size = 16)) + ylab("Observed P minus expected P") + xlab("Expected -log10(P)") 
 
-
-newallsimudat <- aggregate(cbind(p,original_p,log10p,lnp,equivz,expectedp,expectedz)  ~ allgroups + roundedlog10p_1 + methods + nStudies + Between + Within + nSimu, data= allsimudat, FUN=mean)
-
-newallsimudat$expectedz_re <- qnorm(newallsimudat$expectedp, lower.tail=FALSE)
-
-p <- ggplot(data=subset(newallsimudat,expectedz_re>0 & nStudies==20  (newallsimudat$methods %in% levels(newallsimudat$methods)[c(3,4,5,7)])), aes(x=expectedz_re, y=equivz-expectedz_re, group=allgroups, colour=factor(Within)))
-
-p + geom_line() + geom_point(size=1) + facet_grid(Between~ methods) + ylim(-0.3, 0.3) +      theme(strip.text.x = element_text(size = 16))
+# p + geom_line() + geom_point(size=1) + facet_grid(methods~Between+Within+nStudies, scales = "free") + theme(strip.text.x = element_text(size = 16)) + ylab("Difference between estimated and reference z-statistic") + xlab("Reference z-statistic") + geom_abline(intercept=0, slope=1)
 
 
+# p + geom_line() +  geom_abline(slope=1) +  geom_line(slope=1) + facet_grid(Between~methods, scales = "free") + theme(strip.text.x = element_text(size = 16)) + ylab("Estimated and z-statistic") + xlab("Reference z-statistic") 
+
+# + geom_ribbon(aes(ymin=equivz+1,ymax= equivz-1,alpha=0.1, group=methods))
+
+# # # By doing this we accept a lower precison around p=1
+# allsimudat$roundedlog10p_1 <- round(allsimudat $log10p, digits=1)
+
+# newallsimudat <- as.data.frame(aggregate(cbind(p,original_p,log10p,lnp,equivz,expectedp,expectedz)  ~ allgroups + roundedlog10p_1 + methods, data=allsimudat, FUN=mean))
 
 
-p + facet_grid(Between~ methods) +    geom_smooth(method="loess", se=FALSE, fullrange=T)
+# newallsimudat <- aggregate(cbind(p,original_p,log10p,lnp,equivz,expectedp,expectedz)  ~ allgroups + roundedlog10p_1 + methods + nStudies + Between + Within + nSimu, data= allsimudat, FUN=mean)
 
-# Multiple plot function
-#
-# ggplot objects can be passed in ..., or to plotlist (as a list of ggplot objects)
-# - cols:   Number of columns in layout
-# - layout: A matrix specifying the layout. If present, 'cols' is ignored.
-#
-# If the layout is something like matrix(c(1,2,3,3), nrow=2, byrow=TRUE),
-# then plot 1 will go in the upper left, 2 will go in the upper right, and
-# 3 will go all the way across the bottom.
-#
-multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
-  require(grid)
+# newallsimudat$expectedz_re <- qnorm(newallsimudat$expectedp, lower.tail=FALSE)
 
-  # Make a list from the ... arguments and plotlist
-  plots <- c(list(...), plotlist)
+# p <- ggplot(data=subset(newallsimudat,expectedz_re>0 & nStudies==20  (newallsimudat$methods %in% levels(newallsimudat$methods)[c(3,4,5,7)])), aes(x=expectedz_re, y=equivz-expectedz_re, group=allgroups, colour=factor(Within)))
 
-  numPlots = length(plots)
+# p + geom_line() + geom_point(size=1) + facet_grid(Between~ methods) + ylim(-0.3, 0.3) +      theme(strip.text.x = element_text(size = 16))
 
-  # If layout is NULL, then use 'cols' to determine layout
-  if (is.null(layout)) {
-    # Make the panel
-    # ncol: Number of columns of plots
-    # nrow: Number of rows needed, calculated from # of cols
-    layout <- matrix(seq(1, cols * ceiling(numPlots/cols)),
-                    ncol = cols, nrow = ceiling(numPlots/cols))
-  }
 
- if (numPlots==1) {
-    print(plots[[1]])
 
-  } else {
-    # Set up the page
-    grid.newpage()
-    pushViewport(viewport(layout = grid.layout(nrow(layout), ncol(layout))))
 
-    # Make each plot, in the correct location
-    for (i in 1:numPlots) {
-      # Get the i,j matrix positions of the regions that contain this subplot
-      matchidx <- as.data.frame(which(layout == i, arr.ind = TRUE))
+# p + facet_grid(Between~ methods) +    geom_smooth(method="loess", se=FALSE, fullrange=T)
 
-      print(plots[[i]], vp = viewport(layout.pos.row = matchidx$row,
-                                      layout.pos.col = matchidx$col))
-    }
-  }
-}
+
