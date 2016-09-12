@@ -2,7 +2,7 @@ library('ggplot2')
 # allsimudat_pval <- read.csv('../../../allsimudat_pval.csv', header=T, sep=" ")
 # allsimudat_pval_rank <- read.csv('../../../allsimudat_pval_rank.csv', header=T, sep=" ")
 # allsimudat_tval <- read.csv('../../../allsimudat_nopval.csv', header=T, sep=" ")
-pattern = "^test1_k25_btw1"
+pattern = "^test3_k25_btw0"
 suffix <- gsub('[^a-zA-Z_0-9]', '', pattern)
 csv_file = paste(getwd(), '/../../../data/allsimudat_', suffix,'.csv', sep="")
 
@@ -39,7 +39,7 @@ facet_labeller <- function(var, value){
 #selected_methods <- c("megaMFX","megaRFX","permutCon","permutZ","stouffersMFX")
 selected_methods <- c("megaMFX","megaRFX","permutCon")
 
-# data_subset <- subset(allsimudat, expectedz>0 &  nStudies>10 & Between==0 &  (allsimudat$methods %in% selected_methods)  & !(allsimudat$methods %in% c("megaFFX")) & glm==1)
+# data_subset <- subset(allsimudat, expectedz>0 &  nStudies>10 & Between==0 &  (allsimudat$methods not %in% selected_methods)  & !(allsimudat$methods %in% c("megaFFX")) & glm==1)
 
 # expectedz is minus infinity if expected p is 1 which happens when rank = sample_size
 # we look only at positive effect (expectedz>0), supposedly this should be more or less symmetric...?
@@ -49,7 +49,7 @@ subplot=list()
 titles=list()
 
 titles[[1]] <- "Nominal"
-subplot[[1]] <- subset(data_subset, soft2==0 & unitMism=="nominal")
+subplot[[1]] <- subset(data_subset, unitMism=="nominal")
 
 titles[[2]] <- "Different scaling target"
 subplot[[2]] <- subset(data_subset, unitMism=="datascl" & soft2Factor==100)
