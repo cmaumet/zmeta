@@ -337,7 +337,7 @@ function meta_sim(base_dir, redo, path_to_spm)
                                     permutcon_dir = fullfile(simu_dir, 'permutCon');
                                     permutz_dir = fullfile(simu_dir, 'permutZ');
 
-                                    last_data = fullfile(data_dir, ['varcon_st' num2str((k_group1+k_group2), '%03d') '.nii']);
+                                    last_data = fullfile(data_dir, ['z_st' num2str((k_group1+k_group2), '%03d') '.nii']);
                                     exist_data = exist(last_data, 'file');
 
                                     if exist_data
