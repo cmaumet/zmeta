@@ -5,3 +5,5 @@ simulations/
 
 fsl_designs/*.png
 fsl_designs/*/*.ppm
+
+*.DS_Store
