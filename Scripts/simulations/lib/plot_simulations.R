@@ -3,7 +3,7 @@ library('ggplot2')
 # allsimudat_pval <- read.csv('../../../allsimudat_pval.csv', header=T, sep=" ")
 # allsimudat_pval_rank <- read.csv('../../../allsimudat_pval_rank.csv', header=T, sep=" ")
 # allsimudat_tval <- read.csv('../../../allsimudat_nopval.csv', header=T, sep=" ")
-pattern = "^test2_.*_btw1"
+pattern = "^test3_.*_btw1"
 suffix <- gsub('[^a-zA-Z_0-9]', '', pattern)
 csv_file = paste(getwd(), '/../../../data/allsimudat_', suffix,'.csv', sep="")
 
