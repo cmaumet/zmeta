@@ -108,7 +108,7 @@ subpl=list()
 for (i in 1:4){
 	subpl[[i]] <- ggplot(data=subplot[[i]],aes(x=expectedz, y=equivz-expectedz, group=allgroups, colour=factor(Within)))
 	
-	subpl[[i]] <- subpl[[i]] + geom_ribbon(aes(x=expectedz, ymin=z_lower-expectedz, ymax=z_upper-expectedz), fill="grey", alpha=.2, colour=NA) + facet_grid(methods~soft2+nStudies, labeller=facet_labeller,scales = "free") + theme(strip.text.x = element_text(size = 10)) + ylab("Estimated - reference Z") + xlab("Reference Z") + geom_line(aes(x=expectedz, y=0), colour="black") + geom_line() + geom_point(size=0.5) + ggtitle(titles[[i]]) + theme(legend.position="none") + ylim(-1, 0.5)
+	subpl[[i]] <- subpl[[i]] + geom_ribbon(aes(x=expectedz, ymin=z_lower-expectedz, ymax=z_upper-expectedz), fill="grey", alpha=.2, colour=NA) + facet_grid(methods~nStudies+soft2, labeller=facet_labeller,scales = "free") + theme(strip.text.x = element_text(size = 10)) + ylab("Estimated - reference Z") + xlab("Reference Z") + geom_line(aes(x=expectedz, y=0), colour="black") + geom_line() + geom_point(size=0.5) + ggtitle(titles[[i]]) + theme(legend.position="none") + ylim(-1, 0.5)
 
 	
 	# + geom_ribbon(aes(x=expectedz, ymax = equivz_upper-expectedz, ymin= equivz_lower-expectedz), width=0.20) 
