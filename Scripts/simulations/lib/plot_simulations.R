@@ -3,7 +3,7 @@ library('ggplot2')
 # allsimudat_pval <- read.csv('../../../allsimudat_pval.csv', header=T, sep=" ")
 # allsimudat_pval_rank <- read.csv('../../../allsimudat_pval_rank.csv', header=T, sep=" ")
 # allsimudat_tval <- read.csv('../../../allsimudat_nopval.csv', header=T, sep=" ")
-pattern = "^test1_.*_btw1"
+pattern = "^test2_.*_btw1"
 suffix <- gsub('[^a-zA-Z_0-9]', '', pattern)
 csv_file = paste(getwd(), '/../../../data/allsimudat_', suffix,'.csv', sep="")
 
@@ -118,7 +118,8 @@ for (i in 1:4){
 
 #p<- subpl[[1]]
 
-multiplot(subpl[[1]], subpl[[4]], subpl[[3]], subpl[[2]], layout=matrix(c(1,2,3,3,4,4), nrow=1, byrow=TRUE))
+#multiplot(subpl[[1]], subpl[[4]], subpl[[3]], subpl[[2]], layout=matrix(c(1,2,3,3,4,4), nrow=1, byrow=TRUE))
+multiplot(subpl[[1]], subpl[[4]], subpl[[3]], layout=matrix(c(1,2,3,3), nrow=1, byrow=TRUE))
 
 
 # # To be able to do boxplots we need to store all values... otherwise as digits -> infinity we get smaller and smaller box plots...
