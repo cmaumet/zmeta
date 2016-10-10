@@ -49,3 +49,6 @@ fsl_design/*.fsf
 *(Autosaved).R
 
 *.DS_Store
+
+# For now do not store figures in pdf format (only png)
+Paper/figures/*.pdf
