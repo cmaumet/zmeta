@@ -68,7 +68,7 @@ data_subset <- data_subset[order(c(data_subset$soft2, data_subset$soft2Factor, d
 subplot=list()
 titles=list()
 
-titles[[1]] <- "Nominal"
+titles[[1]] <- paste("Nominal (", suffix,")") 
 subplot[[1]] <- subset(data_subset, unitMism=="nominal")
 #subplot[[1]] <- data_subset
 
