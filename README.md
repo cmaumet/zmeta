@@ -16,5 +16,5 @@
  source('get_expected_pval_and_equiv_z.R')
  get_expected_pval_and_equiv_z('test*')
  source('multiplot.R')
- source('plot_simluations.R')
+ source('plot_simulations.R')
  ```
