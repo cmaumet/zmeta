@@ -2,17 +2,26 @@
 %   simuDir: full path to the directory storing the simulations
 %   redo: if true, overwrite previous export (default: false)
 %   downs_tot: Number of points to keep after downsampling
-function export_full_simulations(simuDir, redo, downs_tot, pattern)
+function export_full_simulations(simuDir, redo, pattern, split_in)
     if nargin < 2
         redo = false;
     end
     if nargin < 3
-        downs_tot = 10;
-    end
-    if nargin < 4
         % Export all studies
         pattern = '^(two_|two_unb_|)nStudy';
     end    
+    if nargin < 4
+        % Do not split
+        split_in = 1;
+    end    
+    
+    if split_in == 1
+        downs_tot = 1000;
+    elseif split_in == 10
+        downs_tot = 10;
+    else
+        downs_tot = 1000/(split_in*10);
+    end
 
     donws_pos = [];
     
@@ -64,7 +73,15 @@ function export_full_simulations(simuDir, redo, downs_tot, pattern)
         
         num_iter = numel(iter_dirs);
         
-        filename = 'simu.csv';
+        if split_in == 10
+            csv_suffix = 'wrep';
+        elseif split_in == 1
+            csv_suffix = '';
+        else
+            csv_suffix = ['wrep_' num2str(split_in)];
+        end
+            
+        filename = ['simu_' csv_suffix '.csv';];
         
         main_simu_dir = fullfile(simuDir, simuDirs(s).name);
         simu_file = fullfile(main_simu_dir, filename);
@@ -153,21 +170,30 @@ function export_full_simulations(simuDir, redo, downs_tot, pattern)
                     prev_sample_size = sample_size;
                 end
                 
+                % Split in equal folds
+                bin_size = sample_size/split_in;
+                
                 % We want to keep the same downsampling for all simulations
                 % and methods
                 if isempty(donws_pos)
-                    if downs_tot > sample_size
+                    if downs_tot > bin_size
                         error(['can''t downsize to ' num2str(downs_tot) ...
-                            '(sample size is ' num2str(sample_size) ')'])
+                            '(bin_size is ' ...
+                            num2str(bin_size) ')'])
                     end
                     % downsample in log-space so that we keep more values 
                     % corresponding to smaller ranks/p-values                    
                     donws_pos = round(...
-                        logspace(0,log10(sample_size), downs_tot));
+                        logspace(0,log10(bin_size), downs_tot));
                 end
                 
-                mystr = print_pvalues(mystr, methods(m).name, ...
-                    pvalues, info, donws_pos);
+                start = 1;
+                for spl = 1:split_in
+                    ending = start + bin_size -1; 
+                    mystr = print_pvalues(mystr, methods(m).name, ...
+                        pvalues(start:ending), info, donws_pos);
+                    start = ending + 1;
+                end
             end
             
             % A single file combining all iterations for this simulation

@@ -1,8 +1,9 @@
 library('ggplot2')
+
 # allsimudat_pval <- read.csv('../../../allsimudat_pval.csv', header=T, sep=" ")
 # allsimudat_pval_rank <- read.csv('../../../allsimudat_pval_rank.csv', header=T, sep=" ")
 # allsimudat_tval <- read.csv('../../../allsimudat_nopval.csv', header=T, sep=" ")
-pattern = "^test1_k25_btw1"
+pattern = "^test2_k.*_btw1"
 suffix <- gsub('[^a-zA-Z_0-9]', '', pattern)
 csv_file = paste(getwd(), '/../../../data/allsimudat_', suffix,'.csv', sep="")
 
@@ -25,31 +26,51 @@ facet_labeller <- function(var, value){
         value[value==2] <- "algorithm"    	        
         value[value==100] <- "baseline"    	        
     } else if (var=="soft2") { 
-        value <- paste(as.numeric(value)*100, "%")
+        value <- paste(as.numeric(value)*100, "%", sep='')
+        value[value=="0%"] <- ""    	        
     } else if (var=="methods") { 
         value[value=="megaMFX"] <- "MFX"    	
         value[value=="megaRFX"] <- "RFX"    	    
         value[value=="permutCon"] <- "Perm. E"
         value[value=="permutZ"] <- "Perm. Z"            	    
         value[value=="stouffersMFX"] <- "Stouf."            	            
-    } 
+    } else if (var=="units") { 
+        value[value=="contscl 1 0"] <- "Different contrast vector scaling"    
+        value[value=="contscl 1"] <- "Different contrast vector scaling"            	
+        value[value=="datascl 2"] <- "Different scaling algorithm (same target)"        
+        value[value=="datascl 2 0.2"] <- "Different scaling algorithm (same target) - 20%"
+        value[value=="datascl 2 0.5"] <- "Different scaling algorithm (same target) - 50%"        
+        value[value=="nominal 1 0"] <- "Nominal"                    	    
+        value[value=="nominal 1"] <- "Nominal"                    	            
+        value[value=="datascl 100 0.2"] <- "Different scaling target - 20%"
+        value[value=="datascl 100"] <- "Different scaling target"        
+        value[value=="datascl 100 0.5"] <- "Different scaling target - 50%"        
+    } else if (var=="nStudies") { 
+        value <- paste(as.numeric(value), " studies", sep='')
+    }
     return(value)
 }
 
 #selected_methods <- c("megaMFX","megaRFX","permutCon","permutZ","stouffersMFX")
 selected_methods <- c("megaMFX","megaRFX","permutCon")
 
-# data_subset <- subset(allsimudat, expectedz>0 &  nStudies>10 & Between==0 &  (allsimudat$methods %in% selected_methods)  & !(allsimudat$methods %in% c("megaFFX")) & glm==1)
+# data_subset <- subset(allsimudat, expectedz>0 &  nStudies>10 & Between==0 &  (allsimudat$methods not %in% selected_methods)  & !(allsimudat$methods %in% c("megaFFX")) & glm==1)
 
 # expectedz is minus infinity if expected p is 1 which happens when rank = sample_size
 # we look only at positive effect (expectedz>0), supposedly this should be more or less symmetric...?
 data_subset <- subset(allsimudat, is.finite(expectedz) & expectedz>0 &  (allsimudat$methods %in% selected_methods) )
 
+data_subset$units <- paste(data_subset$unitMism, data_subset$soft2Factor)
+
+# Reorder the data frame to have nominal first
+data_subset <- data_subset[order(c(data_subset$soft2, data_subset$soft2Factor, data_subset$units)), ]
+
 subplot=list()
 titles=list()
 
-titles[[1]] <- "Nominal"
-subplot[[1]] <- subset(data_subset, soft2==0 & unitMism=="nominal")
+titles[[1]] <- paste("Nominal (", suffix,")") 
+subplot[[1]] <- subset(data_subset, unitMism=="nominal")
+#subplot[[1]] <- data_subset
 
 titles[[2]] <- "Different scaling target"
 subplot[[2]] <- subset(data_subset, unitMism=="datascl" & soft2Factor==100)
@@ -87,14 +108,22 @@ subpl=list()
 for (i in 1:4){
 	subpl[[i]] <- ggplot(data=subplot[[i]],aes(x=expectedz, y=equivz-expectedz, group=allgroups, colour=factor(Within)))
 	
-	subpl[[i]] <- subpl[[i]] + geom_ribbon(aes(x=expectedz, ymin=z_lower-expectedz, ymax=z_upper-expectedz), fill="grey", alpha=.2, colour=NA) + facet_grid(soft2~ methods, labeller=facet_labeller) + theme(strip.text.x = element_text(size = 10)) + ylab("Estimated - reference Z") + xlab("Reference Z") + geom_line(aes(x=expectedz, y=0), colour="black") + geom_line() + geom_point(size=0.5) + ggtitle(titles[[i]])   
+	subpl[[i]] <- subpl[[i]] + geom_ribbon(aes(x=expectedz, ymin=z_lower-expectedz, ymax=z_upper-expectedz), fill="grey", alpha=.9, colour=NA) + facet_grid(methods+nStudies ~soft2+Within, labeller=facet_labeller,scales = "free") + theme(strip.text.x = element_text(size = 10)) + ylab("Estimated - reference Z") + xlab("Reference Z") + geom_line(aes(x=expectedz, y=0), colour="black") + ggtitle(titles[[i]]) + theme(legend.position="none") + ylim(-1, 0.5)  + stat_summary(fun.y = mean, geom = "line") + stat_summary(fun.data = mean_se, geom = "pointrange") 
+	
+	#+ stat_summary(fun.data = "interquartile", geom = "errorbar")+    stat_summary(fun.y = 'median', geom='line')
+
+
+
 	
 	# + geom_ribbon(aes(x=expectedz, ymax = equivz_upper-expectedz, ymin= equivz_lower-expectedz), width=0.20) 
 	
 	# subpl[[i]] <- subpl[[i]] + geom_ribbon(aes(x=expectedz, ymin=z_lower-expectedz, ymax=z_upper-expectedz), fill="grey", alpha=.2, colour=NA) + facet_grid(Between + methods + nStudies + glm ~ unitMismatch+soft2Factor+ soft2, labeller=facet_labeller) + theme(strip.text.x = element_text(size = 16)) + ylab("Difference between estimated and reference z-statistic") + xlab("Reference z-statistic") + geom_line(aes(x=expectedz, y=0), colour="black") + geom_line() + geom_point(size=1) 
 }
 
-multiplot(subpl[[1]], subpl[[2]], subpl[[3]], subpl[[4]], cols=2)
+#p<- subpl[[1]]
+
+#multiplot(subpl[[1]], subpl[[4]], subpl[[3]], subpl[[2]], layout=matrix(c(1,2,3,3,4,4), nrow=1, byrow=TRUE))
+multiplot(subpl[[1]], subpl[[4]], subpl[[3]], layout=matrix(c(1,2,3,3), nrow=1, byrow=TRUE))
 
 
 # # To be able to do boxplots we need to store all values... otherwise as digits -> infinity we get smaller and smaller box plots...
