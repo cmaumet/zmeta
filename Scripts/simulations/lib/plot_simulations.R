@@ -3,7 +3,7 @@ library('ggplot2')
 # allsimudat_pval <- read.csv('../../../allsimudat_pval.csv', header=T, sep=" ")
 # allsimudat_pval_rank <- read.csv('../../../allsimudat_pval_rank.csv', header=T, sep=" ")
 # allsimudat_tval <- read.csv('../../../allsimudat_nopval.csv', header=T, sep=" ")
-pattern = "^test2_k25_btw1"
+pattern = "^test2_k.*_btw1"
 suffix <- gsub('[^a-zA-Z_0-9]', '', pattern)
 csv_file = paste(getwd(), '/../../../data/allsimudat_', suffix,'.csv', sep="")
 
@@ -108,8 +108,10 @@ subpl=list()
 for (i in 1:4){
 	subpl[[i]] <- ggplot(data=subplot[[i]],aes(x=expectedz, y=equivz-expectedz, group=allgroups, colour=factor(Within)))
 	
-	subpl[[i]] <- subpl[[i]] + geom_ribbon(aes(x=expectedz, ymin=z_lower-expectedz, ymax=z_upper-expectedz), fill="grey", alpha=.9, colour=NA) + facet_grid(methods~nStudies+soft2+Within, labeller=facet_labeller,scales = "free") + theme(strip.text.x = element_text(size = 10)) + ylab("Estimated - reference Z") + xlab("Reference Z") + geom_line(aes(x=expectedz, y=0), colour="black") + ggtitle(titles[[i]]) + theme(legend.position="none") + ylim(-1, 0.5)  + stat_summary(fun.y = mean, geom = "point") + 
-    stat_summary(fun.data = mean_se, geom = "errorbar")
+	subpl[[i]] <- subpl[[i]] + geom_ribbon(aes(x=expectedz, ymin=z_lower-expectedz, ymax=z_upper-expectedz), fill="grey", alpha=.9, colour=NA) + facet_grid(methods+nStudies ~soft2+Within, labeller=facet_labeller,scales = "free") + theme(strip.text.x = element_text(size = 10)) + ylab("Estimated - reference Z") + xlab("Reference Z") + geom_line(aes(x=expectedz, y=0), colour="black") + ggtitle(titles[[i]]) + theme(legend.position="none") + ylim(-1, 0.5)  + stat_summary(fun.y = mean, geom = "line") + stat_summary(fun.data = mean_se, geom = "pointrange") 
+	
+	#+ stat_summary(fun.data = "interquartile", geom = "errorbar")+    stat_summary(fun.y = 'median', geom='line')
+
 
 
 	

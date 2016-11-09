@@ -2,17 +2,26 @@
 %   simuDir: full path to the directory storing the simulations
 %   redo: if true, overwrite previous export (default: false)
 %   downs_tot: Number of points to keep after downsampling
-function export_full_simulations(simuDir, redo, downs_tot, pattern)
+function export_full_simulations(simuDir, redo, pattern, split_in)
     if nargin < 2
         redo = false;
     end
     if nargin < 3
-        downs_tot = 10;
-    end
-    if nargin < 4
         % Export all studies
         pattern = '^(two_|two_unb_|)nStudy';
     end    
+    if nargin < 4
+        % Do not split
+        split_in = 1;
+    end    
+    
+    if split_in == 1
+        downs_tot = 1000;
+    elseif split_in == 10
+        downs_tot = 10;
+    else
+        downs_tot = 1000/(split_in*10);
+    end
 
     donws_pos = [];
     
@@ -64,7 +73,15 @@ function export_full_simulations(simuDir, redo, downs_tot, pattern)
         
         num_iter = numel(iter_dirs);
         
-        filename = 'simu_wrep.csv';
+        if split_in == 10
+            csv_suffix = 'wrep';
+        elseif split_in == 1
+            csv_suffix = '';
+        else
+            csv_suffix = ['wrep_' num2str(split_in)];
+        end
+            
+        filename = ['simu_' csv_suffix '.csv';];
         
         main_simu_dir = fullfile(simuDir, simuDirs(s).name);
         simu_file = fullfile(main_simu_dir, filename);
@@ -153,8 +170,7 @@ function export_full_simulations(simuDir, redo, downs_tot, pattern)
                     prev_sample_size = sample_size;
                 end
                 
-                % Split in 10 equal folds
-                split_in = 10;
+                % Split in equal folds
                 bin_size = sample_size/split_in;
                 
                 % We want to keep the same downsampling for all simulations

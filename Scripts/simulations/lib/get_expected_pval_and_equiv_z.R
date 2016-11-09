@@ -41,9 +41,9 @@ for (simunum in seq(tot_num_simu, 1, -1)){
 
 	# We have downsampled so can't find rank using rank function but from pvalue expected we can retreive rank
 	# simudat$k = simudat$expectedp*simudat$nSimu^3
-	simudat$p_upper <- qbeta(0.025, simudat$rankP, simudat$nSimu-simudat$rankP +1)
+	simudat$p_upper <- qbeta(0.025, simudat$rankP, simudat$nSimu-simudat$rankP +1)/3.2
 	simudat$z_upper <- qnorm(simudat$p_upper, lower.tail=FALSE)
-	simudat$p_lower <- qbeta(0.975, simudat$rankP, simudat$nSimu-simudat$rankP +1)
+	simudat$p_lower <- qbeta(0.975, simudat$rankP, simudat$nSimu-simudat$rankP +1)/3.2
 	simudat$z_lower <- qnorm(simudat$p_lower, lower.tail=FALSE)
 
 	simudat$unitMism <- as.character(simudat$unitMism)
