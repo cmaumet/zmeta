@@ -12,6 +12,7 @@
 *.log
 *.gz
 *.toc
+*.spl
 
 *.fls
 
