@@ -123,7 +123,9 @@ function export_full_simulations(simuDir, redo, pattern, split_in)
                         info = info.simu.config;
                     catch
                         warning(['Skipped' this_simu_dir])
-                        delete(simu_file)
+                        if exist(simu_file, 'file')
+                            delete(simu_file)
+                        end
                         continue;
                     end             
                     methodDir = fullfile(this_simu_dir, methods(m).name);
