@@ -74,14 +74,14 @@ function export_full_simulations(simuDir, redo, pattern, split_in)
         num_iter = numel(iter_dirs);
         
         if split_in == 10
-            csv_suffix = 'wrep';
+            csv_suffix = '_wrep';
         elseif split_in == 1
             csv_suffix = '';
         else
-            csv_suffix = ['wrep_' num2str(split_in)];
+            csv_suffix = ['_wrep_' num2str(split_in)];
         end
             
-        filename = ['simu_' csv_suffix '.csv';];
+        filename = ['simu' csv_suffix '.csv';];
         
         main_simu_dir = fullfile(simuDir, simuDirs(s).name);
         simu_file = fullfile(main_simu_dir, filename);
