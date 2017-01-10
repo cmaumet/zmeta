@@ -68,6 +68,8 @@ function realdata_MatlabToR(analysisDir)
         title(methods{iMethod})
         ylim([-3 13])
         hold on;dscatter(zGt(~isinf(zData)), zData(~isinf(zData))-zGt(~isinf(zData)), 'plottype','contour');
+        
+        hold on;plot(sort(zGt(~isinf(zData))), sort(zData(~isinf(zData)))-sort(zGt(~isinf(zData))), 'r.')
         % For each unique z-value in the GT         
         for i = 1:numel(uniqueZvalueGt);
             if mod(i, 5)==0
