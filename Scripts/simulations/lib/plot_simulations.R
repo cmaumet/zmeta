@@ -1,9 +1,10 @@
+plot_simulation <- function(pattern="^test1_.*_btw1"){
+
 library('ggplot2')
 
 # allsimudat_pval <- read.csv('../../../allsimudat_pval.csv', header=T, sep=" ")
 # allsimudat_pval_rank <- read.csv('../../../allsimudat_pval_rank.csv', header=T, sep=" ")
 # allsimudat_tval <- read.csv('../../../allsimudat_nopval.csv', header=T, sep=" ")
-pattern = "^test3_.*_btw1"
 suffix <- gsub('[^a-zA-Z_0-9]', '', pattern)
 csv_file = paste(getwd(), '/../../../data/allsimudat_', suffix,'.csv', sep="")
 
@@ -166,3 +167,4 @@ multiplot(subpl[[1]], subpl[[4]], subpl[[3]], layout=matrix(c(1,2,3,3), nrow=1, 
 # p + facet_grid(Between~ methods) +    geom_smooth(method="loess", se=FALSE, fullrange=T)
 
 
+}
