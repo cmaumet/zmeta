@@ -3,10 +3,10 @@ function realdata_MatlabToR(analysisDir)
         analysisDir = pwd;
     end
 
-    baseRealDir = fullfile(analysisDir);
+    baseRealDir = fullfile(analysisDir, '..', 'real_data');
 
-    zStatGt = spm_select('FPList', fullfile(baseRealDir, 'MFX_with readjusting', 'stats'), '^zstat\d\.nii$');
-    mask = spm_select('FPList', fullfile(baseRealDir, 'MFX_with readjusting', 'stats'), '^mask.*\.nii$');
+    zStatGt = spm_select('FPList', fullfile(analysisDir, 'MFX_with readjusting', 'stats'), '^zstat\d\.nii$');
+    mask = spm_select('FPList', fullfile(analysisDir, 'MFX_with readjusting', 'stats'), '^mask.*\.nii$');
         
     zStatGtData = spm_read_vols(spm_vol(zStatGt));
     logPGt = -log10(normcdf(zStatGtData, 'upper'));
@@ -18,7 +18,7 @@ function realdata_MatlabToR(analysisDir)
     pVal.GLMRFX = spm_read_vols(spm_vol(spm_select('FPList', fullfile(baseRealDir, 'megaRFX'), '^mega_rfx_minus_log10_p')));
     pVal.PermutZ = spm_read_vols(spm_vol(spm_select('FPList', fullfile(baseRealDir, 'permutZ'), '^lP\+\.hdr$')));
     pVal.PermutCon = spm_read_vols(spm_vol(spm_select('FPList', fullfile(baseRealDir, 'permutCon'), '^lP\+\.hdr$')));
-    pVal.GLMFFX = spm_read_vols(spm_vol(spm_select('FPList', fullfile(baseRealDir, 'megaFFX'), '^megaFFX_ffx_minus_log10_p\.nii$')));
+    pVal.GLMFFX = spm_read_vols(spm_vol(spm_select('FPList', fullfile(baseRealDir, 'megaFFX'), '^mega_ffx_ffx_minus_log10_p\.nii$')));
     pVal.Stouffers = spm_read_vols(spm_vol(spm_select('FPList', fullfile(baseRealDir, 'stouffers'), '^stouffers_ffx_minus_log10_p\.nii$')));
     pVal.StouffersMFX = spm_read_vols(spm_vol(spm_select('FPList', fullfile(baseRealDir, 'stouffersMFX'), '^stouffers_rfx_minus_log10_p\.nii$')));
     pVal.WeightedZ = spm_read_vols(spm_vol(spm_select('FPList', fullfile(baseRealDir, 'weightedZ'), '^weightedz_ffx_minus_log10_p\.nii$')));
@@ -94,9 +94,9 @@ function realdata_MatlabToR(analysisDir)
                 fprintf(fid, '%s,%f,%f,%.0f\n', methods{iMethod}, ...
                         zGTvalues(r), reps(r), (r==1));
                     
-                if isinf( reps(r))
-                    aa=1
-                end
+%                 if isinf( reps(r))
+%                     aa=1
+%                 end
 %                                     uniqueZvalueGt(i), reps(r), (r==randSelection(1)));
             end
         end
