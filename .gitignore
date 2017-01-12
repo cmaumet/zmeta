@@ -1,3 +1,6 @@
+# notebooks checkpoints
+*checkpoint.ipynb
+
 # NIfTI images
 *.nii
 *.nii.gz
