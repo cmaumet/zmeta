@@ -99,8 +99,8 @@ plot_unit_mismatch <- function(data, suffix, mult=FALSE, single=FALSE){
 
         subpl[[1]] <- subpl[[1]] + 
                 geom_ribbon(
-                    aes(x=expectedz, ymin=z_lower-expectedz, ymax=z_upper-expectedz), 
-                    fill="grey", alpha=.2, colour=NA) + 
+                    aes(x=expectedz, ymin=z_lower-expectedz, ymax=z_upper-expectedz, group=glm), 
+                    fill="grey", alpha=.8, colour=NA) + 
                 facet_grid(methods~nStudies+unitMism+soft2, scales = "free", 
                            labeller = labeller(
                                methods = method_labels, 
