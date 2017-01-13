@@ -37,6 +37,22 @@ soft2_labels <- function(string){
     string
 }
 
+load_data_from_csv <- function(pattern){
+    suffix <- gsub('[^a-zA-Z_0-9]', '', pattern)
+    csv_file = paste(getwd(), '/../../../data/allsimudat_', suffix,'.csv', sep="")
+
+    if (! file.exists(csv_file)){
+        print(paste('pattern=', suffix))
+        print(paste('CSV file', csv_file,' not found, reprocessing the data.'))
+        get_expected_pval_and_equiv_z(pattern)
+    }
+    simudata <- read.csv(csv_file, header=T, sep=",")
+    # Reorder unit mismatch factor levels
+    simudata$unitMism = factor(simudata$unitMism,c('nominal', 'contscl', 'datascl'))
+    
+    return(simudata)
+}
+
 plot_unit_mismatch <- function(data, suffix, mult=FALSE, single=FALSE){
     
     # Ignore soft2Factor=100 (too extreme)

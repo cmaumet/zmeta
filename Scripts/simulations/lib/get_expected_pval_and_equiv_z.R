@@ -13,6 +13,9 @@ if (file.exists(csv_file)){
 tot_num_simu = length(study_dirs)
 
 print(paste(tot_num_simu, "simulations"))
+if (tot_num_simu == 0){
+    stop(paste('No simulation found in', study_dir, 'with pattern', pattern))
+}
 
 first = T
 for (simunum in seq(tot_num_simu, 1, -1)){
