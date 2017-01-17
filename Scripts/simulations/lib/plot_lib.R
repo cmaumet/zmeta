@@ -48,7 +48,7 @@ load_data_from_csv <- function(pattern){
     }
     simudata <- read.csv(csv_file, header=T, sep=",")
     # Reorder unit mismatch factor levels
-    simudata$unitMism = factor(simudata$unitMism,c('nominal', 'contscl', 'datascl'))
+    simudata$unitMism = factor(simudata$unitMism,c('nominal', 'datascl', 'contscl'))
     
     return(simudata)
 }
