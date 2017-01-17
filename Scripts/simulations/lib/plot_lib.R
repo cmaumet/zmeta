@@ -53,7 +53,7 @@ load_data_from_csv <- function(pattern){
     return(simudata)
 }
 
-plot_unit_mismatch <- function(data, suffix, mult=FALSE, single=FALSE){
+plot_unit_mismatch <- function(data, suffix, mult=FALSE, single=FALSE, lim=0.5){
     
     # Ignore soft2Factor=100 (too extreme)
     data = subset(data, data$soft2Factor<100)
@@ -101,7 +101,7 @@ plot_unit_mismatch <- function(data, suffix, mult=FALSE, single=FALSE){
                 geom_ribbon(
                     aes(x=expectedz, ymin=z_lower-expectedz, ymax=z_upper-expectedz, group=glm), 
                     fill="grey", alpha=.8, colour=NA) + 
-                facet_grid(methods~nStudies+unitMism+soft2, scales = "free", 
+                facet_grid(methods~unitMism+soft2, scales = "free", 
                            labeller = labeller(
                                methods = method_labels, 
                                nStudies = label_both,
@@ -112,7 +112,7 @@ plot_unit_mismatch <- function(data, suffix, mult=FALSE, single=FALSE){
                 geom_line(aes(x=expectedz, y=0), colour="black") + 
                 geom_line() + 
         #         geom_point(size=0.5) + 
-                ggtitle(paste("Unit mismatch:", suffix)) + theme(legend.position="bottom") + coord_cartesian(ylim=c(-0.25, 0.25))
+                ggtitle(paste("Unit mismatch:", suffix)) + theme(legend.position="bottom") + coord_cartesian(ylim=c(-lim, lim))
 
     } else {
         # Bland-Altman like
