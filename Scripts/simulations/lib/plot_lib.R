@@ -9,8 +9,8 @@ method_labels <- function(string) {
 }
 
 units_labels <- function(string){
-    string[string=="contscl"] <- "Diff. contrast"    
-    string[string=="datascl"] <- "Diff. scaling"
+    string[string=="contscl"] <- "Different contrasts"    
+    string[string=="datascl"] <- "Different scaling"
     string[string=="nominal"] <- "Nominal"
     # string[string=="contscl 1 0"] <- "Different contrast vector scaling"    
     # string[string=="contscl 1"] <- "Different contrast vector scaling"
@@ -53,7 +53,7 @@ load_data_from_csv <- function(pattern){
     return(simudata)
 }
 
-plot_unit_mismatch <- function(data, suffix, mult=FALSE, single=FALSE, lim=0.5){
+plot_unit_mismatch <- function(data, suffix, mult=FALSE, single=FALSE, lim=0.5, filename=NA){
     
     # Ignore soft2Factor=100 (too extreme)
     data = subset(data, data$soft2Factor<100)
@@ -144,9 +144,20 @@ plot_unit_mismatch <- function(data, suffix, mult=FALSE, single=FALSE, lim=0.5){
     }
     if (mult){
         multiplot(subpl[[1]], subpl[[4]], subpl[[3]], layout=matrix(c(1,2,3,3), nrow=1, byrow=TRUE))
+        return("")
+        if (! is.na(filename)){
+            pdf(paste(filename, ".pdf", sep=""))
+            multiplot(subpl[[1]], subpl[[4]], subpl[[3]], layout=matrix(c(1,2,3,3), nrow=1, byrow=TRUE))
+            dev.off()
+        }
     } else {
         for (i in seq(1,length(subpl))){
             print(subpl[[i]])
+            if (! is.na(filename)){
+                pdf(paste(filename, ".pdf", sep=""))
+                print(subpl[[i]])
+                dev.off()
+            }
         }
     }
 }
