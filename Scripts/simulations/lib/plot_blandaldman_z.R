@@ -1,6 +1,6 @@
-plot_blandaldman_z <- function(data, formula, title, mult, lim, filename){
+plot_blandaldman_z <- function(data, formula, title, mult, lim, filename, max_z=NA){
 
-    data <- prepare_data(data)
+    data <- prepare_data(data, max_z)
     
     if (! mult) {
         p <- ggplot(data=data[[1]],aes(x=expectedz, y=equivz-expectedz, group=allgroups, colour=factor(Within)))
@@ -19,15 +19,13 @@ plot_blandaldman_z <- function(data, formula, title, mult, lim, filename){
             geom_line(aes(x=expectedz, y=0), colour="black") + 
             geom_line() + 
     #         geom_point(size=0.5) + 
-            ggtitle(paste("Small sample sizes:", title)) + theme(legend.position="bottom") 
+            ggtitle(title) + theme(legend.position="bottom") 
     
         if (! is.na(lim)){
             p <- p + coord_cartesian(ylim=c(-lim, lim))
         }
     } else {
         subpl=list()
-        print(length(data))
-        print(seq(1,length(data)))
         for (idx in seq(1,length(data))){
             subpl[[idx]] <- ggplot(data=data[[idx]],aes(x=expectedz, y=equivz-expectedz, group=allgroups, colour=factor(Within))) 
             subpl[[idx]]  <- subpl[[idx]]  + 

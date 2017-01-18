@@ -1,4 +1,4 @@
-plot_sample_sizes <- function(data, title, mult=TRUE, lim=NA, filename=NA){
+plot_sample_sizes <- function(data, title, mult=TRUE, lim=NA, filename=NA, max_z=NA){
     
     if (mult){
         data_subpl <- list()
@@ -9,7 +9,6 @@ plot_sample_sizes <- function(data, title, mult=TRUE, lim=NA, filename=NA){
         }
         data <- data_subpl
     }
-    print(length(data))
-    p <- plot_blandaldman_z(data, methods~nStudies, paste("Small sample sizes:", title), mult, lim, filename)
+    p <- plot_blandaldman_z(data, methods~nStudies, paste("Small sample sizes:", title), mult, lim, filename, max_z)
 }
 

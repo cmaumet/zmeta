@@ -1,4 +1,4 @@
-plot_unit_mismatch <- function(data, suffix, mult=FALSE, single=FALSE, lim=0.5, filename=NA){
+plot_unit_mismatch <- function(data, suffix, mult=FALSE, single=FALSE, lim=0.5, filename=NA, max_z=NA){
     
     data_list=list()
     
@@ -17,5 +17,5 @@ plot_unit_mismatch <- function(data, suffix, mult=FALSE, single=FALSE, lim=0.5, 
         data_list[[1]] <- data
     }
     
-    p <- plot_blandaldman_z(data_list, methods~unitMism+soft2, paste("Unit mismatch:", suffix), mult, lim, filename)
+    p <- plot_blandaldman_z(data_list, methods~unitMism+soft2, paste("Unit mismatch:", suffix), mult, lim, filename, max_z)
 }
