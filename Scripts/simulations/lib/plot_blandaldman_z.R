@@ -1,10 +1,9 @@
 plot_blandaldman_z <- function(data, formula, title, mult, lim, filename){
-    # Ignore soft2Factor=100 (too extreme)
-    data = subset(data, data$soft2Factor<100)
-    allsimudat$Within <- factor(allsimudat$Within)
+
+    data <- prepare_data(data)
     
     if (! mult) {
-        p <- ggplot(data=data,aes(x=expectedz, y=equivz-expectedz, group=allgroups, colour=factor(Within)))
+        p <- ggplot(data=data[[1]],aes(x=expectedz, y=equivz-expectedz, group=allgroups, colour=factor(Within)))
         p <- p + 
             geom_ribbon(
                 aes(x=expectedz, ymin=z_lower-expectedz, ymax=z_upper-expectedz, group=glm), 
@@ -27,7 +26,9 @@ plot_blandaldman_z <- function(data, formula, title, mult, lim, filename){
         }
     } else {
         subpl=list()
-        for (idx in seq(1:length(data))){
+        print(length(data))
+        print(seq(1,length(data)))
+        for (idx in seq(1,length(data))){
             subpl[[idx]] <- ggplot(data=data[[idx]],aes(x=expectedz, y=equivz-expectedz, group=allgroups, colour=factor(Within))) 
             subpl[[idx]]  <- subpl[[idx]]  + 
             geom_ribbon(
