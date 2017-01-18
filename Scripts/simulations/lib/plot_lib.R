@@ -8,6 +8,11 @@ method_labels <- function(string) {
     string
 }
 
+nstudies_labels <- function(string){
+    string <- paste(as.character(string), 'studies')
+}
+
+
 units_labels <- function(string){
     string[string=="contscl"] <- "Different contrasts"    
     string[string=="datascl"] <- "Different scaling"
@@ -161,3 +166,4 @@ plot_unit_mismatch <- function(data, suffix, mult=FALSE, single=FALSE, lim=0.5, 
         }
     }
 }
+
