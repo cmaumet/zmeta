@@ -18,9 +18,6 @@ function meta_sim(base_dir, redo, path_to_spm)
     fsl_designs_dir = fullfile(script_dir, 'fsl_designs');
     
     % ----- Simulation parameters --------
-    avg_n = 20; % Average number of subjects per group
-    diff_n = 15;
-
     settings.ks = [5 10 25 50];
     settings.wth_sigmas = avg_n*[0.25 0.5 1 2 4];
 
@@ -53,7 +50,10 @@ function meta_sim(base_dir, redo, path_to_spm)
     % Constant within-study variance across studies
     settings.wth_sigma_sames = [true];
     % Number of permutations for non-parametric methods
-    settings.nperm = 5000; 
+    settings.nperm = 5000;
+    % Number of subjects per group
+    avg_n = 20;    
+     
     % -------------------------------------------
     display_settings(settings)
   
@@ -199,12 +199,14 @@ function meta_sim(base_dir, redo, path_to_spm)
                             group1_n = ones(1, k_group1)*avg_n;
                             group2_n = ones(1, k_group2)*avg_n;
                         else
-
-                            % Uniformly distributed beween avg_n-diff_n 
-                            % and avg_n+diff_n included, so that 
-                            % mean(nsub) = avg_n
-                            group1_n = randi([avg_n-diff_n avg_n+diff_n], 1, k_group1);%linspace(avg_n/2,avg_n*2,k);
-                            group2_n = randi([avg_n-diff_n avg_n+diff_n], 1, k_group2);%linspace(avg_n/2,avg_n*2,k);
+                            error('Varying number of subjects not supported');
+                            % diff_n = 15;
+                            % 
+                            % % Uniformly distributed beween avg_n-diff_n 
+                            % % and avg_n+diff_n included, so that 
+                            % % mean(nsub) = avg_n
+                            % group1_n = randi([avg_n-diff_n avg_n+diff_n], 1, k_group1);%linspace(avg_n/2,avg_n*2,k);
+                            % group2_n = randi([avg_n-diff_n avg_n+diff_n], 1, k_group2);%linspace(avg_n/2,avg_n*2,k);
                         end
 
                         % Between-studies variance
