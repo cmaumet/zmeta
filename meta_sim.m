@@ -36,7 +36,7 @@ function meta_sim(base_dir, redo, path_to_spm)
     % ---------------
     
     % Number of studies per meta-analysis
-    settings.ks = [5 10 25 50];
+    settings.ks = 50;%[5 10 25 50];
 
     % Within-study variance
     settings.wth_sigmas = avg_n*[0.25 0.5 1 2 4];
@@ -238,7 +238,7 @@ function meta_sim(base_dir, redo, path_to_spm)
                                     end
 
                                     % Directory to store the simulation data and results.
-                                    simu_name = [analysisPrefix 'k' num2str(k) '_btw' num2str(btw_sigma) ...
+                                    simu_name = [analysisPrefix 'k' num2str(k, '%03d') '_btw' num2str(btw_sigma) ...
                                         '_wth' num2str(sigma_sq, '%02.0f'), '_', num2str(unit_mis), opt_str];
                                     simu_dir = fullfile(allsimu_dir, simu_name);
                                     if cluster
