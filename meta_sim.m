@@ -37,10 +37,6 @@ function meta_sim(base_dir, redo, path_to_spm)
     % unbalanced (3)
     settings.analysis_types = [1, 2, 3];
 
-    % Size of the simulation image (in 1 direction). Each voxel of the
-    % simulation image is a simulation sample.
-    settings.iter_onedir = 30;
-    settings.nsimu = settings.iter_onedir^3;
        
     % -------------------------------------------
     % Parameters that remain constant across simulations
@@ -53,7 +49,11 @@ function meta_sim(base_dir, redo, path_to_spm)
     settings.nperm = 5000;
     % Number of subjects per group
     avg_n = 20;    
-     
+    % Size of the simulation image (in 1 direction). Each voxel of the
+    % simulation image is a simulation sample.
+    settings.iter_onedir = 30;
+    % Total number of simulations for each parameter set
+    settings.nsimu = settings.iter_onedir^3;     
     % -------------------------------------------
     display_settings(settings)
   
