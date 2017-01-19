@@ -37,14 +37,14 @@ function meta_sim(base_dir, redo, path_to_spm)
     % unbalanced (3)
     settings.analysis_types = [1, 2, 3];
 
+    % Constant within-study variance across studies
+    settings.wth_sigma_sames = [true, false];
        
     % -------------------------------------------
     % Parameters that remain constant across simulations
 
     % Constant number of subjects per studies     
     settings.same_ns = [true];
-    % Constant within-study variance across studies
-    settings.wth_sigma_sames = [true];
     % Number of permutations for non-parametric methods
     settings.nperm = 5000;
     % Number of subjects per group
@@ -221,13 +221,14 @@ function meta_sim(base_dir, redo, path_to_spm)
                                         group1_wth_sigma_a = ones(1, k_group1);
                                         group2_wth_sigma_a = ones(1, k_group2);
                                     else
-                                        error('Varying within-study variance is not supported');
-                                        % % Generate values from the uniform 
-                                        % % distribution on the interval [a, b].
-                                        % a = 1/2;
-                                        % b = 2;
-                                        % group1_wth_sigma_a = a + (b-a).*rand(k_group1,1);
-                                        % group2_wth_sigma_a = a + (b-a).*rand(k_group2,1);
+                                        if sigma_sq == settings.wth_sigmas(1)
+                                            wth_w = [1 2 4 8 16];
+                                            group1_wth_sigma_a = wth_w(mod(0:k_group1-1, numel(wth_w)) + 1);
+                                            group2_wth_sigma_a = wth_w(mod(0:k_group2-1, numel(wth_w)) + 1);
+                                        else
+                                            % Varying sigma is going through all wth_sigmas at once
+                                            break;
+                                        end
                                     end
 
                                     % Directory to store the simulation data and results.
