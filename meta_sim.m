@@ -22,14 +22,10 @@ function meta_sim(base_dir, redo, path_to_spm)
     diff_n = 15;
 
     settings.ks = [5 10 25 50];
-    settings.wth_sigmas = avg_n*[0.25 0.5 1 2 4];%How to compute z with var = 0?
-    settings.wth_sigma_sames = [true]; %, 'diff'}; don't know yet how to deal with uneq var (for FFX!?)
+    settings.wth_sigmas = avg_n*[0.25 0.5 1 2 4];
 
     % Between-studies variance (RFX?)
     settings.btw_sigmas = [0 1];%  1];
-
-    % Number of subjects per studies     
-    settings.same_ns = [true];%[ true false];
 
     % Proportion of studies with software 2 (fraction)
     settings.soft_props = [1/5 0.5];
@@ -42,23 +38,25 @@ function meta_sim(base_dir, redo, path_to_spm)
 
     % Type of analysis: one-sample (1), two-sample(2), two-sample
     % unbalanced (3)
-    settings.analysis_types = [1, 2, 3];% [1 2 3];
+    settings.analysis_types = [1, 2, 3];
 
     % Size of the simulation image (in 1 direction). Each voxel of the
     % simulation image is a simulation sample.
     settings.iter_onedir = 30;
     settings.nsimu = settings.iter_onedir^3;
-
-    % Number of subject per study
-    %     nSubjects = [25 400 100 25]; %[10, 15, 20, 25, 30, 10, 15, 20, 25, 30, 10, 15, 20, 25, 30];
-    %     nStudies = numel(nSubjects);
-    
-    settings.nperm = 5000;
-    
-    display_settings(settings)
-    
+       
     % -------------------------------------------
-    
+    % Parameters that remain constant across simulations
+
+    % Constant number of subjects per studies     
+    settings.same_ns = [true];
+    % Constant within-study variance across studies
+    settings.wth_sigma_sames = [true];
+    % Number of permutations for non-parametric methods
+    settings.nperm = 5000; 
+    % -------------------------------------------
+    display_settings(settings)
+  
     % Retreive information about current job on the cluster    
     task_id_str = getenv('SGE_TASK_ID');
     job_id = getenv('JOB_ID');
@@ -69,7 +67,7 @@ function meta_sim(base_dir, redo, path_to_spm)
             && isempty(host)
         disp('This simulation is run locally')
         cluster = false;
-        % We want the results to be replicable even locally (hence 1 and
+        % We want the results to be replicable if run locally (hence 1 and
         % not 'default')
         rng_seed = 1;
     else
