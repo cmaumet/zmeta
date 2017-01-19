@@ -18,7 +18,27 @@ function meta_sim(base_dir, redo, path_to_spm)
     fsl_designs_dir = fullfile(script_dir, 'fsl_designs');
     
     % ----- Simulation parameters --------
+
+    % ---------------
+    % Parameters that remain constant across simulations
+
+    % Constant number of subjects per studies     
+    settings.same_ns = [true];
+    % Number of permutations for non-parametric methods
+    settings.nperm = 5000;
+    % Number of subjects per group
+    avg_n = 20;    
+    % Size of the simulation image (in 1 direction). Each voxel of the
+    % simulation image is a simulation sample.
+    settings.iter_onedir = 30;
+    % Total number of simulations for each parameter set
+    settings.nsimu = settings.iter_onedir^3;     
+    % ---------------
+    
+    % Number of studies per meta-analysis
     settings.ks = [5 10 25 50];
+
+    % Within-study variance
     settings.wth_sigmas = avg_n*[0.25 0.5 1 2 4];
 
     % Between-studies variance (RFX?)
@@ -39,22 +59,8 @@ function meta_sim(base_dir, redo, path_to_spm)
 
     % Constant within-study variance across studies
     settings.wth_sigma_sames = [true]%[true, false];
-       
-    % -------------------------------------------
-    % Parameters that remain constant across simulations
-
-    % Constant number of subjects per studies     
-    settings.same_ns = [true];
-    % Number of permutations for non-parametric methods
-    settings.nperm = 5000;
-    % Number of subjects per group
-    avg_n = 20;    
-    % Size of the simulation image (in 1 direction). Each voxel of the
-    % simulation image is a simulation sample.
-    settings.iter_onedir = 30;
-    % Total number of simulations for each parameter set
-    settings.nsimu = settings.iter_onedir^3;     
-    % -------------------------------------------
+    
+    % --------------------------------------   
     display_settings(settings)
   
     % Retreive information about current job on the cluster    
