@@ -21,7 +21,7 @@ function meta_sim(base_dir, redo, path_to_spm)
     avg_n = 20; % Average number of subjects per group
     diff_n = 15;
 
-    settings.ks = [25 50];%[5 10 25 50];
+    settings.ks = [5 10 25 50];
     settings.wth_sigmas = avg_n*[0.25 0.5 1 2 4];%How to compute z with var = 0?
     settings.wth_sigma_sames = [true]; %, 'diff'}; don't know yet how to deal with uneq var (for FFX!?)
 
@@ -46,7 +46,7 @@ function meta_sim(base_dir, redo, path_to_spm)
 
     % Size of the simulation image (in 1 direction). Each voxel of the
     % simulation image is a simulation sample.
-    settings.iter_onedir = 30;%100;
+    settings.iter_onedir = 30;
     settings.nsimu = settings.iter_onedir^3;
 
     % Number of subject per study
