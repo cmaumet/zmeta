@@ -22,7 +22,7 @@ function meta_sim(base_dir, redo, path_to_spm)
     settings.wth_sigmas = avg_n*[0.25 0.5 1 2 4];
 
     % Between-studies variance (RFX?)
-    settings.btw_sigmas = [0 1];%  1];
+    settings.btw_sigmas = [0 1];
 
     % Proportion of studies with software 2 (fraction)
     settings.soft_props = [1/5 0.5];
@@ -221,12 +221,13 @@ function meta_sim(base_dir, redo, path_to_spm)
                                         group1_wth_sigma_a = ones(1, k_group1);
                                         group2_wth_sigma_a = ones(1, k_group2);
                                     else
-                                        % Generate values from the uniform 
-                                        % distribution on the interval [a, b].
-                                        a = 1/2;
-                                        b = 2;
-                                        group1_wth_sigma_a = a + (b-a).*rand(k_group1,1);
-                                        group2_wth_sigma_a = a + (b-a).*rand(k_group2,1);
+                                        error('Varying within-study variance is not supported');
+                                        % % Generate values from the uniform 
+                                        % % distribution on the interval [a, b].
+                                        % a = 1/2;
+                                        % b = 2;
+                                        % group1_wth_sigma_a = a + (b-a).*rand(k_group1,1);
+                                        % group2_wth_sigma_a = a + (b-a).*rand(k_group2,1);
                                     end
 
                                     % Directory to store the simulation data and results.
