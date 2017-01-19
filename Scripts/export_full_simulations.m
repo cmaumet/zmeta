@@ -2,7 +2,7 @@
 %   simuDir: full path to the directory storing the simulations
 %   redo: if true, overwrite previous export (default: false)
 %   downs_tot: Number of points to keep after downsampling
-function export_full_simulations(simuDir, redo, pattern, split_in)
+function export_full_simulations(simuDir, redo, pattern, split_in, downs_to)
     if nargin < 2
         redo = false;
     end
@@ -13,14 +13,18 @@ function export_full_simulations(simuDir, redo, pattern, split_in)
     if nargin < 4
         % Do not split
         split_in = 1;
+    end
+    if nargin < 5
+        % Downsample to xx points
+        downs_to = 1000;
     end    
     
     if split_in == 1
-        downs_tot = 1000;
+        downs_tot = downs_to;
     elseif split_in == 10
         downs_tot = 10;
     else
-        downs_tot = 1000/(split_in*10);
+        downs_tot = downs_to/(split_in*10);
     end
 
     donws_pos = [];
@@ -79,6 +83,9 @@ function export_full_simulations(simuDir, redo, pattern, split_in)
             csv_suffix = '';
         else
             csv_suffix = ['_wrep_' num2str(split_in)];
+        end
+        if downs_tot ~= 1000
+            csv_suffix = [csv_suffix '_' num2str(downs_tot)];
         end
             
         filename = ['simu' csv_suffix '.csv';];
