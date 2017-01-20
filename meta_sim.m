@@ -228,11 +228,13 @@ function meta_sim(base_dir, redo, path_to_spm)
                                     if wth_sigma_same
                                         group1_wth_sigma_a = ones(1, k_group1);
                                         group2_wth_sigma_a = ones(1, k_group2);
+                                        opt_wth = '_wth' num2str(sigma_sq, '%02.0f');
                                     else
                                         if sigma_sq == settings.wth_sigmas(1)
                                             wth_w = [1 2 4 8 16];
                                             group1_wth_sigma_a = wth_w(mod(0:k_group1-1, numel(wth_w)) + 1);
                                             group2_wth_sigma_a = wth_w(mod(0:k_group2-1, numel(wth_w)) + 1);
+                                            opt_wth = '_wthdiff';
                                         else
                                             % Varying sigma is going through all wth_sigmas at once
                                             break;
@@ -241,7 +243,7 @@ function meta_sim(base_dir, redo, path_to_spm)
 
                                     % Directory to store the simulation data and results.
                                     simu_name = [analysisPrefix 'k' num2str(k, '%03d') '_btw' num2str(btw_sigma) ...
-                                        '_wth' num2str(sigma_sq, '%02.0f'), '_', num2str(unit_mis), opt_str];
+                                        opt_wth, '_', num2str(unit_mis), opt_str];
                                     simu_dir = fullfile(allsimu_dir, simu_name);
                                     if cluster
                                         simu_dir = fullfile(simu_dir, num2str(task_id, '%04d'));
