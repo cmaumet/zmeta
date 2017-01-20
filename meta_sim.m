@@ -106,7 +106,7 @@ function meta_sim(base_dir, redo, path_to_spm)
     end
      
     % Number of studies per meta-analysis
-    for k = settings.ks
+    for k = settings.ks           
         
         % One-sample, two-sample, two-sample unbalanced
         for analysis_type = settings.analysis_types
@@ -228,7 +228,7 @@ function meta_sim(base_dir, redo, path_to_spm)
                                     if wth_sigma_same
                                         group1_wth_sigma_a = ones(1, k_group1);
                                         group2_wth_sigma_a = ones(1, k_group2);
-                                        opt_wth = '_wth' num2str(sigma_sq, '%02.0f');
+                                        opt_wth = ['_wth', num2str(sigma_sq, '%02.0f')];
                                     else
                                         if sigma_sq == settings.wth_sigmas(1)
                                             wth_w = [1 2 4 8 16];
