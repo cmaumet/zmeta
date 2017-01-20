@@ -1,5 +1,4 @@
 plot_blandaldman_z <- function(data, formula, title, mult, lim, filename, max_z=NA){
-
     data <- prepare_data(data, max_z)
     
     if (! mult) {
@@ -71,12 +70,10 @@ plot_blandaldman_z <- function(data, formula, title, mult, lim, filename, max_z=
         legend <- get_legend(subpl[[1]] + theme(legend.position="bottom"))
         p <- plot_grid(p, legend, ncol = 1, rel_heights = c(1, .2))
         print(p)
-        return(p)
 
-        # multiplot(subpl[[1]], subpl[[2]], subpl[[3]], layout=matrix(c(1,2,3), nrow=1, byrow=TRUE))
         if (! is.na(filename)){
             pdf(paste(filename, ".pdf", sep=""))
-            multiplot(subpl[[1]], subpl[[4]], subpl[[3]], layout=matrix(c(1,2,3,3), nrow=1, byrow=TRUE))
+            print(p)
             dev.off()
         }
     } else {
@@ -87,5 +84,6 @@ plot_blandaldman_z <- function(data, formula, title, mult, lim, filename, max_z=
             dev.off()
         }
     }
+    return(p)
 }
     

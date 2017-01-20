@@ -20,8 +20,8 @@ if (tot_num_simu == 0){
 first = T
 for (simunum in seq(tot_num_simu, 1, -1)){
 	print(paste('Reading ', simunum, ' / ', tot_num_simu))	
-
-	simu_file = paste(study_dir, study_dirs[simunum], 'simu_.csv', sep="/")
+    print('with 400')
+	simu_file = paste(study_dir, study_dirs[simunum], 'simu_400.csv', sep="/")
 	print(simu_file)
 
 	if (! file.exists(simu_file)){
