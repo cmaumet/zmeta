@@ -122,7 +122,7 @@ function meta_sim(base_dir, redo, path_to_spm)
                 analysisPrefix = 'test3_';
                 k_group1 = k*2/5;
                 k_group2 = k*2*4/5;
-            otherwise
+            else
                 error('Unknow analysis_type')
             end
 
