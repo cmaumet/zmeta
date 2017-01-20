@@ -122,6 +122,8 @@ function meta_sim(base_dir, redo, path_to_spm)
                 analysisPrefix = 'test3_';
                 k_group1 = k*2/5;
                 k_group2 = k*2*4/5;
+            otherwise
+                error('Unknow analysis_type')
             end
 
             % Cross-studies unit mismatch
@@ -263,6 +265,8 @@ function meta_sim(base_dir, redo, path_to_spm)
                                         end
                                     end
 
+                                    % Clear information from previous simulation
+                                    simu = struct();
                                     simu.config.same_n = same_n;
                                     if analysis_type > 1
                                         simu.config.group1_n = group1_n;
@@ -335,7 +339,7 @@ function meta_sim(base_dir, redo, path_to_spm)
 
                                     save(simucfg_file, 'simu')
 
-                                    % Simulate data only if simu_dir did not xist
+                                    % Simulate data only if simu_dir did not exist
                                     % before (helpful to re-run analysis on same data
                                     data_dir = fullfile(simu_dir, 'data');
                                     fisher_dir = fullfile(simu_dir, 'fishers');
