@@ -13,7 +13,7 @@ function run_fishers( out_dir, z_files )
         matlabbatch{1}.spm.tools.ibma.fishers.dir = {out_dir};
         matlabbatch{1}.spm.tools.ibma.fishers.zimages = z_files;
         
-        save('matlabbatch.mat', 'matlabbatch')
+        save(fullfile(out_dir, 'matlabbatch.mat'), 'matlabbatch')
         spm_jobman('run', matlabbatch)
     else
         disp('Fisher''s already computed')
