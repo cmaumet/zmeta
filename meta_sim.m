@@ -96,10 +96,7 @@ function meta_sim(base_dir, redo, path_to_spm)
     % Disable SnPM random seed shuffling
     global SnPMdefs;
     SnPMdefs.shuffle_seed = false;
-    
-    % Initialise random number generator using the task id
-    rng(rng_seed);
-       
+          
     allsimu_dir = fullfile(base_dir, 'simulations');
     if ~isdir(allsimu_dir)
         mkdir(allsimu_dir)
@@ -338,7 +335,7 @@ function meta_sim(base_dir, redo, path_to_spm)
                                     simu.sge(end).task_id_str = task_id_str;
                                     simu.sge(end).queue = queue;
                                     simu.sge(end).host = host;
-
+                                    simu.sge(end).seed = rng_seed;
                                     save(simucfg_file, 'simu')
 
                                     % Simulate data only if simu_dir did not exist
@@ -358,6 +355,9 @@ function meta_sim(base_dir, redo, path_to_spm)
                                     last_data = fullfile(data_dir, ['z_st' num2str((k_group1+k_group2), '%03d') '.nii']);
                                     exist_data = exist(last_data, 'file');
 
+                                    % Initialise random number generator using the task id
+                                    rng(rng_seed);
+                                    
                                     if exist_data
                                         con_files = cell(k,1);
                                         varcon_files = cell(k,1);
