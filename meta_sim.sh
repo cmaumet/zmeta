@@ -2,9 +2,9 @@
 #$ -S /bin/bash
 #$ -l h_rt=04:00:00
 #$ -l h_vmem=8G
-#$ -t 1:5
-#$ -o log/test3_btw1_wth80_k50_nominal_$JOB_NAME.o$JOB_ID.$TASK_ID
-#$ -e log/test3_btw1_wth80_k50_nominal_$JOB_NAME.e$JOB_ID.$TASK_ID
+#$ -t 1:38
+#$ -o log/test3_btw1_k50_$JOB_NAME.o$JOB_ID.$TASK_ID
+#$ -e log/test3_btw1_k50_$JOB_NAME.e$JOB_ID.$TASK_ID
 #$ -cwd
 
 . /etc/profile
