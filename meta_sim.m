@@ -48,7 +48,7 @@ function meta_sim(base_dir, redo, path_to_spm)
     settings.soft_props = [1/5 0.5];
 
     % Correction factor with software 2
-    settings.soft_factors = [2 100];
+    settings.soft_factors = [2];
 
     % Study-specific bias due to units mismatch
     settings.unit_mismatches = {'nominal', 'datascl', 'contscl'};
