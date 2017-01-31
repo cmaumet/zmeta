@@ -39,7 +39,7 @@ function meta_sim(base_dir, redo, path_to_spm)
     settings.ks = 50;%[5 10 25 50];
 
     % Within-study variance
-    settings.wth_sigmas = avg_n*[0.25 0.5 1 2];%[0.25 0.5 1 2 4];
+    settings.wth_sigmas = avg_n*[4];%[0.25 0.5 1 2 4];
 
     % Between-studies variance (RFX?)
     settings.btw_sigmas = [1]% [0 1];
