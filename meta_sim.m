@@ -58,7 +58,7 @@ function meta_sim(base_dir, redo, path_to_spm)
     settings.analysis_types = 3%[1, 2, 3];
 
     % Constant within-study variance across studies
-    settings.wth_sigma_sames = [true]%[true, false];
+    settings.wth_sigma_sames = [false]%[true, false];
     
     % --------------------------------------   
     display_settings(settings)
