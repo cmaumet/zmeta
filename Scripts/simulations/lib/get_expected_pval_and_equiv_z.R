@@ -20,7 +20,6 @@ if (tot_num_simu == 0){
 first = T
 for (simunum in seq(tot_num_simu, 1, -1)){
 	print(paste('Reading ', simunum, ' / ', tot_num_simu))	
-    print('with 400')
 	simu_file = paste(study_dir, study_dirs[simunum], 'simu_400.csv', sep="/")
 	print(simu_file)
 
@@ -51,15 +50,10 @@ for (simunum in seq(tot_num_simu, 1, -1)){
 
 	simudat$unitMism <- as.character(simudat$unitMism)
 	
+    # In some previous version of the code (zmeta_buster) WithinSame was called varScheme
+    names(simudat)[names(simudat)=="varScheme"] <- "WithinSame"
+    
 	# We want to keep the allsimudat variable (to be able to directly use it without re-reading from the file)
-	if (! exists("allsimudat"))
-	{
-		allsimudat <- simudat
-	} else
-	{
-		allsimudat <-rbind(allsimudat, simudat)
-	}	
-
 	if (first){
 		col_names = T
 		app = F
