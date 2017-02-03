@@ -42,7 +42,7 @@ function meta_sim(base_dir, redo, path_to_spm)
     settings.wth_sigmas = avg_n*[0.25 0.5 1 2 4];
 
     % Between-studies variance (RFX?)
-    settings.btw_sigmas = [0]% [0 1];
+    settings.btw_sigmas = [1]% [0 1];
 
     % Proportion of studies with software 2 (fraction)
     settings.soft_props = [1/5 0.5];
@@ -55,7 +55,7 @@ function meta_sim(base_dir, redo, path_to_spm)
 
     % Type of analysis: one-sample (1), two-sample(2), two-sample
     % unbalanced (3)
-    settings.analysis_types = 3%[1, 2, 3];
+    settings.analysis_types = 1%[1, 2, 3];
 
     % Constant within-study variance across studies
     settings.wth_sigma_sames = [true, false];
