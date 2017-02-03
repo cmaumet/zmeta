@@ -29,7 +29,7 @@ plot_blandaldman_z <- function(data, formula, title, mult, lim, filename, max_z=
             subpl[[idx]] <- ggplot(data=data[[idx]],aes(x=expectedz, y=equivz-expectedz, group=allgroups, colour=factor(Within))) 
             subpl[[idx]]  <- subpl[[idx]]  + 
             geom_ribbon(
-                aes(x=expectedz, ymin=z_lower-expectedz, ymax=z_upper-expectedz, group=glm), 
+                aes(ymin=z_lower-expectedz, ymax=z_upper-expectedz, group=glm), 
                 fill="grey", alpha=.8, colour=NA) + 
             facet_grid(formula, scales = "free", 
                        labeller = labeller(
