@@ -248,6 +248,10 @@ function mystr = print_pvalues(mystr, methodName, minuslog10pvalues, ...
     if info.wth_sigma_same
         within = info.sigma_sq;
     else
+        % For one-sample analyses, there is no 'group2_wth_sigma_a' field
+        if ~isfield(info, 'group2_wth_sigma_a')
+            info.group2_wth_sigma_a = [];
+        end
         within = mean(repmat(info.sigma_sq, 1, info.k).*[...
             info.group1_wth_sigma_a, info.group2_wth_sigma_a]);
     end
