@@ -55,7 +55,7 @@ function meta_sim(base_dir, redo, path_to_spm)
 
     % Type of analysis: one-sample (1), two-sample(2), two-sample
     % unbalanced (3)
-    settings.analysis_types = 2%[1, 2, 3];
+    settings.analysis_types = 1%[1, 2, 3];
 
     % Constant within-study variance across studies
     settings.wth_sigma_sames = [true, false];
