@@ -1,4 +1,4 @@
-prepare_data <- function(data_list, max_z=NA){
+prepare_data <- function(data_list, max_z=NA, min_z=NA){
     for (i in seq(1, length(data_list))){
         # Ignore soft2Factor=100 (too extreme)
         # print(length(data))
@@ -8,6 +8,9 @@ prepare_data <- function(data_list, max_z=NA){
         
         if (! is.na(max_z)){
             data_list[[i]] = subset(data_list[[i]], expectedz<max_z)
+        }
+        if (! is.na(min_z)){
+            data_list[[i]] = subset(data_list[[i]], expectedz>min_z)
         }
     }
         
