@@ -61,8 +61,12 @@ plot_blandaldman_z <- function(data, formula, title, mult, lim, filename, max_z=
         }
     }
     
-    if (mult){       
-        p <- plot_grid(subpl[[1]], subpl[[2]], subpl[[3]], labels = '',ncol = 3)
+    if (mult){
+        if (length(subpl)==3){
+            p <- plot_grid(subpl[[1]], subpl[[2]], subpl[[3]], labels = '',ncol = 3)
+        } else {
+            p <- plot_grid(subpl[[1]], subpl[[2]], labels = '',ncol = 2)
+        }
         
         title <- ggdraw() + draw_label(title)
         p <- plot_grid(title, p, ncol=1, rel_heights=c(0.1, 1))
