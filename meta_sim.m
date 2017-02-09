@@ -27,7 +27,7 @@ function meta_sim(base_dir, redo, path_to_spm)
     % Number of permutations for non-parametric methods
     settings.nperm = 5000;
     % Number of subjects per group
-    avg_n = 20;    
+    avg_n = 50;    
     % Size of the simulation image (in 1 direction). Each voxel of the
     % simulation image is a simulation sample.
     settings.iter_onedir = 30;
@@ -36,7 +36,7 @@ function meta_sim(base_dir, redo, path_to_spm)
     % ---------------
     
     % Number of studies per meta-analysis
-    settings.ks = 5;%[5 10 25 50];
+    settings.ks = 25;%[5 10 25 50];
 
     % Within-study variance
     settings.wth_sigmas = avg_n*[0.25 0.5 1 2 4];
@@ -238,8 +238,12 @@ function meta_sim(base_dir, redo, path_to_spm)
                                         end
                                     end
 
-                                    % Directory to store the simulation data and results.
-                                    simu_name = [analysisPrefix 'k' num2str(k, '%03d') '_btw' num2str(btw_sigma) ...
+        			    n_str = '';
+                                    if avg_n ~= 20
+                                        n_str = ['_n' num2str(avg_n)];
+                                    end
+  				    % Directory to store the simulation data and results.
+                                    simu_name = [analysisPrefix 'k' num2str(k, '%03d') n_str  '_btw' num2str(btw_sigma) ...
                                         opt_wth, '_', num2str(unit_mis), opt_str];
                                     simu_dir = fullfile(allsimu_dir, simu_name);
                                     if cluster
