@@ -8,6 +8,10 @@ plot_qq_p <- function(data, formula, title, mult, lim, filename, max_z=NA){
     #     aes_ribbon=aes(ymin=-log10(p_lower), ymax=-log10(p_upper), group=glm), formula, title, mult, lim, filename, max_z=NA,
     #     xlabel="-log10(expected P)", ylabel="-log10(P)")
     
+    if (! is.na(filename)){
+        filename = paste(filename, "_p", sep="")
+    }
+    
     plot_grid_methods_color_within(data,
         aes_main=aes(x=-log10(expectedP), y=-log10(P)-(-log10(expectedP)), group=allgroups, colour=factor(Within)),
         aes_line=aes(x=-log10(expectedP), y=0),
