@@ -13,7 +13,7 @@ plot_qq_p <- function(data, formula, title, mult, lim, filename, max_z=NA){
     }
     
     plot_grid_methods_color_within(data,
-        aes_main=aes(x=-log10(expectedP), y=-log10(P)-(-log10(expectedP)), group=allgroups, colour=factor(Within)),
+        aes_main=aes(x=-log10(expectedP), y=-log10(P)-(-log10(expectedP)), group=allgroups, colour=factor(withinInfo)),
         aes_line=aes(x=-log10(expectedP), y=0),
         aes_ribbon=aes(ymin=-log10(p_lower)-(-log10(expectedP)), ymax=-log10(p_upper)-(-log10(expectedP)), group=glm), formula, title, mult, -log10(lim), filename, max_z,
         xlabel="-log10(expectedP)", ylabel="-log10(P)-(-log10(expectedP))")

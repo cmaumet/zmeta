@@ -2,7 +2,7 @@ plot_blandaldman_z <- function(data, formula, title, mult, lim, filename, max_z=
     data <- prepare_data(data, max_z)
     
     if (! mult) {
-        p <- ggplot(data=data[[1]],aes(x=expectedz, y=equivz-expectedz, group=allgroups, colour=factor(Within)))
+        p <- ggplot(data=data[[1]],aes(x=expectedz, y=equivz-expectedz, group=allgroups, colour=factor(withinInfo)))
         p <- p + 
             geom_ribbon(
                 aes(x=expectedz, ymin=z_lower-expectedz, ymax=z_upper-expectedz, group=glm), 
@@ -26,7 +26,7 @@ plot_blandaldman_z <- function(data, formula, title, mult, lim, filename, max_z=
     } else {
         subpl=list()
         for (idx in seq(1,length(data))){
-            subpl[[idx]] <- ggplot(data=data[[idx]],aes(x=expectedz, y=equivz-expectedz, group=allgroups, colour=factor(Within))) 
+            subpl[[idx]] <- ggplot(data=data[[idx]],aes(x=expectedz, y=equivz-expectedz, group=allgroups, colour=factor(withinInfo))) 
             subpl[[idx]]  <- subpl[[idx]]  + 
             geom_ribbon(
                 aes(ymin=z_lower-expectedz, ymax=z_upper-expectedz, group=glm), 
