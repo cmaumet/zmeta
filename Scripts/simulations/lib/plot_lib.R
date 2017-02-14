@@ -12,6 +12,9 @@ nstudies_labels <- function(string){
     string <- paste(as.character(string), 'studies')
 }
 
+nsubjects_labels <- function(string){
+    string <- paste(as.character(string), 'subjects')
+}
 
 units_labels <- function(string){
     string[string=="contscl"] <- "Different contrasts"    

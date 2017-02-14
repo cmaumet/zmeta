@@ -10,7 +10,8 @@ plot_blandaldman_z <- function(data, formula, title, mult, lim, filename, max_z=
             facet_grid(formula, scales = "free", 
                        labeller = labeller(
                            methods = method_labels, 
-                           nStudies = label_both,
+                           nStudies = nstudies_labels,
+                           nSubjects = nsubjects_labels,
                            soft2 = soft2_labels,
                            unitMism = units_labels)) + 
             theme(strip.text.x = element_text(size = 10)) + 
@@ -35,6 +36,7 @@ plot_blandaldman_z <- function(data, formula, title, mult, lim, filename, max_z=
                        labeller = labeller(
                            methods = method_labels, 
                            nStudies = nstudies_labels,
+                           nSubjects = nsubjects_labels,
                            soft2 = soft2_labels,
                            unitMism = units_labels)) + 
             theme(strip.text.x = element_text(size = 10)) + 
