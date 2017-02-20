@@ -1,6 +1,6 @@
 #!/bin/bash
 #$ -S /bin/bash
-#$ -l h_rt=04:00:00
+#$ -l h_rt=00:30:00
 #$ -l h_vmem=8G
 #$ -t 1:38
 #$ -o log/test1_btw1_k25_n100_nominal$JOB_NAME.o$JOB_ID.$TASK_ID
