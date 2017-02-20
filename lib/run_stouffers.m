@@ -7,7 +7,13 @@ function run_stouffers(out_dir, z_files, ffx)
 %       Z_FILES using Stouffer's random-effects method, store the results 
 %       in OUT_DIR.
 
-    if ~exist_nii(fullfile(out_dir, 'stouffers_ffx_minus_log10_p.nii'))
+    if ffx
+        out_file_name = 'stouffers_ffx_minus_log10_p.nii';
+    else
+        out_file_name = 'stouffers_rfx_minus_log10_p.nii'
+    end
+
+    if ~exist_nii(fullfile(out_dir, out_file_name))
         % Delete any halted analysis        
         if isdir(out_dir)
             rmdir(out_dir,'s')
