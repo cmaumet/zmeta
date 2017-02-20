@@ -1,0 +1,1 @@
+qsub -v wth_id=1 metasim.sh
