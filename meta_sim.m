@@ -1,4 +1,4 @@
-function meta_sim(base_dir, redo, path_to_spm)
+function meta_sim(base_dir, redo, path_to_spm, within_id)
     % META_SIM  Simulate meta-analyses results under the null
     %   META_SIM(base_dir, REDO) Create simulation results in a 
     %       'simulations' folder under base_dir. Overwrite existing
@@ -40,6 +40,7 @@ function meta_sim(base_dir, redo, path_to_spm)
 
     % Within-study variance
     settings.wth_sigmas = avg_n*[0.25 0.5 1 2 4];
+    settings.wth_sigmas = settings.wth_sigmas(within_id);
 
     % Between-studies variance (RFX?)
     settings.btw_sigmas = [1]% [0 1];
