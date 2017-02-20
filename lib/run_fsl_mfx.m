@@ -24,6 +24,7 @@ function run_fsl_mfx(datadir, wd, analysisType, nSubjects, nStudies, ...
         flame_mod = 'flame12';
     else
         error(['Unknown flame type ' num2str(flame_mod)]);
+    end
     disp(flame_mod)
     
     cmd = ['flameo --cope=cope --vc=varcope ' ...
