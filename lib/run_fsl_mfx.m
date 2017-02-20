@@ -15,8 +15,6 @@ function run_fsl_mfx(datadir, wd, analysisType, nSubjects, nStudies, ...
         design = ['design_' num2str(nStudies*2, '%03d') 'studies_' num2str(nStudies*2/5, '%02d') '_equal'];
     end
     prepare_fsl_data(datadir, wd, nSubjects, design, designs_dir)
-    disp('Prepared')
-    disp(flame_type)
 
     if flame_type == 1
         flame_mod = 'flame1';
@@ -25,7 +23,6 @@ function run_fsl_mfx(datadir, wd, analysisType, nSubjects, nStudies, ...
     else
         error(['Unknown flame type ' num2str(flame_mod)]);
     end
-    disp(flame_mod)
     
     cmd = ['flameo --cope=cope --vc=varcope ' ...
         '--dvc=dof --mask=mask --ld=stats '...

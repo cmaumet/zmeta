@@ -438,7 +438,6 @@ function meta_sim(base_dir, redo, path_to_spm, within_id)
                                     % GLM MFX (FLAME 1)
                                     run_mega_mfx(data_dir, megaMFX_dir, analysis_type, [group1_n group2_n], k, fsl_designs_dir, 1)
 
-                                    disp('Run FLAME2')
                                     % GLM MFX (FLAME 1+2)
                                     run_mega_mfx(data_dir, megaMFX2_dir, analysis_type, [group1_n group2_n], k, fsl_designs_dir, 2)                                    
 
