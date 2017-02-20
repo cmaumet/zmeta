@@ -14,7 +14,9 @@ function run_fsl_mfx(datadir, wd, analysisType, nSubjects, nStudies, ...
     elseif analysisType == 3
         design = ['design_' num2str(nStudies*2, '%03d') 'studies_' num2str(nStudies*2/5, '%02d') '_equal'];
     end
+    disp('Starting prepare_fsl_data')
     prepare_fsl_data(datadir, wd, nSubjects, design, designs_dir)
+    disp('Finished prepare_fsl_data')
 
     if flame_type == 1
         flame_mod = 'flame1';

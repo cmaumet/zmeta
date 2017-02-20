@@ -1,6 +1,8 @@
 function prepare_fsl_data(datadir, wd, nSubjects, design, designs_dir)
     out_file = fullfile(wd, 'zstat1.nii');
 
+    disp(~exist(out_file, 'file'))
+    disp('--')
     if ~exist(out_file, 'file')
         cwd = pwd;
         cd(datadir);
