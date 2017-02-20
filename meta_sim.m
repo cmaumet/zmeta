@@ -354,6 +354,7 @@ function meta_sim(base_dir, redo, path_to_spm, within_id)
                                     megaFFX_dir = fullfile(simu_dir, 'megaFFX');
                                     megaFFXFSL_dir = fullfile(simu_dir, 'megaFFX_FSL');
                                     megaMFX_dir = fullfile(simu_dir, 'megaMFX');
+                                    megaMFX2_dir = fullfile(simu_dir, 'megaMFX2');
                                     permutcon_dir = fullfile(simu_dir, 'permutCon');
                                     permutz_dir = fullfile(simu_dir, 'permutZ');
 
@@ -393,6 +394,7 @@ function meta_sim(base_dir, redo, path_to_spm, within_id)
                                         mkdir(permutcon_dir);                            
                                         mkdir(permutz_dir);   
                                         mkdir(megaMFX_dir);   
+                                        mkdir(megaMFX2_dir);   
                                         mkdir(megaFFXFSL_dir);
                                     end  
 
@@ -433,8 +435,11 @@ function meta_sim(base_dir, redo, path_to_spm, within_id)
                                         run_permut_z(permutz_dir, settings.nperm, z_files(1:k_group1), z_files(k_group1+(1:k_group2)))
                                     end
 
-                                    % GLM MFX
-                                    run_mega_mfx(data_dir, megaMFX_dir, analysis_type, [group1_n group2_n], k, fsl_designs_dir)
+                                    % GLM MFX (FLAME 1)
+                                    run_mega_mfx(data_dir, megaMFX_dir, analysis_type, [group1_n group2_n], k, fsl_designs_dir, 1)
+
+                                    % GLM MFX (FLAME 1+2)
+                                    run_mega_mfx(data_dir, megaMFX_dir, analysis_type, [group1_n group2_n], k, fsl_designs_dir, 2)                                    
 
                                     % GLM FFX (via FSL)
                                     run_mega_ffx(data_dir, megaFFXFSL_dir, analysis_type, [group1_n group2_n], k, fsl_designs_dir)

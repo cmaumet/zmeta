@@ -1,5 +1,5 @@
 function run_fsl_mfx(datadir, wd, analysisType, nSubjects, nStudies, ...
-        designs_dir)
+        designs_dir, flame_type)
     cwd = pwd;
     
     if ~isdir(wd)
@@ -15,11 +15,18 @@ function run_fsl_mfx(datadir, wd, analysisType, nSubjects, nStudies, ...
         design = ['design_' num2str(nStudies*2, '%03d') 'studies_' num2str(nStudies*2/5, '%02d') '_equal'];
     end
     prepare_fsl_data(datadir, wd, nSubjects, design, designs_dir)
+
+    if flame_type == 1
+        flame_mod = 'flame1';
+    elseif flame_type == 2
+        flame_mod = 'flame12';
+    else
+        error(['Unknown flame type ' num2str(flame_mod)]);
     
     cmd = ['flameo --cope=cope --vc=varcope ' ...
         '--dvc=dof --mask=mask --ld=stats '...
         '--dm=' design '.mat --cs=' design '.grp --tc=' design '.con '...
-        ' --runmode=flame1'];
+        ' --runmode=' flame_mod];
     
     save('cmd.mat', 'cmd')
     system(cmd);
