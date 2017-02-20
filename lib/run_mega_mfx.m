@@ -13,10 +13,11 @@ function run_mega_mfx(data_dir, out_dir, analysis_type, nsub, k, ...
             rmdir(out_dir,'s')
         end
         mkdir(out_dir)
+        disp('Starting run_fsl_mfx')
         run_fsl_mfx(data_dir, out_dir, analysis_type, nsub, k, ...
             fsl_designs_dir, flame_type)
     else
-        disp('Mega MFX (FSL) already computed')
+        disp(['Mega MFX (FSL FLAME' num2str(flame_type) ') already computed'])
     end
 
 end
