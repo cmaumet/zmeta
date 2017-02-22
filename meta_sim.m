@@ -481,7 +481,7 @@ function [con_files, varcon_files, z_files] = simulate_data(config, data_dir)
         estimatedContrast = normrnd(0, sqrt(config.sigma_sq*wth_sigma_a(studyIndex)./nsub(studyIndex)+config.btw_sigma), [config.iter_onedir, config.iter_onedir, config.iter_onedir]);
 
         % Estimated contrast variance (from chi square distribution)
-        estimatedSigmaSquare = chi2rnd(dof, [config.iter_onedir, config.iter_onedir, config.iter_onedir])*config.sigma_sq*(wth_sigma_a(studyIndex))^2/dof;
+        estimatedSigmaSquare = chi2rnd(dof, [config.iter_onedir, config.iter_onedir, config.iter_onedir])*config.sigma_sq*wth_sigma_a(studyIndex)/dof;
         estimatedVarContrast = estimatedSigmaSquare./nsub(studyIndex);
 
         % units correction
