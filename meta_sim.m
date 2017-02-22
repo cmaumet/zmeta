@@ -39,8 +39,8 @@ function meta_sim(base_dir, redo, path_to_spm, within_id)
     settings.ks = 25;%[5 10 25 50];
 
     % Within-study variance
-    settings.wth_sigmas = avg_n*[0.25 0.5 1 2 4];
-    settings.wth_sigmas = settings.wth_sigmas(within_id);
+    settings.wth_sigmas_all = avg_n*[0.25 0.5 1 2 4];
+    settings.wth_sigmas = settings.wth_sigmas_all(within_id);
 
     % Between-studies variance (RFX?)
     settings.btw_sigmas = [1]% [0 1];
@@ -228,7 +228,7 @@ function meta_sim(base_dir, redo, path_to_spm, within_id)
                                         group2_wth_sigma_a = ones(1, k_group2);
                                         opt_wth = ['_wth', num2str(sigma_sq, '%02.0f')];
                                     else
-                                        if sigma_sq == settings.wth_sigmas(1)
+                                        if sigma_sq == settings.wth_sigmas_all(1)
                                             wth_w = [1 2 4 8 16];
                                             group1_wth_sigma_a = wth_w(mod(0:k_group1-1, numel(wth_w)) + 1);
                                             group2_wth_sigma_a = wth_w(mod(0:k_group2-1, numel(wth_w)) + 1);
