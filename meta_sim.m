@@ -27,7 +27,7 @@ function meta_sim(base_dir, redo, path_to_spm, within_id)
     % Number of permutations for non-parametric methods
     settings.nperm = 5000;
     % Number of subjects per group
-    avg_n = 100;    
+    avg_n = 1000;    
     % Size of the simulation image (in 1 direction). Each voxel of the
     % simulation image is a simulation sample.
     settings.iter_onedir = 30;
