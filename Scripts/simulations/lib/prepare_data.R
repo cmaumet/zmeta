@@ -5,7 +5,7 @@ prepare_data <- function(data_list, max_z=NA, min_z=NA){
         # print(head(data))
         data_list[[i]] = subset(data_list[[i]], soft2Factor<100)
         data_list[[i]]$Within <- factor(data_list[[i]]$Within)
-        
+               
         if (! is.na(max_z)){
             data_list[[i]] = subset(data_list[[i]], expectedz<max_z)
         }
