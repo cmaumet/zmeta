@@ -43,7 +43,7 @@ function meta_sim(base_dir, redo, path_to_spm, within_id)
     settings.wth_sigmas = settings.wth_sigmas_all(within_id);
 
     % Between-studies variance (RFX?)
-    settings.btw_sigmas = 1; %[0 1];
+    settings.btw_sigmas = 0; %[0 1];
 
     % Proportion of studies with software 2 (fraction)
     settings.soft_props = [1/5 0.5];
