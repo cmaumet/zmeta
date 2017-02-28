@@ -27,7 +27,7 @@ function meta_sim(base_dir, redo, path_to_spm, within_id)
     % Number of permutations for non-parametric methods
     settings.nperm = 5000;
     % Number of subjects per group
-    avg_n = 20;    
+    avg_n = 1000;    
     % Size of the simulation image (in 1 direction). Each voxel of the
     % simulation image is a simulation sample.
     settings.iter_onedir = 30;
@@ -52,7 +52,7 @@ function meta_sim(base_dir, redo, path_to_spm, within_id)
     settings.soft_factors = [2];
 
     % Study-specific bias due to units mismatch
-    settings.unit_mismatches = {'nominal', 'datascl', 'contscl'};
+    settings.unit_mismatches = 'nominal';% {'nominal', 'datascl', 'contscl'};
 
     % Type of analysis: one-sample (1), two-sample(2), two-sample
     % unbalanced (3)
@@ -239,10 +239,7 @@ function meta_sim(base_dir, redo, path_to_spm, within_id)
                                         end
                                     end
 
-        			    n_str = '';
-                                    if avg_n ~= 20
-                                        n_str = ['_n' num2str(avg_n)];
-                                    end
+                                    n_str = ['_n' num2str(avg_n)];
   				    % Directory to store the simulation data and results.
                                     simu_name = [analysisPrefix 'k' num2str(k, '%03d') n_str  '_btw' num2str(btw_sigma) ...
                                         opt_wth, '_', num2str(unit_mis), opt_str];
