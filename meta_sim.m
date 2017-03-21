@@ -474,8 +474,11 @@ function [con_files, varcon_files, z_files] = simulate_data(config, data_dir)
         % Degrees of freedom of the within-study variance estimate
         dof = nsub(studyIndex)-1;
 
+        % Study-specific mean effect
+        study_mean = normrnd(0, sqrt(config.btw_sigma));
+        
         % Estimated paramater estimate.
-        estimatedContrast = normrnd(0, sqrt(config.sigma_sq*wth_sigma_a(studyIndex)./nsub(studyIndex)+config.btw_sigma), [config.iter_onedir, config.iter_onedir, config.iter_onedir]);
+        estimatedContrast = normrnd(study_mean, sqrt(config.sigma_sq*wth_sigma_a(studyIndex)./nsub(studyIndex)), [config.iter_onedir, config.iter_onedir, config.iter_onedir]);
 
         % Estimated contrast variance (from chi square distribution)
         estimatedSigmaSquare = chi2rnd(dof, [config.iter_onedir, config.iter_onedir, config.iter_onedir])*config.sigma_sq*wth_sigma_a(studyIndex)/dof;
