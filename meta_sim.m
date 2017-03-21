@@ -25,7 +25,7 @@ function meta_sim(base_dir, redo, path_to_spm, within_id)
     % Constant number of subjects per studies     
     settings.same_ns = [true];
     % Number of permutations for non-parametric methods
-    settings.nperm = 5000;
+    settings.nperm = 10000;
     % Number of subjects per group
     avg_n = 20;    
     % Size of the simulation image (in 1 direction). Each voxel of the
@@ -226,7 +226,7 @@ function meta_sim(base_dir, redo, path_to_spm, within_id)
                                     if wth_sigma_same
                                         group1_wth_sigma_a = ones(1, k_group1);
                                         group2_wth_sigma_a = ones(1, k_group2);
-                                        opt_wth = ['_wth', num2str(sigma_sq, '%02.0f')];
+                                        opt_wth = ['_wth', strrep(num2str(sigma_sq/avg_n, '%0.2f'), '.', '')];
                                     else
                                         if sigma_sq == settings.wth_sigmas_all(1)
                                             wth_w = [1 2 4 8 16];
