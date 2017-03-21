@@ -475,7 +475,7 @@ function [con_files, varcon_files, z_files] = simulate_data(config, data_dir)
         dof = nsub(studyIndex)-1;
 
         % Study-specific mean effect
-        study_mean = normrnd(0, sqrt(config.btw_sigma));
+        study_mean = normrnd(0, sqrt(config.btw_sigma*wth_sigma_a(studyIndex)));
         
         % Estimated paramater estimate.
         estimatedContrast = normrnd(study_mean, sqrt(config.sigma_sq*wth_sigma_a(studyIndex)./nsub(studyIndex)), [config.iter_onedir, config.iter_onedir, config.iter_onedir]);
