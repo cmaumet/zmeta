@@ -36,7 +36,7 @@ function meta_sim(base_dir, redo, path_to_spm, within_id)
     % ---------------
     
     % Number of studies per meta-analysis
-    settings.ks = 50;%[5 10 25 50];
+    settings.ks = 25;%[5 10 25 50];
 
     % Within-study variance
     settings.wth_sigmas_all = avg_n*[0.25 0.5 1 2 4];
@@ -52,7 +52,7 @@ function meta_sim(base_dir, redo, path_to_spm, within_id)
     settings.soft_factors = [2];
 
     % Study-specific bias due to units mismatch
-    settings.unit_mismatches = {'nominal', 'datascl', 'contscl'};
+    settings.unit_mismatches = {'nominal'};% {'nominal', 'datascl', 'contscl'};
 
     % Type of analysis: one-sample (1), two-sample(2), two-sample
     % unbalanced (3)
