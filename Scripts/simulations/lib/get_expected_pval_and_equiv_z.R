@@ -1,6 +1,6 @@
 get_expected_pval_and_equiv_z <- function(pattern="^nStudy50_subNumidentical_varidentical_Betw1") {
 
-study_dir = '/Volumes/camille/IBMA_simu/'
+study_dir = '/Volumes/camille/IBMA_simu_hier_noperm/'
 suffix <- gsub('[^a-zA-Z_0-9]', '', pattern)
 print(pattern)
 study_dirs = dir(study_dir, pattern=paste(pattern, ".*", sep=''))
