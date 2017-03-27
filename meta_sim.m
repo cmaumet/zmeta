@@ -230,12 +230,12 @@ function meta_sim(base_dir, redo, path_to_spm, within_id)
                                     else
                                         if sigma_sq == settings.wth_sigmas_all(1)
                                             wth_w_or = [1 2 4 8 16];
-                                            wth_w = (1.5).^[0:4];
+                                            wth_w = (3).^[0:4];
                                             wth_w = wth_w*mean(wth_w_or)/(mean(wth_w));%;
 %                                             ps=3;x_new=ps.^[0:4];x_new=x_new*mean(x_or)/(mean(x_new));disp(x_new);disp(mean(x_new));disp(x_new(end)./x_new(1))
                                             group1_wth_sigma_a = wth_w(mod(0:k_group1-1, numel(wth_w)) + 1);
                                             group2_wth_sigma_a = wth_w(mod(0:k_group2-1, numel(wth_w)) + 1);
-                                            opt_wth = '_wthdiff_1.5';
+                                            opt_wth = '_wthdiff_3';
                                         else
                                             % Varying sigma is going through all wth_sigmas at once
                                             break;
