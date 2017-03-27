@@ -6,7 +6,7 @@ p_uppers = dict()
 p_lowers = dict()
 
 # Pre-computed confidence interval for QQplots for more effeciency
-data_sizes = [27000, 38*30*30*30]
+data_sizes = [27000, 38*30*30*30, 270000]
 for d in data_sizes:
     x_log_spaced = np.logspace(np.log10(1), np.log10(d), num=500, endpoint=False)
     x_log_spaced = np.append(x_log_spaced,d) # Manually add endpoint to avoid rounding errors
@@ -20,12 +20,35 @@ for d in data_sizes:
         [scipy.stats.beta.ppf(0.975, t, d-t+1) for t in x_log_spaced]
     )
 
+def qqplot(data, dist, ax2, title, rightTail, *args, **kwargs):
+    p_th = [t/data.size for t in range(1,data.size+1)]
+
+    if rightTail:
+        p_obs = dist.sf(data, *args)
+        ptitle = 'Q-Q plot (right tail)'
+    else:
+        p_obs = dist.cdf(data, *args)
+        ptitle = 'Q-Q plot (left tail)'
+    
+    line1, = ax2.loglog(p_th, sorted(p_obs), '.', linewidth=1,
+                     label=title, markersize=3)
+    ax2.plot(p_th, p_th, '-')
+    x, p_upper = p_uppers[int(data.size)]
+    ax2.plot(x, p_upper, 'c-')
+    x, p_lower = p_lowers[int(data.size)]
+    ax2.plot(x, p_lower, 'c-')   
+    ax2.set_title(ptitle)
+    ax2.legend(loc='lower right')
+    ax2.invert_yaxis()
+    ax2.invert_xaxis()
+    
+    
 def distribution_plot(title, data, dist, *args, **kwargs):
     np.random.seed(0)
     num_bins = 100
     
 
-    f, (ax1, ax2) = plt.subplots(1, 2, sharey=False, figsize=(10,5))
+    f, (ax1, ax2, ax3) = plt.subplots(1, 3, sharey=False, figsize=(10,5))
 
     # histogram plot
     n, bins, patches = ax1.hist(data, num_bins, normed=True)
@@ -42,21 +65,9 @@ def distribution_plot(title, data, dist, *args, **kwargs):
     ax1.set_title(title)
     
     # qq-plot plot
-    p_th = [t/data.size for t in range(1,data.size+1)]
+    qqplot(data, dist, ax2, title, True, *args)
+    qqplot(data, dist, ax3, title, False, *args)
 
-    line1, = ax2.loglog(p_th, sorted(dist.sf(data, *args)), '.', linewidth=1,
-                     label=title, markersize=3)
-    ax2.plot(p_th, p_th, '-')
-    x, p_upper = p_uppers[int(data.size)]
-    ax2.plot(x, p_upper, 'c-')
-    x, p_lower = p_lowers[int(data.size)]
-    ax2.plot(x, p_lower, 'c-')   
-    ax2.set_title('Q-Q plot')
-
-
-    ax2.legend(loc='lower right')
-    plt.gca().invert_yaxis()
-    plt.gca().invert_xaxis()
     plt.show()
     
 def chi2_distribution_plot(data, title, *args, **kwargs):   
