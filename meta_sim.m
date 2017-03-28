@@ -98,7 +98,7 @@ function meta_sim(base_dir, redo, path_to_spm, within_id)
     global SnPMdefs;
     SnPMdefs.shuffle_seed = false;
           
-    allsimu_dir = fullfile(base_dir, 'simulations');
+    allsimu_dir = base_dir;
     if ~isdir(allsimu_dir)
         mkdir(allsimu_dir)
     end
