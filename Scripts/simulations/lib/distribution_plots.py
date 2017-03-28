@@ -2,6 +2,14 @@ import numpy as np
 import scipy
 import matplotlib.pyplot as plt
 
+
+from matplotlib import rc
+# Set up latex settings
+# rc('font',**{'family':'sans-serif','sans-serif':['Helvetica']})
+## for Palatino and other serif fonts use:
+#rc('font',**{'family':'serif','serif':['Palatino']})
+
+
 p_uppers = dict()
 p_lowers = dict()
 
@@ -30,15 +38,14 @@ def qqplot(data, dist, ax2, title, rightTail, *args, **kwargs):
         p_obs = dist.cdf(data, *args)
         ptitle = 'Q-Q plot (left tail)'
     
-    line1, = ax2.loglog(p_th, sorted(p_obs), '.', linewidth=1,
-                     label=title, markersize=3)
+    line1, = ax2.loglog(p_th, sorted(p_obs), '.', linewidth=1, markersize=3)
     ax2.plot(p_th, p_th, '-')
     x, p_upper = p_uppers[int(data.size)]
     ax2.plot(x, p_upper, 'c-')
     x, p_lower = p_lowers[int(data.size)]
     ax2.plot(x, p_lower, 'c-')   
     ax2.set_title(ptitle)
-    ax2.legend(loc='lower right')
+    # ax2.legend(loc='lower right')
     ax2.invert_yaxis()
     ax2.invert_xaxis()
     
@@ -61,8 +68,17 @@ def distribution_plot(title, data, dist, *args, **kwargs):
     # known distribution
     y = dist.pdf(bins, *args)
     
-    ax1.plot(bins, y, '-')
-    ax1.set_title(title)
+    ax1.plot(bins, y, '-', label='Theoretical null distribution')
+    # ax1.legend(loc='lower right')
+    ax1.legend(bbox_to_anchor=(4, 1), loc='upper left', ncol=1)
+    ax1.set_title('Histogram')
+    
+    rc('text', usetex=True)
+    plt.suptitle(title, fontsize=20)
+    rc('text', usetex=False)
+    # plt.title(r"\TeX\ is Number ", fontsize=16, color='gray')
+    # Make room for large title.
+    plt.subplots_adjust(top=0.85)
     
     # qq-plot plot
     qqplot(data, dist, ax2, title, True, *args)
