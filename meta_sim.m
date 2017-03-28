@@ -246,6 +246,7 @@ function meta_sim(base_dir, redo, path_to_spm, within_id)
                                         wth_w = wth_w*mean(wth_w_or)/(mean(wth_w));
                                         group1_wth_sigma_a = wth_w(mod(0:k_group1-1, numel(wth_w)) + 1);
                                         group2_wth_sigma_a = wth_w(mod(0:k_group2-1, numel(wth_w)) + 1);
+                                        sigma_sq = settings.wth_sigmas_all(1);
                                     end
 
                                     n_str = ['_n' num2str(avg_n)];
