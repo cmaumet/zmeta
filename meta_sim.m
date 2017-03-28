@@ -12,9 +12,9 @@ function meta_sim(base_dir, redo, path_to_spm, within_id)
     if isempty(which('spm'))
         addpath(path_to_spm)
     end
-    addpath(fullfile(pwd, 'lib'))    
-    
     script_dir = fileparts(mfilename('fullpath'));
+    
+    addpath(fullfile(script_dir, 'lib'))    
     fsl_designs_dir = fullfile(script_dir, 'fsl_designs');
     
     % ----- Simulation parameters --------
