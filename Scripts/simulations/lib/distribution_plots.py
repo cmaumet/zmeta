@@ -28,14 +28,14 @@ for d in data_sizes:
         [scipy.stats.beta.ppf(0.975, t, d-t+1) for t in x_log_spaced]
     )
 
-def qqplot(data, dist, ax2, title, rightTail, *args, **kwargs):
+def qqplot(data, factor, dist, ax2, title, rightTail, *args, **kwargs):
     p_th = [t/data.size for t in range(1,data.size+1)]
 
     if rightTail:
-        p_obs = dist.sf(data, *args)
+        p_obs = dist.sf(data/factor, *args)
         ptitle = 'Q-Q plot (right tail)'
     else:
-        p_obs = dist.cdf(data, *args)
+        p_obs = dist.cdf(data/factor, *args)
         ptitle = 'Q-Q plot (left tail)'
     
     line1, = ax2.loglog(p_th, sorted(p_obs), '.', linewidth=1, markersize=3)
@@ -50,7 +50,7 @@ def qqplot(data, dist, ax2, title, rightTail, *args, **kwargs):
     ax2.invert_xaxis()
     
     
-def distribution_plot(title, data, dist, *args, **kwargs):
+def distribution_plot(title, factor, data, dist, *args, **kwargs):
     np.random.seed(0)
     num_bins = 100
     
@@ -65,8 +65,9 @@ def distribution_plot(title, data, dist, *args, **kwargs):
 #     print(param)
 #     y = dist.pdf(bins, *param[:-2], loc=param[-2], scale=param[-1])
     
-    # known distribution
-    y = dist.pdf(bins, *args)
+    # known distribution   
+    y = dist.pdf(bins/factor, *args)
+    y = y/sum(y)*sum(n) # Normalise by histogramm area
     
     ax1.plot(bins, y, '-', label='Theoretical null distribution')
     # ax1.legend(loc='lower right')
@@ -81,16 +82,16 @@ def distribution_plot(title, data, dist, *args, **kwargs):
     plt.subplots_adjust(top=0.85)
     
     # qq-plot plot
-    qqplot(data, dist, ax2, title, True, *args)
-    qqplot(data, dist, ax3, title, False, *args)
+    qqplot(data, factor, dist, ax2, title, True, *args)
+    qqplot(data, factor, dist, ax3, title, False, *args)
 
     plt.show()
     
-def chi2_distribution_plot(data, title, *args, **kwargs):   
-    distribution_plot(title, data, scipy.stats.chi2, *args)
+def chi2_distribution_plot(data, factor, title, *args, **kwargs):   
+    distribution_plot(title, factor, data, scipy.stats.chi2, *args)
     
 def t_distribution_plot(data, title, *args, **kwargs):   
-    distribution_plot(title, data, scipy.stats.t, *args)
+    distribution_plot(title, 1, data, scipy.stats.t, *args)
 
 def z_distribution_plot(data, title, *args, **kwargs):    
-    distribution_plot(title, data, scipy.stats.norm, *args)
+    distribution_plot(title, 1, data, scipy.stats.norm, *args)
