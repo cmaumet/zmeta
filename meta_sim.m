@@ -37,27 +37,15 @@ function meta_sim(base_dir, redo, path_to_spm, within_id, k_id, test_id, btw_id)
     
     % Number of studies per meta-analysis
     settings.ks_all = [5 10 25 50];
-    if exist(k_id, 'var')
-        settings.ks = settings.ks_all(k_id);
-    else
-        settings.ks = settings.ks_all;
-    end
-
+    settings.ks = settings.ks_all(k_id);
+  
     % Within-study variance either constant or factor when varying
     settings.wth_sigmas_all = avg_n*[0.25 0.5 1 2 4];
-    if exist(within_id, 'var')
-        settings.wth_sigmas = settings.wth_sigmas_all(within_id);
-    else
-        settings.wth_sigmas = settings.wth_sigmas_all;
-    end
+    settings.wth_sigmas = settings.wth_sigmas_all(within_id);
     
     % Between-studies variance (RFX?)
     settings.btw_sigmas_all = [0 1];
-    if exist(btw_id, 'var')
-        settings.btw_sigmas = settings.btw_sigmas_all(btw_id);
-    else
-        settings.btw_sigmas = settings.btw_sigmas_all;
-    end
+    settings.btw_sigmas = settings.btw_sigmas_all(btw_id);
 
     % Proportion of studies with software 2 (fraction)
     settings.soft_props = [1/5 0.5];
@@ -71,11 +59,7 @@ function meta_sim(base_dir, redo, path_to_spm, within_id, k_id, test_id, btw_id)
     % Type of analysis: one-sample (1), two-sample(2), two-sample
     % unbalanced (3)
     settings.analysis_types_all = [1, 2, 3];
-    if exist(test_id, 'var')
-        settings.analysis_types = settings.analysis_types_all(test_id);
-    else
-        settings.analysis_types = settings.analysis_types_all;
-    end
+    settings.analysis_types = settings.analysis_types_all(test_id);
 
     % Constant within-study variance across studies
     settings.wth_sigma_sames = false;% [true, false];
