@@ -1,5 +1,5 @@
-for i in {1..2}
+for i in {1..5}
 do
-    name=test1_k25
+    name=test1_k25_btw1
     qsub -v wth_id=$i,k_id=3,test_id=1,btw_id=2,avgn_id=1 -N $name meta_sim.sh
 done
