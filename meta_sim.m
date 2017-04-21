@@ -38,10 +38,10 @@ function meta_sim(base_dir, redo, path_to_spm, within_id)
     % Number of studies per meta-analysis
     settings.ks = 5;%[5 10 25 50];
 
-    % Within-study variance
+    % Within-study variance either constant or factor when varying
     settings.wth_sigmas_all = avg_n*[0.25 0.5 1 2 4];
     settings.wth_sigmas = settings.wth_sigmas_all(within_id);
-
+    
     % Between-studies variance (RFX?)
     settings.btw_sigmas = [0 1];
 
@@ -220,33 +220,33 @@ function meta_sim(base_dir, redo, path_to_spm, within_id)
 
                              % Within-study variance (ignoring sample
                              % size)
-                             for sigma_sq = settings.wth_sigmas
+                             for sigma_sq_factor = settings.wth_sigmas
                                 for wth_sigma_same = settings.wth_sigma_sames
 
                                     if wth_sigma_same
+                                        % Constant within-study variance
                                         group1_wth_sigma_a = ones(1, k_group1);
                                         group2_wth_sigma_a = ones(1, k_group2);
-                                        opt_wth = ['_wth', strrep(num2str(sigma_sq/avg_n, '%0.2f'), '.', '')];
+                                        opt_wth = ['_wth', strrep(num2str(sigma_sq_factor/avg_n, '%0.2f'), '.', '')];
+                                        sigma_sq = sigma_sq_factor;
+                                        
+                                        factor_wthsigma = 1;
                                     else
-                                        wth_w_or = [1 2 4 8 16];
-                                        if sigma_sq == settings.wth_sigmas_all(1)
-                                            wth_w = wth_w_or;
-                                            opt_wth = '_wthdiff';
-                                        elseif sigma_sq == settings.wth_sigmas_all(2)
-                                            wth_w = (1.5).^[0:4];
-%                                             ps=3;x_new=ps.^[0:4];x_new=x_new*mean(x_or)/(mean(x_new));disp(x_new);disp(mean(x_new));disp(x_new(end)./x_new(1))
-                                            opt_wth = '_wthdiff_1.5';
-                                        elseif sigma_sq == settings.wth_sigmas_all(3)
-                                            wth_w = (3).^[0:4];
-                                            opt_wth = '_wthdiff_3';
+                                        % Varying within-study variances
+                                        % (mean 1 across studies)
+                                        factor_wthsigma = sigma_sq_factor/min(wth_sigmas_all);
+                                        
+                                        if factor_wthsigma ~= 1
+                                            wth_w = linspace(1,factor_wthsigma,5);
+                                            opt_wth = ['_wthdiff_' num2str(factor_wthsigma)];
                                         else
-                                            % Varying sigma is going through all wth_sigmas at once
+                                            % constant within-study var
                                             break;
-                                        end                                       
-                                        wth_w = wth_w*mean(wth_w_or)/(mean(wth_w));
+                                        end
+                                        wth_w = wth_w/(mean(wth_w));
                                         group1_wth_sigma_a = wth_w(mod(0:k_group1-1, numel(wth_w)) + 1);
                                         group2_wth_sigma_a = wth_w(mod(0:k_group2-1, numel(wth_w)) + 1);
-                                        sigma_sq = settings.wth_sigmas_all(1);
+                                        sigma_sq = 1;
                                     end
 
                                     n_str = ['_n' num2str(avg_n)];
@@ -287,7 +287,7 @@ function meta_sim(base_dir, redo, path_to_spm, within_id)
                                         simu.config.n = group1_n;
                                     end
                                     simu.config.wth_sigma_same = wth_sigma_same;
-
+                                    simu.config.wth_sigma_factor = factor_wthsigma;
                                     if analysis_type > 1
                                         simu.config.k_group1 = k_group1;
                                         simu.config.k_group2 = k_group2;
