@@ -14,6 +14,6 @@ module add fsl
 
 cwd=`pwd`
 cd $HOME
-matlab -nodisplay -r "addpath('$cwd');addpath('$cwd/lib');meta_sim('/storage/wmsmfe/simulations',false,fullfile('$cwd', '..', 'code', 'spm12'), $wth_id, $k_id, $test_id, $btw_id);quit"
+matlab -nodisplay -r "addpath('$cwd');addpath('$cwd/lib');meta_sim('/storage/wmsmfe/simulations',false,fullfile('$cwd', '..', 'code', 'spm12'), $wth_id, $k_id, $test_id, $btw_id, $avgn_id);quit"
 
 cd $cwd

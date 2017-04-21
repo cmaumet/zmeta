@@ -1,4 +1,4 @@
-function meta_sim(base_dir, redo, path_to_spm, within_id, k_id, test_id, btw_id)
+function meta_sim(base_dir, redo, path_to_spm, within_id, k_id, test_id, btw_id, avgn_id)
     % META_SIM  Simulate meta-analyses results under the null
     %   META_SIM(base_dir, REDO) Create simulation results in a 
     %       'simulations' folder under base_dir. Overwrite existing
@@ -27,7 +27,8 @@ function meta_sim(base_dir, redo, path_to_spm, within_id, k_id, test_id, btw_id)
     % Number of permutations for non-parametric methods
     settings.nperm = 10000;
     % Number of subjects per group
-    avg_n = 20;    
+    avg_n_all = [20 100];    
+    avg_n = avg_n_all(avgn_id)
     % Size of the simulation image (in 1 direction). Each voxel of the
     % simulation image is a simulation sample.
     settings.iter_onedir = 30;
@@ -62,7 +63,7 @@ function meta_sim(base_dir, redo, path_to_spm, within_id, k_id, test_id, btw_id)
     settings.analysis_types = settings.analysis_types_all(test_id);
 
     % Constant within-study variance across studies
-    settings.wth_sigma_sames = false;% [true, false];
+    settings.wth_sigma_sames = [true, false];
     
     % --------------------------------------   
     display_settings(settings)
@@ -237,7 +238,7 @@ function meta_sim(base_dir, redo, path_to_spm, within_id, k_id, test_id, btw_id)
                                     else
                                         % Varying within-study variances
                                         % (mean 1 across studies)
-                                        factor_wthsigma = sigma_sq_factor/min(wth_sigmas_all);
+                                        factor_wthsigma = sigma_sq_factor/min(settings.wth_sigmas_all);
                                         
                                         if factor_wthsigma ~= 1
                                             wth_w = linspace(1,factor_wthsigma,5);
