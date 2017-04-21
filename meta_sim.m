@@ -25,7 +25,7 @@ function meta_sim(base_dir, redo, path_to_spm, within_id)
     % Constant number of subjects per studies     
     settings.same_ns = [true];
     % Number of permutations for non-parametric methods
-    settings.nperm = 50;
+    settings.nperm = 10000;
     % Number of subjects per group
     avg_n = 20;    
     % Size of the simulation image (in 1 direction). Each voxel of the
