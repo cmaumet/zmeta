@@ -28,7 +28,7 @@ function meta_sim(base_dir, redo, path_to_spm, within_id, k_id, test_id, btw_id,
     settings.nperm = 10000;
     % Number of subjects per group
     avg_n_all = [20 100];    
-    avg_n = avg_n_all(avgn_id)
+    avg_n = avg_n_all(avgn_id);
     % Size of the simulation image (in 1 direction). Each voxel of the
     % simulation image is a simulation sample.
     settings.iter_onedir = 30;
@@ -227,22 +227,23 @@ function meta_sim(base_dir, redo, path_to_spm, within_id, k_id, test_id, btw_id,
                              for sigma_sq_factor = settings.wth_sigmas
                                 for wth_sigma_same = settings.wth_sigma_sames
 
-                                    if wth_sigma_same
+                                    if wth_sigma_same                                       
                                         % Constant within-study variance
-                                        group1_wth_sigma_a = ones(1, k_group1);
-                                        group2_wth_sigma_a = ones(1, k_group2);
-                                        opt_wth = ['_wth', strrep(num2str(sigma_sq_factor/avg_n, '%0.2f'), '.', '')];
+                                        factor_wthsigma = 1;
                                         sigma_sq = sigma_sq_factor;
                                         
-                                        factor_wthsigma = 1;
+                                        group1_wth_sigma_a = ones(1, k_group1);
+                                        group2_wth_sigma_a = ones(1, k_group2);
+                                        opt_wth = ['_wth', strrep(num2str(sigma_sq/avg_n, '%0.2f'), '.', '')];
                                     else
                                         % Varying within-study variances
-                                        % (mean 1 across studies)
+                                        % (contrast variance of mean 1 across studies)
                                         factor_wthsigma = sigma_sq_factor/min(settings.wth_sigmas_all);
+                                        sigma_sq = avg_n;
                                         
                                         if factor_wthsigma ~= 1
                                             wth_w = linspace(1,factor_wthsigma,5);
-                                            opt_wth = ['_wthdiff_' num2str(factor_wthsigma)];
+                                            opt_wth = ['_wthdiff' num2str(factor_wthsigma, '%02d')];
                                         else
                                             % constant within-study var
                                             break;
@@ -250,11 +251,10 @@ function meta_sim(base_dir, redo, path_to_spm, within_id, k_id, test_id, btw_id,
                                         wth_w = wth_w/(mean(wth_w));
                                         group1_wth_sigma_a = wth_w(mod(0:k_group1-1, numel(wth_w)) + 1);
                                         group2_wth_sigma_a = wth_w(mod(0:k_group2-1, numel(wth_w)) + 1);
-                                        sigma_sq = 1;
                                     end
 
                                     n_str = ['_n' num2str(avg_n)];
-  				    % Directory to store the simulation data and results.
+                                    % Directory to store the simulation data and results.
                                     simu_name = [analysisPrefix 'k' num2str(k, '%03d') n_str  '_btw' num2str(btw_sigma) ...
                                         opt_wth, '_', num2str(unit_mis), opt_str];
                                     simu_dir = fullfile(allsimu_dir, simu_name);
