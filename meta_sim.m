@@ -62,7 +62,7 @@ function meta_sim(base_dir, redo, path_to_spm, within_id, k_id, test_id, btw_id,
     settings.analysis_types_all = [1, 2, 3];
     settings.analysis_types = settings.analysis_types_all(test_id);
 
-    % Variations inwithin-study variance across studies (1=constant)
+    % Variations in within-study variance across studies (1=constant)
     settings.wth_sigma_variations = [1, 2, 4, 8, 16];
     
     % --------------------------------------   
@@ -287,7 +287,7 @@ function meta_sim(base_dir, redo, path_to_spm, within_id, k_id, test_id, btw_id,
                                         simu.config.group1_n = group1_n;
                                         simu.config.n = group1_n;
                                     end
-                                    simu.config.wth_sigma_same = wth_sigma_same;
+                                    simu.config.wth_sigma_variations = wth_sigma_variations;
                                     simu.config.wth_sigma_factor = wth_sigma_variation;
                                     if analysis_type > 1
                                         simu.config.k_group1 = k_group1;
