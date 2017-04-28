@@ -287,7 +287,7 @@ function meta_sim(base_dir, redo, path_to_spm, within_id, k_id, test_id, btw_id,
                                         simu.config.group1_n = group1_n;
                                         simu.config.n = group1_n;
                                     end
-                                    simu.config.wth_sigma_variations = wth_sigma_variations;
+                                    simu.config.wth_sigma_variation = wth_sigma_variation;
                                     simu.config.wth_sigma_factor = wth_sigma_variation;
                                     if analysis_type > 1
                                         simu.config.k_group1 = k_group1;
