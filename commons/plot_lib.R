@@ -47,7 +47,7 @@ soft2_labels <- function(string){
 
 load_data_from_csv <- function(pattern){
     suffix <- gsub('[^a-zA-Z_0-9]', '', pattern)
-    csv_file = paste(getwd(), '/../../../data/allsimudat_', suffix,'.csv', sep="")
+    csv_file = paste(getwd(), '/../data/allsimudat_', suffix,'.csv', sep="")
 
     if (! file.exists(csv_file)){
         print(paste('pattern=', suffix))
