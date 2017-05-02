@@ -1,14 +1,14 @@
-get_expected_pval_and_equiv_z <- function(pattern="^nStudy50_subNumidentical_varidentical_Betw1") {
+get_expected_pval_and_equiv_z <- function(pattern="^nStudy50_subNumidentical_varidentical_Betw1", csv_file) {
 
 study_dir = '/Volumes/camille/IBMA_simu/'
 suffix <- gsub('[^a-zA-Z_0-9]', '', pattern)
 print(pattern)
 study_dirs = dir(study_dir, pattern=paste(pattern, ".*", sep=''))
 
-csv_file = paste(getwd(), '/../../../data/allsimudat_', suffix,'.csv', sep="")
-if (file.exists(csv_file)){
-	file.remove(csv_file)
-}
+# csv_file = paste(getwd(), '/../../../data/allsimudat_', suffix,'.csv', sep="")
+# if (file.exists(csv_file)){
+# 	file.remove(csv_file)
+# }
 
 tot_num_simu = length(study_dirs)
 

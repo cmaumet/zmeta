@@ -52,7 +52,9 @@ load_data_from_csv <- function(pattern){
     if (! file.exists(csv_file)){
         print(paste('pattern=', suffix))
         print(paste('CSV file', csv_file,' not found, reprocessing the data.'))
-        get_expected_pval_and_equiv_z(pattern)
+        get_expected_pval_and_equiv_z(pattern, csv_file)
+    } else {
+        print(paste('Reading from ', csv_file))
     }
     simudata <- read.csv(csv_file, header=T, sep=",")
     # Reorder unit mismatch factor levels
