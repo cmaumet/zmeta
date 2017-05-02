@@ -195,8 +195,8 @@ function export_full_simulations(simuDir, redo, pattern, split_in, downs_to)
                     end
                     % downsample in log-space so that we keep more values 
                     % corresponding to smaller ranks/p-values                    
-                    donws_pos = round(...
-                        logspace(0,log10(bin_size), downs_tot));
+                    donws_pos = unique(round(...
+                        logspace(0,log10(bin_size), downs_tot)));
                 end
                 
                 start = 1;
