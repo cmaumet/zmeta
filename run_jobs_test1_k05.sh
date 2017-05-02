@@ -1,5 +1,5 @@
-qsub -v wth_id=1 k_id=5 test_id=1 meta_sim.sh
-qsub -v wth_id=2 k_id=5 test_id=1 meta_sim.sh
-qsub -v wth_id=3 k_id=5 test_id=1 meta_sim.sh
-qsub -v wth_id=4 k_id=5 test_id=1 meta_sim.sh
-qsub -v wth_id=5 k_id=5 test_id=1 meta_sim.sh
+for i in {1..5}
+do
+    name=test1_k05
+    qsub -v wth_id=$i,k_id=1,test_id=1,btw_id=1:2,avgn_id=1 -N $name meta_sim.sh
+done
