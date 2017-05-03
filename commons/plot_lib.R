@@ -9,11 +9,16 @@ method_labels <- function(string) {
 }
 
 nstudies_labels <- function(string){
-    string <- paste(as.character(string), 'studies')
+    string <- paste(as.character(string), 'subjects')
 }
 
+percent_labels <- function(string){
+    string <- paste(as.character(string), '% outliers')
+}
+
+
 nsubjects_labels <- function(string){
-    string <- paste(as.character(string), 'subjects')
+    string <- paste(as.character(string), 'scans')
 }
 
 units_labels <- function(string){
@@ -45,14 +50,14 @@ soft2_labels <- function(string){
     string
 }
 
-load_data_from_csv <- function(pattern){
+load_data_from_csv <- function(pattern, data_dir){
     suffix <- gsub('[^a-zA-Z_0-9]', '', pattern)
     csv_file = paste(getwd(), '/../data/allsimudat_', suffix,'.csv', sep="")
 
     if (! file.exists(csv_file)){
         print(paste('pattern=', suffix))
         print(paste('CSV file', csv_file,' not found, reprocessing the data.'))
-        get_expected_pval_and_equiv_z(pattern, csv_file)
+        get_expected_pval_and_equiv_z(pattern, csv_file, data_dir)
     } else {
         print(paste('Reading from ', csv_file))
     }
