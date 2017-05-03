@@ -13,7 +13,8 @@ plot_blandaldman_z <- function(data, formula, title, mult, lim, filename, max_z=
                            nStudies = nstudies_labels,
                            nSubjects = nsubjects_labels,
                            soft2 = soft2_labels,
-                           unitMism = units_labels)) + 
+                           unitMism = units_labels,
+                           percentOutliers = percent_labels)) + 
             theme(strip.text.x = element_text(size = 10)) + 
             ylab("Estimated - reference Z") + xlab("Reference Z") + 
             geom_line(aes(x=expectedz, y=0), colour="black") + 
@@ -38,7 +39,8 @@ plot_blandaldman_z <- function(data, formula, title, mult, lim, filename, max_z=
                            nStudies = nstudies_labels,
                            nSubjects = nsubjects_labels,
                            soft2 = soft2_labels,
-                           unitMism = units_labels)) + 
+                           unitMism = units_labels,
+                           percentOutliers = percent_labels)) + 
             theme(strip.text.x = element_text(size = 10)) + 
             ylab("Estimated - reference Z") + xlab("Reference Z") + 
             geom_line(aes(x=expectedz, y=0), colour="black") + 
