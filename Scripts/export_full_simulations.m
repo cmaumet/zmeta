@@ -259,6 +259,9 @@ function mystr = print_pvalues(mystr, methodName, minuslog10pvalues, ...
             info.group1_wth_sigma_a, info.group2_wth_sigma_a]);
     end
     
+    if ~isfield(info, 'n')
+        info.n = [info.group1_n, info.group2_n];
+    end
     n = mean(info.n);
 
     mystr = [mystr sprintf([methodName ...
