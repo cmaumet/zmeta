@@ -56,3 +56,5 @@ fsl_design/*.fsf
 
 # For now do not store figures in pdf format (only png)
 Paper/figures/*.pdf
+
+*.pyc
