@@ -7,7 +7,7 @@ plot_blandaldman_z <- function(data, formula, title, mult, lim, filename, max_z=
             geom_ribbon(
                 aes(x=expectedz, ymin=z_lower-expectedz, ymax=z_upper-expectedz, group=glm), 
                 fill="grey", alpha=.8, colour=NA) + 
-            facet_grid(formula, scales = "free", 
+            facet_grid(formula,
                        labeller = labeller(
                            methods = method_labels, 
                            nStudies = nstudies_labels,
@@ -32,7 +32,7 @@ plot_blandaldman_z <- function(data, formula, title, mult, lim, filename, max_z=
             geom_ribbon(
                 aes(ymin=z_lower-expectedz, ymax=z_upper-expectedz, group=glm), 
                 fill="grey", alpha=.8, colour=NA) + 
-            facet_grid(formula, scales = "free", 
+            facet_grid(formula, 
                        labeller = labeller(
                            methods = method_labels, 
                            nStudies = nstudies_labels,

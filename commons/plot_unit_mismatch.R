@@ -1,6 +1,15 @@
-plot_unit_mismatch <- function(data, suffix, mult=FALSE, single=FALSE, lim=0.5, filename=NA, max_z=NA){
+plot_unit_mismatch <- function(data, suffix, mult=FALSE, single=FALSE, lim=0.5, filename=NA, max_z=NA, both=TRUE){
     
     data_list=list()
+
+    if (!("withinInfo" %in% colnames(data)))
+    {
+        data$withinInfo <- data$Within/data$nSubjects
+        data$withinInfo[data$withinVariation!=1] <- paste(
+            "varying: ", sprintf("%02d", data$withinVariation[data$withinVariation!=1]), sep='')
+        data$withinInfo <- factor(data$withinInfo)
+    }
+    
     
     if (mult){
         titles=list()
@@ -16,7 +25,18 @@ plot_unit_mismatch <- function(data, suffix, mult=FALSE, single=FALSE, lim=0.5, 
     } else {
         data_list[[1]] <- data
     }
+
+    formula=methods~unitMism+soft2
+    if (length(unique(data[data$unitMism=='datascl',]$soft2)) == 1)
+    {
+        # If there is only one parametrisation of data scaling do not facet over parameters
+        formula=methods~unitMism
+    }
+
     
-    p <- plot_blandaldman_z(data_list, methods~unitMism+soft2, paste("Unit mismatch:", suffix), mult, lim, filename, max_z)
-    p <- plot_qq_p(data_list, methods~unitMism+soft2, paste("Unit mismatch:", suffix), mult, lim, filename, max_z)
+    p <- plot_blandaldman_z(data_list, formula, paste("Unit mismatch:", suffix), mult, lim, filename, max_z)
+    if (both)
+    {
+        p <- plot_qq_p(data_list, formula, paste("Unit mismatch:", suffix), mult, lim, filename, max_z)
+    }
 }
