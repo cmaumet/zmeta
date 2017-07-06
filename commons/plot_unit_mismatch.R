@@ -1,15 +1,6 @@
 plot_unit_mismatch <- function(data, suffix, mult=FALSE, single=FALSE, lim=0.5, filename=NA, max_z=NA, both=TRUE){
     
-    data_list=list()
-
-    if (!("withinInfo" %in% colnames(data)))
-    {
-        data$withinInfo <- data$Within/data$nSubjects
-        data$withinInfo[data$withinVariation!=1] <- paste(
-            "varying: ", sprintf("%02d", data$withinVariation[data$withinVariation!=1]), sep='')
-        data$withinInfo <- factor(data$withinInfo)
-    }
-    
+    data_list=list()   
     
     if (mult){
         titles=list()
