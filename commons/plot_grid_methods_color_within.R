@@ -8,11 +8,11 @@ plot_grid_methods_color_within <- function(data, aes_main, aes_line, aes_ribbon,
             geom_ribbon(
                 aes_ribbon, 
                 fill="grey", alpha=.8, colour=NA) + 
-            facet_grid(formula, scales = "free", 
+            facet_grid(formula,  
                        labeller = labeller(
                            methods = method_labels, 
-                           nStudies = label_both,
-                           nSubjects = label_both,
+                           nStudies = nstudies_labels,
+                           nSubjects = nsubjects_labels,
                            soft2 = soft2_labels,
                            unitMism = units_labels)) + 
             theme(strip.text.x = element_text(size = 10)) + 
@@ -33,11 +33,11 @@ plot_grid_methods_color_within <- function(data, aes_main, aes_line, aes_ribbon,
             geom_ribbon(
                 aes_ribbon, 
                 fill="grey", alpha=.8, colour=NA) + 
-            facet_grid(formula, scales = "free", 
+            facet_grid(formula,  
                        labeller = labeller(
                            methods = method_labels, 
                            nStudies = nstudies_labels,
-                           nSubjects = label_both,
+                           nSubjects = nsubjects_labels,
                            soft2 = soft2_labels,
                            unitMism = units_labels)) + 
             theme(strip.text.x = element_text(size = 10)) + 
