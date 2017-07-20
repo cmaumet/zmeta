@@ -15,7 +15,7 @@ plot_grid_methods_color_within <- function(data, aes_main, aes_line, aes_ribbon,
                            nSubjects = nsubjects_labels,
                            soft2 = soft2_labels,
                            unitMism = units_labels)) + 
-            theme(strip.text.x = element_text(size = 10)) + 
+            theme(strip.text.x = element_text(size = 10)) + theme(aspect.ratio = 1) +
             ylab(ylabel) + xlab(xlabel) + 
             geom_line(aes_line, colour="black") + 
             geom_line() + 
@@ -28,7 +28,7 @@ plot_grid_methods_color_within <- function(data, aes_main, aes_line, aes_ribbon,
     } else {
         subpl=list()
         for (idx in seq(1,length(data))){
-            subpl[[idx]] <- ggplot(data=data[[idx]],aesth) 
+            subpl[[idx]] <- ggplot(data=data[[idx]], aes_main) 
             subpl[[idx]]  <- subpl[[idx]]  + 
             geom_ribbon(
                 aes_ribbon, 
@@ -40,7 +40,7 @@ plot_grid_methods_color_within <- function(data, aes_main, aes_line, aes_ribbon,
                            nSubjects = nsubjects_labels,
                            soft2 = soft2_labels,
                            unitMism = units_labels)) + 
-            theme(strip.text.x = element_text(size = 10)) + 
+            theme(strip.text.x = element_text(size = 10))  + theme(aspect.ratio = 1) +
             ylab(ylabel) + xlab(xlabel) + 
             geom_line(aes_line, colour="black") + 
             geom_line() +
@@ -55,7 +55,8 @@ plot_grid_methods_color_within <- function(data, aes_main, aes_line, aes_ribbon,
                 } else {
                     currlim = lim[idx]
                 }
-                subpl[[idx]]  <- subpl[[idx]]  + scale_y_continuous(limits=c(-currlim, currlim), minor_breaks = seq(-currlim, currlim, by=0.05), breaks = seq(-currlim, currlim, by=0.1))
+                subpl[[idx]]  <- subpl[[idx]]  + scale_y_continuous(limits=c(-currlim, currlim), minor_breaks = seq(-currlim, currlim, by=0.05), 
+                    breaks = seq(-currlim, currlim, by=0.1))
             }
 
             # + geom_ribbon(aes(x=expectedz, ymax = equivz_upper-expectedz, ymin= equivz_lower-expectedz), width=0.20) 
@@ -65,7 +66,7 @@ plot_grid_methods_color_within <- function(data, aes_main, aes_line, aes_ribbon,
     }
     
     if (mult){       
-        p <- plot_grid(subpl[[1]], subpl[[2]], subpl[[3]], labels = '',ncol = 3)
+        p <- plot_grid(plotlist=subpl, labels = '',ncol = length(subpl), rel_widths = c(2, 1))
         
         title <- ggdraw() + draw_label(title)
         p <- plot_grid(title, p, ncol=1, rel_heights=c(0.1, 1))
