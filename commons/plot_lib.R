@@ -8,6 +8,19 @@ method_labels <- function(string) {
     string
 }
 
+between_labels <- function(value){
+    value[value==0] <- "Fixed effects"
+    value[value==1] <- "Random effects"
+    value
+}
+
+test_labels <- function(value){
+    value[value==1] <- "One-sample"
+    value[value==2] <- "Two-sample"
+    value[value==3] <- "Unbalanced"
+    value
+}
+
 nstudies_labels <- function(string){
     string <- paste(as.character(string), 'studies')
 }

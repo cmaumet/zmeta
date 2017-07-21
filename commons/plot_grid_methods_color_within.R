@@ -14,6 +14,8 @@ plot_grid_methods_color_within <- function(data, aes_main, aes_line, aes_ribbon,
                            nStudies = nstudies_labels,
                            nSubjects = nsubjects_labels,
                            soft2 = soft2_labels,
+                           Between=between_labels,
+                           glm=test_labels,
                            unitMism = units_labels)) + 
             theme(strip.text.x = element_text(size = 10)) + theme(aspect.ratio = 1) +
             ylab(ylabel) + xlab(xlabel) + 
@@ -39,6 +41,8 @@ plot_grid_methods_color_within <- function(data, aes_main, aes_line, aes_ribbon,
                            nStudies = nstudies_labels,
                            nSubjects = nsubjects_labels,
                            soft2 = soft2_labels,
+                           Between=between_labels,
+                           glm=test_labels,
                            unitMism = units_labels)) + 
             theme(strip.text.x = element_text(size = 10))  + theme(aspect.ratio = 1) +
             ylab(ylabel) + xlab(xlabel) + 
