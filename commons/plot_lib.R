@@ -3,7 +3,10 @@ method_labels <- function(string) {
     string[string=="megaRFX"] <- "RFX"
     string[string=="permutCon"] <- "Perm. E"
     string[string=="permutZ"] <- "Perm. Z"
-    string[string=="stouffersMFX"] <- "Stouf."
+    string[string=="stouffers"] <- "Stouffer's"
+    string[string=="fishers"] <- "Fisher's"
+    string[string=="fishers"] <- "Fisher's"
+    string[string=="weightedZ"] <- "Weighted Z"
     string[string=="megaFFX_FSL"] <- "FFX"
     string
 }

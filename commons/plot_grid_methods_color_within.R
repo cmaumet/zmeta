@@ -1,7 +1,9 @@
 plot_grid_methods_color_within <- function(data, aes_main, aes_line, aes_ribbon, formula, title, mult, lim, filename, max_z=NA,xlabel="", ylabel=""){
-    
     data <- prepare_data(data, max_z)
+    # cbbPalette <- c("#000000", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
     
+    # scale_colour_manual(values=cbPalette)
+
     if (! mult) {
         p <- ggplot(data=data[[1]],aes_main)
         p <- p + 
@@ -17,12 +19,18 @@ plot_grid_methods_color_within <- function(data, aes_main, aes_line, aes_ribbon,
                            Between=between_labels,
                            glm=test_labels,
                            unitMism = units_labels)) + 
-            theme(strip.text.x = element_text(size = 10)) + theme(aspect.ratio = 1) +
+            theme(strip.text.x = element_text(size = 10)) +
             ylab(ylabel) + xlab(xlabel) + 
             geom_line(aes_line, colour="black") + 
-            geom_line() + 
     #         geom_point(size=0.5) + 
-            ggtitle(title) + theme(legend.position="bottom") 
+            ggtitle(title) + theme(legend.position="bottom")
+
+        # joint_palette <-  c("#f0f9e8", "#bae4bc", "#7bccc4", "#43a2ca", "#0868ac", )
+        joint_palette <- c("#d0d1e6", "#a6bddb", "#74a9cf", "#2b8cbe", "#045a8d")
+        joint_palette <- c(joint_palette, "#d7b5d8", "#df65b0", "#dd1c77", "#980043")
+
+        p <- p + geom_line(data=data[[1]][data[[1]]$withinVariation==1,])
+        p <- p + geom_line(data=data[[1]][data[[1]]$withinVariation>1,]) + scale_colour_manual(values = joint_palette)
     
         if (! is.na(lim)){
             p <- p + coord_cartesian(ylim=c(-lim, lim))
