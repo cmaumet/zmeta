@@ -85,7 +85,7 @@ plot_grid_methods_color_within <- function(data, aes_main, aes_line, aes_ribbon,
 
         legend <- get_legend(subpl[[1]] + theme(legend.position="bottom"))
         p <- plot_grid(p, legend, ncol = 1, rel_heights = c(1, .2))
-        print(p)
+        # print(p)
 
         if (! is.na(filename)){
             pdf(paste(filename, ".pdf", sep=""))
@@ -93,7 +93,7 @@ plot_grid_methods_color_within <- function(data, aes_main, aes_line, aes_ribbon,
             dev.off()
         }
     } else {
-        print(p)
+        # print(p)
         if (! is.na(filename)){
             pdf(paste(filename, ".pdf", sep=""))
             print(p)
