@@ -21,18 +21,20 @@ plot_grid_methods_color_within <- function(data, aes_main, aes_line, aes_ribbon,
                            unitMism = units_labels)) + 
             theme(strip.text.x = element_text(size = 10)) +
             ylab(ylabel) + xlab(xlabel) + 
-            geom_line(aes_line, colour="black") + 
+            geom_line(aes_line, colour="black") + theme(legend.position="bottom")
     #         geom_point(size=0.5) + 
-            ggtitle(title) + theme(legend.position="bottom")
+            
 
-        # joint_palette <-  c("#f0f9e8", "#bae4bc", "#7bccc4", "#43a2ca", "#0868ac", )
-        # joint_palette <- c("#d0d1e6", "#a6bddb", "#74a9cf", "#2b8cbe", "#045a8d")
-        # joint_palette <- c(joint_palette, "#d7b5d8", "#df65b0", "#dd1c77", "#980043")
-        joint_palette <- c("#fee090", "#fdae61", "#f46d43", "#d73027", "#a50026", # "#e0f3f8",
-                            "#abd9e9", "#74add1", "#4575b4", "#313695")
+        if (title != "") {
+            p <- p + ggtitle(title)
+        }
+
+        # joint_palette <- c("#fee090", "#fdae61", "#f46d43", "#d73027", "#a50026", # "#e0f3f8",
+        #                     "#abd9e9", "#74add1", "#4575b4", "#313695")
 
         # p <- p + geom_line(data=data[[1]][data[[1]]$withinVariation==1,])
-        p <- p + geom_line() + scale_colour_manual(values = joint_palette)
+        p <- p + geom_line()
+         # + scale_colour_manual(values = joint_palette)
     
         if (! is.na(lim)){
             p <- p + coord_cartesian(ylim=c(-lim, lim))

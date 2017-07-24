@@ -30,4 +30,6 @@ plot_unit_mismatch <- function(data, suffix, mult=FALSE, single=FALSE, lim=0.5, 
     {
         p <- plot_blandaldman_z(data_list, formula, paste("Unit mismatch:", suffix), mult, lim, filename, max_z)
     }
+
+    return(p)
 }

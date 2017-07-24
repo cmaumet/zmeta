@@ -35,7 +35,7 @@ nsubjects_labels <- function(string){
 units_labels <- function(string){
     string[string=="contscl"] <- "Different contrasts"    
     string[string=="datascl"] <- "Different scaling"
-    string[string=="nominal"] <- "Nominal"
+    string[string=="nominal"] <- "Matched units"
     # string[string=="contscl 1 0"] <- "Different contrast vector scaling"    
     # string[string=="contscl 1"] <- "Different contrast vector scaling"
     # string[string=="datascl 2"] <- "Different scaling algorithm (same target)"
@@ -56,9 +56,11 @@ soft2Factor_labels <- function(string){
     string
 }
 
-soft2_labels <- function(string){
-    string[string==0] = ""
-    string
+soft2_labels <- function(value){
+    out_value=value
+    out_value[value==0] = ""
+    out_value[value!=0] = paste(as.numeric(as.character(value[value!=0]))*100, '%') 
+    out_value
 }
 
 load_data_from_csv <- function(pattern, folder){

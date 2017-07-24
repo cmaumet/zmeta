@@ -22,7 +22,7 @@ plot_qq_p <- function(data, formula, title, mult, lim, filename, max_z=NA, short
         aes_main=aes(x=-log10(expectedP), y=-log10(P/expectedP), group=allgroups, colour=factor(withinInfo)),
         aes_line=aes(x=-log10(expectedP), y=0),
         aes_ribbon=aes(ymin=-log10(p_lower/expectedP), ymax=-log10(p_upper/expectedP), group=glm), 
-        formula, title, mult, -log10(lim), filename, max_z,
+        formula, title, mult, lim, filename, max_z,
         xlabel=bquote("Expected"~-log[10]~"(P)"), ylabel=ylab)
     
 #     data <- prepare_data(data, max_z, min_z=0)
