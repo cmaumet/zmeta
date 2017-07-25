@@ -1,4 +1,14 @@
-plot_qq_p <- function(data, formula, title, mult, lim, filename, max_z=NA, short=FALSE){
+plot_qq_p <- function(data, formula, title, mult=FALSE, lim=NA, filename=NA, max_z=NA, short=FALSE){
+
+    if (inherits(data, "data.frame"))  {
+        org_data <- data
+        data <- list()
+        data[[1]] <- org_data
+    } else{
+        print("is list !!!")
+        print(class(data))
+        print(is.list(data))
+    }
     
     # data, aes_main, aes_ribbon, formula, title, mult, lim, filename, max_z=NA
     
