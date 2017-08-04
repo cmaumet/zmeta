@@ -4,10 +4,6 @@ plot_qq_p <- function(data, formula, title, mult=FALSE, lim=NA, filename=NA, max
         org_data <- data
         data <- list()
         data[[1]] <- org_data
-    } else{
-        print("is list !!!")
-        print(class(data))
-        print(is.list(data))
     }
     
     # data, aes_main, aes_ribbon, formula, title, mult, lim, filename, max_z=NA
@@ -23,9 +19,9 @@ plot_qq_p <- function(data, formula, title, mult=FALSE, lim=NA, filename=NA, max
     }
 
     if (short){
-        ylab = "Obs. minus exp."~-log[10]~"(P)"
+        ylab = "Observed P - Cumulative P"
     } else{
-        ylab = "Observed minus expected"~-log[10]~"(P)"
+        ylab = "Observed P - Cumulative P"
     }
 
     plot_grid_methods_color_within(data,
@@ -33,7 +29,7 @@ plot_qq_p <- function(data, formula, title, mult=FALSE, lim=NA, filename=NA, max
         aes_line=aes(x=-log10(expectedP), y=0),
         aes_ribbon=aes(ymin=-log10(p_lower/expectedP), ymax=-log10(p_upper/expectedP), group=glm), 
         formula, title, mult, lim, filename, max_z,
-        xlabel=bquote("Expected"~-log[10]~"(P)"), ylabel=ylab)
+        xlabel=bquote("Cumulative P"), ylabel=ylab)
     
 #     data <- prepare_data(data, max_z, min_z=0)
     
