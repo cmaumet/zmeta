@@ -59,7 +59,7 @@ soft2Factor_labels <- function(string){
 soft2_labels <- function(value){
     out_value=value
     out_value[value==0] = ""
-    out_value[value!=0] = paste(as.numeric(as.character(value[value!=0]))*100, '%') 
+    out_value[value!=0] = paste(as.numeric(as.character(value[value!=0]))*100, '% of the studies') 
     out_value
 }
 
