@@ -58,3 +58,6 @@ fsl_design/*.fsf
 Paper/figures/*.pdf
 
 *.pyc
+
+# Backup data folder
+data_safe/**
