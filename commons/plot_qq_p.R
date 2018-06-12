@@ -1,4 +1,10 @@
-plot_qq_p <- function(data, formula, title, mult, lim, filename, max_z=NA){
+plot_qq_p <- function(data, formula, title, mult=FALSE, lim=NA, filename=NA, max_z=NA, short=FALSE){
+
+    if (inherits(data, "data.frame"))  {
+        org_data <- data
+        data <- list()
+        data[[1]] <- org_data
+    }
     
     # data, aes_main, aes_ribbon, formula, title, mult, lim, filename, max_z=NA
     
@@ -11,12 +17,19 @@ plot_qq_p <- function(data, formula, title, mult, lim, filename, max_z=NA){
     if (! is.na(filename)){
         filename = paste(filename, "_p", sep="")
     }
-    
+
+    if (short){
+        ylab = "Observed P - Cumulative P"
+    } else{
+        ylab = "Observed P - Cumulative P"
+    }
+
     plot_grid_methods_color_within(data,
-        aes_main=aes(x=-log10(expectedP), y=-log10(P)-(-log10(expectedP)), group=allgroups, colour=factor(withinInfo)),
+        aes_main=aes(x=-log10(expectedP), y=-log10(P/expectedP), group=allgroups, colour=factor(withinInfo)),
         aes_line=aes(x=-log10(expectedP), y=0),
-        aes_ribbon=aes(ymin=-log10(p_lower)-(-log10(expectedP)), ymax=-log10(p_upper)-(-log10(expectedP)), group=glm), formula, title, mult, -log10(lim), filename, max_z,
-        xlabel="-log10(expectedP)", ylabel="-log10(P)-(-log10(expectedP))")
+        aes_ribbon=aes(ymin=-log10(p_lower/expectedP), ymax=-log10(p_upper/expectedP), group=glm), 
+        formula, title, mult, lim, filename, max_z,
+        xlabel=bquote("Cumulative P"), ylabel=ylab)
     
 #     data <- prepare_data(data, max_z, min_z=0)
     
@@ -26,7 +39,7 @@ plot_qq_p <- function(data, formula, title, mult, lim, filename, max_z=NA){
 #             geom_ribbon(
 #                 aes(x=-log10(expectedP), ymin=-log10(p_lower), ymax=-log10(p_upper), group=glm), 
 #                 fill="grey", alpha=.8, colour=NA) + 
-#             facet_grid(formula, scales = "free", 
+#             facet_grid(formula, scales = "free", 
 #                        labeller = labeller(
 #                            methods = method_labels, 
 #                            nStudies = label_both,
@@ -50,7 +63,7 @@ plot_qq_p <- function(data, formula, title, mult, lim, filename, max_z=NA){
 #             geom_ribbon(
 #                 aes(ymin=-log10(p_lower), ymax=-log10(p_upper), group=glm), 
 #                 fill="grey", alpha=.8, colour=NA) + 
-#             facet_grid(formula, scales = "free", 
+#             facet_grid(formula, scales = "free", 
 #                        labeller = labeller(
 #                            methods = method_labels, 
 #                            nStudies = nstudies_labels,
@@ -105,4 +118,3 @@ plot_qq_p <- function(data, formula, title, mult, lim, filename, max_z=NA){
 #     }
 #     return(p)
 }
-    
