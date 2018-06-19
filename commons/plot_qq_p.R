@@ -25,7 +25,7 @@ plot_qq_p <- function(data, formula, title, mult=FALSE, lim=NA, filename=NA, max
     }
 
     plot_grid_methods_color_within(data,
-        aes_main=aes(x=-log10(expectedP), y=-log10(P/expectedP), group=allgroups, colour=factor(withinInfo)),
+        aes_main=aes(x=-log10(expectedP), y=-log10(P/expectedP), group=allgroups, colour=factor(withinVariation)),
         aes_line=aes(x=-log10(expectedP), y=0),
         aes_ribbon=aes(ymin=-log10(p_lower/expectedP), ymax=-log10(p_upper/expectedP), group=glm), 
         formula, title, mult, lim, filename, max_z,

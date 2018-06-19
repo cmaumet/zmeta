@@ -35,7 +35,7 @@ for (simunum in seq(tot_num_simu, 1, -1)){
 	# It is easier to work with the equiv z stat
 	simudat$equivz <- qnorm(simudat$lnp, lower.tail = FALSE, log.p = TRUE)
 
-	simudat$allgroups <- paste(simudat$Between, simudat$Within, simudat$nStudies, simudat$nSubjects, simudat$nSimu, simudat$numSubjectsSame, simudat$withinVariation, simudat$percentOutliers, simudat$soft2, simudat$soft2Factor, as.character(simudat$unitMism))
+	simudat$allgroups <- paste(simudat$Between, simudat$Within, simudat$WithinStd, simudat$nStudies, simudat$nSubjects, simudat$nSimu, simudat$numSubjectsSame, simudat$withinVariation, simudat$percentOutliers, simudat$soft2, simudat$soft2Factor, as.character(simudat$unitMism))
 
 	# newsimudat$expectedp <- newsimudat$rankp/newsimudat$nSimu
 	simudat$expectedz <- qnorm(simudat$expectedP, lower.tail = FALSE)
