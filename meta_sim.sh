@@ -1,19 +1,21 @@
 #!/bin/bash
-#$ -S /bin/bash
-#$ -l h_rt=04:00:00
-#$ -l h_vmem=8G
-#$ -t 1:38
-#$ -o log/$JOB_NAME.o$JOB_ID.$TASK_ID
-#$ -e log/$JOB_NAME.e$JOB_ID.$TASK_ID
-#$ -cwd
 
-. /etc/profile
+#OAR -q production 
+#OAR -l host=1/gpu=1
+#OAR -l walltime=3:00:00
+#OAR -p gpu-16GB AND gpu_compute_capability_major>=5
+#OAR -O OAR_%jobid%.out
+#OAR -E OAR_%jobid%.err 
 
-module add matlab
-module add fsl
+hostname 
 
-cwd=`pwd`
-cd $HOME
-matlab -nodisplay -r "addpath('$cwd');addpath('$cwd/lib');meta_sim('/storage/wmsmfe/simulations',false,fullfile('$cwd', '..', 'code', 'spm12'), $wth_id, $k_id, $test_id, $btw_id, $avgn_id);quit"
+# . /etc/profile
 
-cd $cwd
+# module add matlab
+# module add fsl
+
+# cwd=`pwd`
+# cd $HOME
+# matlab -nodisplay -r "addpath('$cwd');addpath('$cwd/lib');meta_sim('/storage/wmsmfe/simulations',false,fullfile('$cwd', '..', 'code', 'spm12'), $wth_id, $k_id, $test_id, $btw_id, $avgn_id);quit"
+
+# cd $cwd
