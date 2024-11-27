@@ -6,16 +6,17 @@
 #OAR -p gpu-16GB AND gpu_compute_capability_major>=5
 #OAR -O OAR_%jobid%.out
 #OAR -E OAR_%jobid%.err 
+#OAR -n meta_sim
 
-hostname 
+echo $OAR_ARRAY_INDEX,$OAR_ARRAY_ID,$1,$2,$3,$4,$5,$6 >> /home/$USER/logs/jobids.csv
 
-# . /etc/profile
+export LM_LICENSE_FILE=1731@licence.irisa.fr
 
-# module add matlab
-# module add fsl
+module load matlab/R2022a
 
-# cwd=`pwd`
-# cd $HOME
-# matlab -nodisplay -r "addpath('$cwd');addpath('$cwd/lib');meta_sim('/storage/wmsmfe/simulations',false,fullfile('$cwd', '..', 'code', 'spm12'), $wth_id, $k_id, $test_id, $btw_id, $avgn_id);quit"
+cwd=`pwd`
+cd $HOME
 
-# cd $cwd
+matlab -nodisplay -r "addpath('$cwd');addpath('$cwd/lib');meta_sim('/srv/storage/empenn@storage2.rennes.grid5000.fr/cmaumet',false,fullfile('$cwd', '..', 'code', 'spm12'), $2, $2, $3, $4, $5);quit"
+
+cd $cwd
