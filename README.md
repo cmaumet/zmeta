@@ -1,31 +1,32 @@
 # zmeta_buster
-Code to be used on buster to run the zmeta simulations
 
-##### Buster
+##### G5k
 ###### Installation
 ```
-cd /storage/wmsmfe/
+cd $HOME
+mkdir code
+cd code/
 git clone git@github.com:cmaumet/zmeta_buster.git
 ```
 
 ###### Start the simulations
 ```
-cd /storage/wmsmfe/zmeta_buster
-qsub meta_sim.sh 
+cd $HOME/code/zmeta_buster
+run_simulation.sh 
 ```
 
 ###### Check status
 ```
-qstat
+oarstat
 ```
 
 ###### Kill a job
 ```
-$ qstat
+$ oarstat
 job-ID  prior   name       user         state submit/start at     queue                          slots ja-task-ID 
 -----------------------------------------------------------------------------------------------------------------
  296698 0.56000 CamilleEx. wmsmfe       Eqw   06/20/2016 10:51:23                                    1 1-38:1
-$ qdel 296698
+$ oardel 296698
 ```
 
 ###### Find non-empty error logs (replace `<job_id>`)
