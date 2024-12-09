@@ -6,6 +6,15 @@ function meta_sim(base_dir, redo, path_to_spm, within_id, k_id, test_id, btw_id,
     % 
     if ~exist('redo', 'var')
         redo = false;
+        dofsl = false;
+    end
+
+    if ~exist('dofsl', 'var')
+        dofsl = false;
+    end
+
+    if ~exist('doperm', 'var')
+        doperm = false;
     end
     
     % SPM is required to write-out NIfTI images    
@@ -15,7 +24,9 @@ function meta_sim(base_dir, redo, path_to_spm, within_id, k_id, test_id, btw_id,
     script_dir = fileparts(mfilename('fullpath'));
     
     addpath(fullfile(script_dir, 'lib'))    
-    fsl_designs_dir = fullfile(script_dir, 'fsl_designs');
+    if dofsl
+        fsl_designs_dir = fullfile(script_dir, 'fsl_designs');
+    end
     
     % ----- Simulation parameters --------
 
@@ -24,8 +35,10 @@ function meta_sim(base_dir, redo, path_to_spm, within_id, k_id, test_id, btw_id,
 
     % Constant number of subjects per studies     
     settings.same_ns = [true];
-    % Number of permutations for non-parametric methods
-    settings.nperm = 10000;
+    if doperm
+        % Number of permutations for non-parametric methods
+        settings.nperm = 10000;
+    end
     % Number of subjects per group
     avg_n_all = [20 100];    
     avg_n = avg_n_all(avgn_id);
@@ -96,7 +109,9 @@ function meta_sim(base_dir, redo, path_to_spm, within_id, k_id, test_id, btw_id,
     global defaults;
     defaults.cmdline = true;
     
-    set_fsl_env()
+    if dofsl
+        set_fsl_env()
+    end
     
     % Disable SnPM random seed shuffling
     global SnPMdefs;
@@ -360,11 +375,15 @@ function meta_sim(base_dir, redo, path_to_spm, within_id, k_id, test_id, btw_id,
                                     weightedZ_dir = fullfile(simu_dir, 'weightedZ');
                                     megaRFX_dir = fullfile(simu_dir, 'megaRFX');
                                     megaFFX_dir = fullfile(simu_dir, 'megaFFX');
-                                    megaFFXFSL_dir = fullfile(simu_dir, 'megaFFX_FSL');
-                                    megaMFX_dir = fullfile(simu_dir, 'megaMFX');
+                                    if dofsl
+                                        megaFFXFSL_dir = fullfile(simu_dir, 'megaFFX_FSL');
+                                        megaMFX_dir = fullfile(simu_dir, 'megaMFX');
+                                    end
                                     % megaMFX2_dir = fullfile(simu_dir, 'megaMFX2');
-                                    permutcon_dir = fullfile(simu_dir, 'permutCon');
-                                    permutz_dir = fullfile(simu_dir, 'permutZ');
+                                    if doperm
+                                        permutcon_dir = fullfile(simu_dir, 'permutCon');
+                                        permutz_dir = fullfile(simu_dir, 'permutZ');
+                                    end
 
                                     last_data = fullfile(data_dir, ['z_st' num2str((k_group1+k_group2), '%03d') '.nii']);
                                     exist_data = exist(last_data, 'file');
@@ -399,11 +418,15 @@ function meta_sim(base_dir, redo, path_to_spm, within_id, k_id, test_id, btw_id,
                                         end
                                         mkdir(megaRFX_dir);
 %                                             mkdir(megaFFX_dir);
-                                        mkdir(permutcon_dir);                            
-                                        mkdir(permutz_dir);   
-                                        mkdir(megaMFX_dir);   
-                                        % mkdir(megaMFX2_dir);   
-                                        mkdir(megaFFXFSL_dir);
+                                        if doperm
+                                            mkdir(permutcon_dir);                            
+                                            mkdir(permutz_dir);   
+                                        end
+                                        if dofsl 
+                                            mkdir(megaMFX_dir);   
+                                            % mkdir(megaMFX2_dir);  
+                                            mkdir(megaFFXFSL_dir);
+                                        end
                                     end  
 
                                     % --- Compute meta-analysis ---
@@ -427,30 +450,35 @@ function meta_sim(base_dir, redo, path_to_spm, within_id, k_id, test_id, btw_id,
                                         % Mega-analysis RFX
                                         run_mega_rfx(megaRFX_dir, con_files)
 
-                                        % Permutation on con_files
-                                        run_permut_con(permutcon_dir, settings.nperm, con_files)
+                                        if doperm
+                                            % Permutation on con_files
+                                            run_permut_con(permutcon_dir, settings.nperm, con_files)
 
-                                        % Permutation on z_files
-                                        run_permut_z(permutz_dir, settings.nperm, z_files)
+                                            % Permutation on z_files
+                                            run_permut_z(permutz_dir, settings.nperm, z_files)
+                                        end
                                     else
                                         % Mega-analysis RFX
                                         run_mega_rfx(megaRFX_dir, con_files(1:k_group1), con_files(k_group1+(1:k_group2)))
 
-                                        % Permutation on con_files
-                                        run_permut_con(permutcon_dir, settings.nperm, con_files(1:k_group1), con_files(k_group1+(1:k_group2)))
+                                        if doperm
+                                            % Permutation on con_files
+                                            run_permut_con(permutcon_dir, settings.nperm, con_files(1:k_group1), con_files(k_group1+(1:k_group2)))
 
-                                        % Permutation on z_files
-                                        run_permut_z(permutz_dir, settings.nperm, z_files(1:k_group1), z_files(k_group1+(1:k_group2)))
+                                            % Permutation on z_files
+                                            run_permut_z(permutz_dir, settings.nperm, z_files(1:k_group1), z_files(k_group1+(1:k_group2)))
+                                        end
                                     end
+                                    if dofsl
+                                        % GLM MFX (FLAME 1)
+                                        run_mega_mfx(data_dir, megaMFX_dir, analysis_type, [group1_n group2_n], k, fsl_designs_dir, 1)
 
-                                    % GLM MFX (FLAME 1)
-                                    run_mega_mfx(data_dir, megaMFX_dir, analysis_type, [group1_n group2_n], k, fsl_designs_dir, 1)
+                                        % % GLM MFX (FLAME 1+2)
+                                        % run_mega_mfx(data_dir, megaMFX2_dir, analysis_type, [group1_n group2_n], k, fsl_designs_dir, 2)                                    
 
-                                    % % GLM MFX (FLAME 1+2)
-                                    % run_mega_mfx(data_dir, megaMFX2_dir, analysis_type, [group1_n group2_n], k, fsl_designs_dir, 2)                                    
-
-                                    % GLM FFX (via FSL)
-                                    run_mega_ffx(data_dir, megaFFXFSL_dir, analysis_type, [group1_n group2_n], k, fsl_designs_dir)
+                                        % GLM FFX (via FSL)
+                                        run_mega_ffx(data_dir, megaFFXFSL_dir, analysis_type, [group1_n group2_n], k, fsl_designs_dir)
+                                    end
                                 end
                             end
                         end
