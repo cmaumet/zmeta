@@ -38,6 +38,8 @@ function meta_sim(base_dir, redo, path_to_spm, within_id, k_id, test_id, btw_id,
     if doperm
         % Number of permutations for non-parametric methods
         settings.nperm = 10000;
+    else
+        settings.nperm = nan;
     end
     % Number of subjects per group
     avg_n_all = [20 100];    
