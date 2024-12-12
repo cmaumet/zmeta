@@ -17,6 +17,6 @@ module load matlab/R2022a
 cwd=`pwd`
 cd $HOME
 
-matlab -nodisplay -r "addpath('$cwd');addpath('$cwd/lib');meta_sim('/srv/storage/empenn@storage2.rennes.grid5000.fr/cmaumet',false,fullfile('$cwd', '..', 'code', 'spm12'), $2, $3, $4, $5, $6);quit"
+matlab -nodisplay -r "addpath('$cwd');addpath('$cwd/lib');meta_sim('/srv/storage/empenn@storage2.rennes.grid5000.fr/cmaumet',false,fullfile('$cwd', '..', 'spm12'), $2, $3, $4, $5, $6);quit"
 
 cd $cwd
