@@ -7,12 +7,14 @@ function meta_sim(base_dir, redo, path_to_spm, within_id, k_id, test_id, btw_id,
     if ~exist('redo', 'var')
         redo = false;
     end
-
+    if ~exist('dospm', 'var')
+        dofsl = false;
+    end
     if ~exist('dofsl', 'var')
         dofsl = true;
     end
     if ~exist('doperm', 'var')
-        doperm = true;
+        doperm = false;
     end
     
     % SPM is required to write-out NIfTI images    
@@ -23,7 +25,7 @@ function meta_sim(base_dir, redo, path_to_spm, within_id, k_id, test_id, btw_id,
     
     addpath(fullfile(script_dir, 'lib'))    
     if dofsl
-        fsl_designs_dir = fullfile(script_dir, 'fsl_designs');
+        fsl_designs_dir = fullfile(script_dir, 'fsl_designs')
     end
     
     % ----- Simulation parameters --------
@@ -369,12 +371,14 @@ function meta_sim(base_dir, redo, path_to_spm, within_id, k_id, test_id, btw_id,
                                     % Simulate data only if simu_dir did not exist
                                     % before (helpful to re-run analysis on same data
                                     data_dir = fullfile(simu_dir, 'data');
-                                    fisher_dir = fullfile(simu_dir, 'fishers');
-                                    stouffer_dir = fullfile(simu_dir, 'stouffers');
-                                    stoufferMFX_dir = fullfile(simu_dir, 'stouffersMFX');
-                                    weightedZ_dir = fullfile(simu_dir, 'weightedZ');
-                                    megaRFX_dir = fullfile(simu_dir, 'megaRFX');
-                                    megaFFX_dir = fullfile(simu_dir, 'megaFFX');
+                                    if dospm
+                                        fisher_dir = fullfile(simu_dir, 'fishers');
+                                        stouffer_dir = fullfile(simu_dir, 'stouffers');
+                                        stoufferMFX_dir = fullfile(simu_dir, 'stouffersMFX');
+                                        weightedZ_dir = fullfile(simu_dir, 'weightedZ');
+                                        megaRFX_dir = fullfile(simu_dir, 'megaRFX');
+                                        megaFFX_dir = fullfile(simu_dir, 'megaFFX');
+                                    end
                                     if dofsl
                                         megaFFXFSL_dir = fullfile(simu_dir, 'megaFFX_FSL');
                                         megaMFX_dir = fullfile(simu_dir, 'megaMFX');
@@ -430,43 +434,44 @@ function meta_sim(base_dir, redo, path_to_spm, within_id, k_id, test_id, btw_id,
                                     end  
 
                                     % --- Compute meta-analysis ---
+                                    if dospm
+                                        if analysis_type == 1
+                                            % Fisher's
+                                            run_fishers(fisher_dir, z_files)
 
-                                    if analysis_type == 1
-                                        % Fisher's
-                                        run_fishers(fisher_dir, z_files)
+                                            % FFX Stouffer's
+                                            run_stouffers(stouffer_dir, z_files, true)
 
-                                        % FFX Stouffer's
-                                        run_stouffers(stouffer_dir, z_files, true)
+                                            % Stouffer's MFX
+                                            run_stouffers(stoufferMFX_dir, z_files, false)
 
-                                        % Stouffer's MFX
-                                        run_stouffers(stoufferMFX_dir, z_files, false)
-
-                                        % Optimally weighted z
-                                        run_weighted_z(weightedZ_dir, z_files, group1_n)
-                                    end
-
-
-                                    if analysis_type == 1
-                                        % Mega-analysis RFX
-                                        run_mega_rfx(megaRFX_dir, con_files)
-
-                                        if doperm
-                                            % Permutation on con_files
-                                            run_permut_con(permutcon_dir, settings.nperm, con_files)
-
-                                            % Permutation on z_files
-                                            run_permut_z(permutz_dir, settings.nperm, z_files)
+                                            % Optimally weighted z
+                                            run_weighted_z(weightedZ_dir, z_files, group1_n)
                                         end
-                                    else
-                                        % Mega-analysis RFX
-                                        run_mega_rfx(megaRFX_dir, con_files(1:k_group1), con_files(k_group1+(1:k_group2)))
 
-                                        if doperm
-                                            % Permutation on con_files
-                                            run_permut_con(permutcon_dir, settings.nperm, con_files(1:k_group1), con_files(k_group1+(1:k_group2)))
 
-                                            % Permutation on z_files
-                                            run_permut_z(permutz_dir, settings.nperm, z_files(1:k_group1), z_files(k_group1+(1:k_group2)))
+                                        if analysis_type == 1
+                                            % Mega-analysis RFX
+                                            run_mega_rfx(megaRFX_dir, con_files)
+
+                                            if doperm
+                                                % Permutation on con_files
+                                                run_permut_con(permutcon_dir, settings.nperm, con_files)
+
+                                                % Permutation on z_files
+                                                run_permut_z(permutz_dir, settings.nperm, z_files)
+                                            end
+                                        else
+                                            % Mega-analysis RFX
+                                            run_mega_rfx(megaRFX_dir, con_files(1:k_group1), con_files(k_group1+(1:k_group2)))
+
+                                            if doperm
+                                                % Permutation on con_files
+                                                run_permut_con(permutcon_dir, settings.nperm, con_files(1:k_group1), con_files(k_group1+(1:k_group2)))
+
+                                                % Permutation on z_files
+                                                run_permut_z(permutz_dir, settings.nperm, z_files(1:k_group1), z_files(k_group1+(1:k_group2)))
+                                            end
                                         end
                                     end
                                     if dofsl
