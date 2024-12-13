@@ -8,13 +8,13 @@ function meta_sim(base_dir, redo, path_to_spm, within_id, k_id, test_id, btw_id,
         redo = false;
     end
     if ~exist('dospm', 'var')
-        dospm = false;
+        dospm = true;
     end
     if ~exist('dofsl', 'var')
         dofsl = true;
     end
     if ~exist('doperm', 'var')
-        doperm = false;
+        doperm = true;
     end
     
     % SPM is required to write-out NIfTI images    
