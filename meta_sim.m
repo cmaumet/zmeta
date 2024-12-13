@@ -23,7 +23,7 @@ function meta_sim(base_dir, redo, path_to_spm, within_id, k_id, test_id, btw_id,
     
     addpath(fullfile(script_dir, 'lib'))    
     if dofsl
-        fsl_designs_dir = fullfile(script_dir, 'fsl_designs');
+        fsl_designs_dir = fullfile(script_dir, 'fsl_designs')
     end
     
     % ----- Simulation parameters --------
