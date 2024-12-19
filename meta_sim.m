@@ -8,10 +8,10 @@ function meta_sim(base_dir, redo, path_to_spm, within_id, k_id, test_id, btw_id,
         redo = false;
     end
     if ~exist('dospm', 'var')
-        dofsl = false;
+        dospm = true;
     end
     if ~exist('dofsl', 'var')
-        dofsl = true;
+        dofsl = false;
     end
     if ~exist('doperm', 'var')
         doperm = false;
@@ -414,13 +414,15 @@ function meta_sim(base_dir, redo, path_to_spm, within_id, k_id, test_id, btw_id,
                                         % Generate simulated data
                                         [con_files, varcon_files, z_files] = simulate_data(simu.config, data_dir);
 
-                                        if analysis_type == 1
-                                            mkdir(fisher_dir);
-                                            mkdir(stouffer_dir);
-                                            mkdir(stoufferMFX_dir);    
-                                            mkdir(weightedZ_dir);
+                                        if dospm
+                                            if analysis_type == 1
+                                                mkdir(fisher_dir);
+                                                mkdir(stouffer_dir);
+                                                mkdir(stoufferMFX_dir);    
+                                                mkdir(weightedZ_dir);
+                                            end
+                                            mkdir(megaRFX_dir);
                                         end
-                                        mkdir(megaRFX_dir);
 %                                             mkdir(megaFFX_dir);
                                         if doperm
                                             mkdir(permutcon_dir);                            
