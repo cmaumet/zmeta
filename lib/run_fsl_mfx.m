@@ -3,7 +3,7 @@ function run_fsl_mfx(datadir, wd, analysisType, nSubjects, nStudies, ...
 
     pValueFile = fullfile(wd, 'mega_mfx_minus_log10_p.nii');
 
-    if ~isfile(pValueFile)
+    if ~exist_nii(pValueFile)
         disp('--> Computing FSL MFX...')
 
         cwd = pwd;
