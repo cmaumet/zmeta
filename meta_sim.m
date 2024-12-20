@@ -283,6 +283,7 @@ function meta_sim(base_dir, redo, path_to_spm, task_id, within_id, k_id, test_id
                                     end
 
                                     if ~exist_simu_dir
+                                        disp(fullfile(allsimu_dir, simu_name))
                                         if ~isdir(fullfile(allsimu_dir, simu_name))
                                             mkdir(fullfile(allsimu_dir, simu_name))
                                         end
