@@ -1,9 +1,12 @@
-function meta_sim(base_dir, redo, path_to_spm, within_id, k_id, test_id, btw_id, avgn_id)
+function meta_sim(base_dir, redo, path_to_spm, task_id, within_id, k_id, test_id, btw_id, avgn_id)
     % META_SIM  Simulate meta-analyses results under the null
     %   META_SIM(base_dir, REDO) Create simulation results in a 
     %       'simulations' folder under base_dir. Overwrite existing
     %       simulations only if REDO is 'true'.
     % 
+
+    % note: task_id should go 1:38 
+
     if ~exist('redo', 'var')
         redo = false;
     end
@@ -84,13 +87,9 @@ function meta_sim(base_dir, redo, path_to_spm, within_id, k_id, test_id, btw_id,
     display_settings(settings)
   
     % Retreive information about current job on the cluster    
-    task_id_str = getenv('SGE_TASK_ID');
-    job_id = getenv('JOB_ID');
-    queue = getenv('QUEUE');
-    host = getenv('HOSTNAME');
+    job_id = getenv('OAR_JOB_ID');
 
-    if isempty(task_id_str) && isempty(job_id) && isempty(queue) ...
-            && isempty(host)
+    if isempty(job_id) 
         disp('This simulation is run locally')
         cluster = false;
         % We want the results to be replicable if run locally (hence 1 and
@@ -98,10 +97,8 @@ function meta_sim(base_dir, redo, path_to_spm, within_id, k_id, test_id, btw_id,
         rng_seed = 1;
     else
         cluster = true;
-        task_id = str2num(task_id_str);
         rng_seed = task_id;
         disp('This simulation is run on a cluster')
-        disp(['This is run ' task_id_str])
         disp(['This is job ' job_id])
     end
 
@@ -356,16 +353,14 @@ function meta_sim(base_dir, redo, path_to_spm, within_id, k_id, test_id, btw_id,
                                         end
                                     end
 
-                                    if isfield(simu, 'sge')
-                                        simu.sge(end+1).job_id = job_id;
+                                    if isfield(simu, 'oar')
+                                        simu.oar(end+1).job_id = job_id;
                                     else
-                                        simu.sge(1).job_id = job_id;
+                                        simu.oar(1).job_id = job_id;
                                     end
 
-                                    simu.sge(end).task_id_str = task_id_str;
-                                    simu.sge(end).queue = queue;
-                                    simu.sge(end).host = host;
-                                    simu.sge(end).seed = rng_seed;
+                                    simu.oar(end).task_id = task_id;
+                                    simu.oar(end).seed = rng_seed;
                                     save(simucfg_file, 'simu')
 
                                     % Simulate data only if simu_dir did not exist
