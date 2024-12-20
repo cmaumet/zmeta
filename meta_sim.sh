@@ -19,7 +19,7 @@ addpath(pwd);
 addpath(fullfile(pwd, 'lib'));
 pkg load statistics
 
-meta_sim('/srv/storage/empenn@storage2.rennes.grid5000.fr/cmaumet/simus_first/',false,fullfile(pwd, '..', 'spm12-r7771'), $1, $2, $3, $4, $5, $6)
+meta_sim('/srv/storage/empenn@storage2.rennes.grid5000.fr/cmaumet/simus/',false,fullfile(pwd, '..', 'spm12-r7771'), $1, $2, $3, $4, $5, $6)
 EOF
 
 export PATH=/home/cmaumet/fsl/share/fsl/bin:$PATH
