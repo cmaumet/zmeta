@@ -10,19 +10,13 @@
 
 echo $OAR_ARRAY_INDEX,$OAR_ARRAY_ID,$1,$2,$3,$4,$5,$6 >> /home/$USER/logs/jobids.csv
 
-source ~/.bashrc
+export LM_LICENSE_FILE=1731@licence.irisa.fr
+
+module load matlab/R2022a
 
 cwd=`pwd`
 cd $HOME
 
-cat > octave_cmd.sh <<EOF
-addpath(pwd);
-addpath(fullfile(pwd, 'lib');
-pkg load statistics
-
-meta_sim('/home/cmaumet/simus',true,fullfile(pwd, '..', 'spm12'), $1, $2, $3, $4, $5, $6);quit"
-EOF
-
-octave octave_cmd.sh
+matlab -nodisplay -r "addpath('$cwd');addpath('$cwd/lib');meta_sim('/home/cmaumet/simus',false,fullfile('$cwd', '..', 'spm12'), $2, $3, $4, $5, $6, $7);quit"
 
 cd $cwd
