@@ -8,13 +8,13 @@ function meta_sim(base_dir, redo, path_to_spm, task_id, within_id, k_id, test_id
     % note: task_id should go 1:38 
 
     if ~exist('redo', 'var')
-        redo = false;
+        redo = true;
     end
     if ~exist('dospm', 'var')
         dospm = true;
     end
     if ~exist('dofsl', 'var')
-        dofsl = false;
+        dofsl = true;
     end
     if ~exist('doperm', 'var')
         doperm = true;
