@@ -351,6 +351,7 @@ function meta_sim(base_dir, redo, path_to_spm, task_id, within_id, k_id, test_id
                                             end 
                                             simu.oar = prev_simu.oar;
                                         end
+                                        movefile(simucfg_file, strrep(simucfg_file, '.mat', '_OLD.mat'))
                                     end
 
                                     if isfield(simu, 'oar')
