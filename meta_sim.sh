@@ -22,6 +22,7 @@ pkg load statistics
 meta_sim('/home/cmaumet/simus',true,fullfile(pwd, '..', 'spm12-r7771'), $1, $2, $3, $4, $5, $6)
 EOF
 
+export PATH=/home/cmaumet/fsl/share/fsl/bin:$PATH
 guix shell octave -- octave $PWD/octave_cmd.sh
 
 cd $cwd
