@@ -349,7 +349,7 @@ function meta_sim(base_dir, redo, path_to_spm, task_id, within_id, k_id, test_id
                                                 disp(simu_dir)
                                                 error('Different simulations config in the same folder')
                                             end 
-                                            simu.sge = prev_simu.sge;
+                                            simu.oar = prev_simu.oar;
                                         end
                                     end
 
