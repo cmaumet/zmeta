@@ -8,7 +8,7 @@ function export_full_simulations(simuDir, redo, pattern, split_in, downs_to)
     end
     if nargin < 3
         % Export all studies
-        pattern = '^(two_|two_unb_|)nStudy';
+        pattern = 'test';
     end    
     if nargin < 4
         % Do not split
