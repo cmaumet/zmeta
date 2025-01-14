@@ -1,3 +1,3 @@
 oarsub \
     -S ./meta_sim.sh \
-    --array-param-file paramarrays/parameter_array_ak_bis
+    --array-param-file paramarrays/parameter_array_al_00
