@@ -28,7 +28,7 @@ cat $tempfile
 export PATH=/home/cmaumet/fsl/share/fsl/bin:$PATH
 guix shell octave -- octave $tempfile
 
-rm $tempfile
+#rm $tempfile
 
 cd $cwd
 
