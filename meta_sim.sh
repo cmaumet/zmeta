@@ -20,7 +20,7 @@ addpath(pwd);
 addpath(fullfile(pwd, 'lib'));
 pkg load statistics
 
-meta_sim('/home/cmaumet/simus/',false,fullfile(pwd, '..', 'spm12-r7771'), task_id=$1, within_id=$2, k_id=$3, test_id=$4, btw_id=$5, avgn_id=$6)
+meta_sim('/srv/storage/empenn@storage2.rennes.grid5000.fr/cmaumet/simus/',false,fullfile(pwd, '..', 'spm12-r7771'), task_id=$1, within_id=$2, k_id=$3, test_id=$4, btw_id=$5, avgn_id=$6)
 EOF
 
 cat $tempfile
