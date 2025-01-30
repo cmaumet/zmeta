@@ -130,6 +130,7 @@ function export_full_simulations(simuDir, redo, pattern, split_in, downs_to)
                     try
                         simu_mat_file = fullfile(this_simu_dir, 'simu.mat');
                         info = load(simu_mat_file);
+                        jid = info.simu.oar.job_id;
                         info = info.simu.config;
                     catch
                         warning(['Skipped' this_simu_dir])
@@ -144,13 +145,6 @@ function export_full_simulations(simuDir, redo, pattern, split_in, downs_to)
                         regpval = ['^' regexptranslate('escape', methods(m).pValueFile) '(\.gz)?$'];
                         pValueFile = spm_select('FPList', methodDir, regpval);
                         if isempty(pValueFile)
-                            simfile = fullfile(methodDir, '..', 'simu.mat');
-                            siminfo = load(simfile);
-			    if isfield(siminfo.simu, 'oar') && isfield(siminfo.simu.oar, 'job_id')
-                                jid = num2str(siminfo.simu.oar.job_id);
-                            else
-                               jid = 'NA';
-                            end 
                             warning(['pValueFile not found for ' methodDir ': job OAR_' jid]);
                             skip = true;
                             if exist(simu_file, 'file')
@@ -164,7 +158,7 @@ function export_full_simulations(simuDir, redo, pattern, split_in, downs_to)
                         pvalues = [pvalues iter_pval(:)];
                     else
                         warning(['Missing ' methods(m).name ...
-                                     ' for ' this_simu_dir])
+                                     ' for ' this_simu_dir ': job OAR_' jid])
                     end
                 end
                 if skip
@@ -179,9 +173,9 @@ function export_full_simulations(simuDir, redo, pattern, split_in, downs_to)
                 if exist('prev_sample_size', 'var') && ...
                         sample_size ~= prev_sample_size
                     if sample_size < prev_sample_size
-                        warning(['Incomplete simulation: ' simu_file])
+                        warning(['Incomplete simulation: ' simu_file ': job OAR_' jid])
                     else
-                        warning('Different sample size for this simulation');
+                        warning('Different sample size for this simulation: job OAR_' jid);
                     end
                     delete(simu_file)
                     continue;
