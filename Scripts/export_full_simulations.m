@@ -2,7 +2,7 @@
 %   simuDir: full path to the directory storing the simulations
 %   redo: if true, overwrite previous export (default: false)
 %   downs_tot: Number of points to keep after downsampling
-function export_full_simulations(simuDir, redo, pattern, split_in, downs_to)
+function export_full_simulations(ndatapoints, simuDir, redo, pattern, split_in, downs_to)
     if nargin < 2
         redo = false;
     end
@@ -170,19 +170,15 @@ function export_full_simulations(simuDir, redo, pattern, split_in, downs_to)
                 % Combine all iterations of this method for this simulation
                 
                 sample_size = numel(pvalues(:));
-                if exist('prev_sample_size', 'var') && ...
-                        sample_size ~= prev_sample_size
-                    if sample_size < prev_sample_size
-                        warning(['Incomplete simulation: ' simu_file ': prev=' num2str(prev_sample_size) ' this=' num2str(sample_size)])
-                    else
-                        warning(['Different sample size for this simulation: ' simu_file ': prev=' num2str(prev_sample_size) ' this=' num2str(sample_size)]);
+
+                if sample_size ~= ndatapoints
+                    if sample_size < ndatapoints
+                        warning(['Incomplete simulation: ' simu_file ': expected=' num2str(ndatapoints) ' this=' num2str(sample_size)])
                     end
-                    if exist(simu_file, 'file')
-                    	delete(simu_file)
+                    if exist(simu_file)
+                        delete(simu_file)
                     end
                     continue;
-                else
-                    prev_sample_size = sample_size;
                 end
                 
                 % Split in equal folds
