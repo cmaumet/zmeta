@@ -141,10 +141,10 @@ function export_full_simulations(simuDir, redo, pattern, split_in, downs_to)
                     methodDir = fullfile(this_simu_dir, methods(m).name);
 
                     if isdir(methodDir)
-                        pValueFile = spm_select('FPList', methodDir, ...
-                            ['^' regexptranslate('escape', methods(m).pValueFile) '(\.gz)?$']);
+                        regpval = ['^' regexptranslate('escape', methods(m).pValueFile) '(\.gz)?$'];
+                        pValueFile = spm_select('FPList', methodDir, regpval);
                         if isempty(pValueFile)
-                            warning(['pValueFile not found for ' methodDir])
+                            warning(['pValueFile not found for ' methodDir ': ' regpval])
                             skip = true;
                             if exist(simu_file, 'file')
                                 delete(simu_file)
