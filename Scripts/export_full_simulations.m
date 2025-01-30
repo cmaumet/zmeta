@@ -144,7 +144,14 @@ function export_full_simulations(simuDir, redo, pattern, split_in, downs_to)
                         regpval = ['^' regexptranslate('escape', methods(m).pValueFile) '(\.gz)?$'];
                         pValueFile = spm_select('FPList', methodDir, regpval);
                         if isempty(pValueFile)
-                            warning(['pValueFile not found for ' methodDir ': ' regpval])
+                            simfile = fullfile(methodDir, '..', 'simu.mat');
+                            siminfo = load(simfile);
+			    if isfield(siminfo.simu, 'oar') && isfield(siminfo.simu.oar, 'job_id')
+                                jid = num2str(siminfo.simu.oar.job_id);
+                            else
+                               jid = 'NA';
+                            end 
+                            warning(['pValueFile not found for ' methodDir ': job OAR_' jid]);
                             skip = true;
                             if exist(simu_file, 'file')
                                 delete(simu_file)
