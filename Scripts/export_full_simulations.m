@@ -175,7 +175,7 @@ function export_full_simulations(simuDir, redo, pattern, split_in, downs_to)
                     if sample_size < prev_sample_size
                         warning(['Incomplete simulation: ' simu_file ': prev=' num2str(prev_sample_size) ' this=' num2str(sample_size)])
                     else
-                        warning('Different sample size for this simulation: prev=' num2str(prev_sample_size) ' this=' num2str(sample_size));
+                        warning(['Different sample size for this simulation: ' simu_file ': prev=' num2str(prev_sample_size) ' this=' num2str(sample_size)]);
                     end
                     delete(simu_file)
                     continue;
