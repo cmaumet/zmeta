@@ -173,9 +173,9 @@ function export_full_simulations(simuDir, redo, pattern, split_in, downs_to)
                 if exist('prev_sample_size', 'var') && ...
                         sample_size ~= prev_sample_size
                     if sample_size < prev_sample_size
-                        warning(['Incomplete simulation: ' simu_file ': job OAR_' jid])
+                        warning(['Incomplete simulation: ' simu_file ': prev=' num2str(prev_sample_size) ' this=' num2str(sample_size)])
                     else
-                        warning('Different sample size for this simulation: job OAR_' jid);
+                        warning('Different sample size for this simulation: prev=' num2str(prev_sample_size) ' this=' num2str(sample_size));
                     end
                     delete(simu_file)
                     continue;
