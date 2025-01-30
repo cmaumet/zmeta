@@ -140,7 +140,7 @@ function export_full_simulations(simuDir, redo, pattern, split_in, downs_to)
                     end             
                     methodDir = fullfile(this_simu_dir, methods(m).name);
 
-                    if isdir(methodDir)
+                    if isfolder(methodDir)
                         regpval = ['^' regexptranslate('escape', methods(m).pValueFile) '(\.gz)?$'];
                         pValueFile = spm_select('FPList', methodDir, regpval);
                         if isempty(pValueFile)
