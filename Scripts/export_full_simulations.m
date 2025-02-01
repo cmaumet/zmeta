@@ -173,12 +173,16 @@ function export_full_simulations(ndatapoints, simuDir, redo, pattern, split_in, 
 
                 if sample_size ~= ndatapoints
                     if sample_size < ndatapoints
-                        warning(['Incomplete simulation: ' simu_file ': expected=' num2str(ndatapoints) ' this=' num2str(sample_size)])
+                        warning(['Incomplete simulation: ' simu_file ': expected=' num2str(ndatapoints) ' this=' num2str(sample_size)]);
+                        if exist(simu_file)
+                            delete(simu_file)
+                        end
+                        continue;    
+                    else
+                        warning(['Too many simulations: ' simu_file ': expected=' num2str(ndatapoints) ' this=' num2str(sample_size)]);
+                        % Remove extra simulations
+                        pvalues = pvalues(1:ndatapoints);
                     end
-                    if exist(simu_file)
-                        delete(simu_file)
-                    end
-                    continue;
                 end
                 
                 % Split in equal folds
