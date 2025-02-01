@@ -182,6 +182,7 @@ function export_full_simulations(ndatapoints, simuDir, redo, pattern, split_in, 
                         warning(['Too many simulations: ' simu_file ': expected=' num2str(ndatapoints) ' this=' num2str(sample_size)]);
                         % Remove extra simulations
                         pvalues = pvalues(1:ndatapoints);
+                        sample_size = ndatapoints;
                     end
                 end
                 
