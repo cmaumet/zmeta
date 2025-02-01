@@ -3,18 +3,18 @@
 %   redo: if true, overwrite previous export (default: false)
 %   downs_tot: Number of points to keep after downsampling
 function export_full_simulations(ndatapoints, simuDir, redo, pattern, split_in, downs_to)
-    if nargin < 2
+    if nargin < 3
         redo = false;
     end
-    if nargin < 3
+    if nargin < 4
         % Export all studies
         pattern = 'test';
     end    
-    if nargin < 4
+    if nargin < 5
         % Do not split
         split_in = 1;
     end
-    if nargin < 5
+    if nargin < 6
         % Downsample to xx points
         downs_to = 1000;
     end    
