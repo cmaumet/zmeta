@@ -1,3 +1,3 @@
 oarsub \
     -S ./meta_sim.sh \
-    --array-param-file paramarrays/parameter_array_redo_06_02
+    --array-param-file paramarrays/parameter_array_redo_06_03
