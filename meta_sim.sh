@@ -9,6 +9,7 @@ set -x
 #OAR -n meta_sim
 
 echo $OAR_ARRAY_INDEX,$OAR_ARRAY_ID,$1,$2,$3,$4,$5,$6 >> /home/$USER/logs/jobids.csv
+echo "params " $1 " " $2 " " $3 " " $4  " " $5 " " $6
 
 cwd=`pwd`
 cd $HOME/code/zmeta_buster
