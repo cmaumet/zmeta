@@ -162,7 +162,7 @@ function export_full_simulations(ndatapoints, simuDir, redo, pattern, split_in, 
                     else
                         this_warn = ['Missing ' methods(m).name ...
                                      ' for ' this_simu_dir ': job OAR_' jid];
-                        warning_msg = [warning_msg '\n' this_warn];
+                        warning_msg = [warning_msg "\n" this_warn];
                     end
                 end
                 if skip
@@ -179,7 +179,7 @@ function export_full_simulations(ndatapoints, simuDir, redo, pattern, split_in, 
                     if sample_size < ndatapoints
                         warning(['Incomplete simulation: ' simu_file ...
                             ': expected=' num2str(ndatapoints)...
-                             ' this=' num2str(sample_size) '\n' warning_msg]);
+                             ' this=' num2str(sample_size) "\n" warning_msg]);
                         warning_msg = '';
                         if exist(simu_file)
                             delete(simu_file)
