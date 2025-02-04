@@ -147,7 +147,7 @@ function export_full_simulations(ndatapoints, simuDir, redo, pattern, split_in, 
                         pValueFile = spm_select('FPList', methodDir, regpval);
                         if isempty(pValueFile)
                             this_warn = ['pValueFile not found for ' methodDir ': job OAR_' jid];
-                            warning_msg = [warning_msg '\n' this_warn];
+                            warning_msg = [warning_msg "\n" this_warn];
                             
                             skip = true;
                             if exist(simu_file, 'file')
