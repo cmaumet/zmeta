@@ -91,7 +91,7 @@ function export_full_simulations(ndatapoints, simuDir, redo, pattern, split_in, 
             csv_suffix = [csv_suffix '_' num2str(downs_tot)];
         end
             
-        filename = ['simu' csv_suffix '.csv';];
+        filename = ['simu' csv_suffix '_' num2str(ndatapoints/30/30/30) '.csv';];
         
         main_simu_dir = fullfile(simuDir, simuDirs(s).name);
         simu_file = fullfile(main_simu_dir, filename);
