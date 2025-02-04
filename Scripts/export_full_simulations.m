@@ -72,6 +72,7 @@ function export_full_simulations(ndatapoints, simuDir, redo, pattern, split_in, 
 %     saveSimuCsvDir = fullfile(simuDir, 'csv_tom');
     num_simu = numel(simuDirs);
     disp([num2str(num_simu) ' simulations']);
+    warning_msg = '';
     
     for s = numel(simuDirs):-1:1
         skip = false;
@@ -145,7 +146,9 @@ function export_full_simulations(ndatapoints, simuDir, redo, pattern, split_in, 
                         regpval = ['^' regexptranslate('escape', methods(m).pValueFile) '(\.gz)?$'];
                         pValueFile = spm_select('FPList', methodDir, regpval);
                         if isempty(pValueFile)
-                            warning(['pValueFile not found for ' methodDir ': job OAR_' jid]);
+                            this_warn = ['pValueFile not found for ' methodDir ': job OAR_' jid];
+                            warning_msg = [warning_msg '\n' this_warn];
+                            
                             skip = true;
                             if exist(simu_file, 'file')
                                 delete(simu_file)
@@ -157,8 +160,9 @@ function export_full_simulations(ndatapoints, simuDir, redo, pattern, split_in, 
 
                         pvalues = [pvalues iter_pval(:)];
                     else
-                        warning(['Missing ' methods(m).name ...
-                                     ' for ' this_simu_dir ': job OAR_' jid])
+                        this_warn = ['Missing ' methods(m).name ...
+                                     ' for ' this_simu_dir ': job OAR_' jid];
+                        warning_msg = [warning_msg '\n' this_warn];
                     end
                 end
                 if skip
@@ -173,13 +177,19 @@ function export_full_simulations(ndatapoints, simuDir, redo, pattern, split_in, 
 
                 if sample_size ~= ndatapoints
                     if sample_size < ndatapoints
-                        warning(['Incomplete simulation: ' simu_file ': expected=' num2str(ndatapoints) ' this=' num2str(sample_size)]);
+                        warning(['Incomplete simulation: ' simu_file ...
+                            ': expected=' num2str(ndatapoints)...
+                             ' this=' num2str(sample_size) '\n' warning_msg]);
+                        warning_msg = '';
                         if exist(simu_file)
                             delete(simu_file)
                         end
                         continue;    
                     else
-                        disp(['Too many simulations: ' simu_file ': expected=' num2str(ndatapoints) ' this=' num2str(sample_size)]);
+                        disp(['Too many simulations: ' ...
+                            simu_file ': expected=' num2str(ndatapoints)...
+                             ' this=' num2str(sample_size)]);
+                        warning_msg = '';
                         % Remove extra simulations
                         pvalues = pvalues(1:ndatapoints);
                         sample_size = ndatapoints;
