@@ -146,7 +146,7 @@ function export_full_simulations(ndatapoints, simuDir, redo, pattern, split_in, 
                         regpval = ['^' regexptranslate('escape', methods(m).pValueFile) '(\.gz)?$'];
                         pValueFile = spm_select('FPList', methodDir, regpval);
                         if isempty(pValueFile)
-                            this_warn = ['pValueFile not found for ' methodDir ': job OAR_' jid];
+                            this_warn = ['\t pValueFile not found for ' methodDir ': job OAR_' jid];
                             warning_msg = [warning_msg "\n" this_warn];
                             
                             skip = true;
@@ -160,7 +160,7 @@ function export_full_simulations(ndatapoints, simuDir, redo, pattern, split_in, 
 
                         pvalues = [pvalues iter_pval(:)];
                     else
-                        this_warn = ['Missing ' methods(m).name ...
+                        this_warn = ['\tMissing ' methods(m).name ...
                                      ' for ' this_simu_dir ': job OAR_' jid];
                         warning_msg = [warning_msg "\n" this_warn];
                     end
@@ -186,9 +186,9 @@ function export_full_simulations(ndatapoints, simuDir, redo, pattern, split_in, 
                         end
                         continue;    
                     else
-                        disp(['Too many simulations: ' ...
-                            simu_file ': expected=' num2str(ndatapoints)...
-                             ' this=' num2str(sample_size)]);
+                        %disp(['Too many simulations: ' ...
+                        %    simu_file ': expected=' num2str(ndatapoints)...
+                        %     ' this=' num2str(sample_size)]);
                         warning_msg = '';
                         % Remove extra simulations
                         pvalues = pvalues(1:ndatapoints);
