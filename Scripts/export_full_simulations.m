@@ -122,6 +122,9 @@ function export_full_simulations(ndatapoints, simuDir, redo, pattern, split_in, 
             for m = 1:numel(methods)  
                 statistic = [];
                 pvalues = [];
+
+                disp([num2str(num_simu-s+1, '%03d') ...
+                     '.' methods(m).name ' Exporting ' main_simu_dir])
                 
                 for it = 1:num_iter   
                     this_simu_dir = fullfile(main_simu_dir, iter_dirs(it).name);         
@@ -161,16 +164,15 @@ function export_full_simulations(ndatapoints, simuDir, redo, pattern, split_in, 
                         pvalues = [pvalues iter_pval(:)];
                     else
                         this_warn = ["\tMissing " methods(m).name ...
-                                     " for " this_simu_dir ": job OAR_" jid];
+                                     " for " this_simu_dir ": job OAR_ jid];
                         warning_msg = [warning_msg "\n" this_warn];
                     end
                 end
                 if skip
+                    disp("... skipping")
                     continue;
                 end
                 
-                disp([num2str(num_simu-s+1, '%03d') ...
-                     '.' methods(m).name ' Exporting ' main_simu_dir])
                 % Combine all iterations of this method for this simulation
                 
                 sample_size = numel(pvalues(:));
