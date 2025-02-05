@@ -75,7 +75,7 @@ function export_full_simulations(ndatapoints, simuDir, redo, pattern, split_in, 
     warning_msg = '';
     
     for s = numel(simuDirs):-1:1
-        skip = false;
+        disp([num2str(num_simu-s+1, '%03d') '.' simuDirs(s).name ' Exporting '])
         
         iter_dirs = dir(fullfile(simuDir, simuDirs(s).name, '0*'));
         
@@ -123,8 +123,7 @@ function export_full_simulations(ndatapoints, simuDir, redo, pattern, split_in, 
                 statistic = [];
                 pvalues = [];
 
-                disp([num2str(num_simu-s+1, '%03d') ...
-                     '.' methods(m).name ' Exporting ' simuDirs(s).name])
+                disp(['-->' methods(m).name ])
                 
                 for it = 1:num_iter   
                     this_simu_dir = fullfile(main_simu_dir, iter_dirs(it).name);         
@@ -152,7 +151,6 @@ function export_full_simulations(ndatapoints, simuDir, redo, pattern, split_in, 
                             this_warn = ["\t pValueFile not found for " methodDir ": job OAR_" jid];
                             warning_msg = [warning_msg "\n" this_warn];
                             
-                            skip = true;
                             if exist(simu_file, 'file')
                                 delete(simu_file)
                             end
@@ -167,10 +165,6 @@ function export_full_simulations(ndatapoints, simuDir, redo, pattern, split_in, 
                                      " for " this_simu_dir ": job OAR_" jid];
                         warning_msg = [warning_msg "\n" this_warn];
                     end
-                end
-                if skip
-                    disp("... skipping")
-                    continue;
                 end
                 
                 % Combine all iterations of this method for this simulation
