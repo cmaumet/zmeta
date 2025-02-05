@@ -165,6 +165,11 @@ function export_full_simulations(ndatapoints, simuDir, redo, pattern, split_in, 
                                      " for " this_simu_dir ": job OAR_" jid];
                         warning_msg = [warning_msg "\n" this_warn];
                     end
+
+                    if numel(pvalues(:)) > ndatapoints
+                        % We have enough data
+                        break
+                    end
                 end
                 
                 % Combine all iterations of this method for this simulation
