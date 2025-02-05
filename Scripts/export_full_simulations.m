@@ -123,7 +123,7 @@ function export_full_simulations(ndatapoints, simuDir, redo, pattern, split_in, 
                 statistic = [];
                 pvalues = [];
 
-                disp(['    -->' methods(m).name ])
+                disp(['    ... ' methods(m).name ])
                 
                 for it = 1:num_iter   
                     this_simu_dir = fullfile(main_simu_dir, iter_dirs(it).name);         
@@ -226,9 +226,9 @@ function export_full_simulations(ndatapoints, simuDir, redo, pattern, split_in, 
             % A single file combining all iterations for this simulation
             fprintf(fid, '%s', mystr);
             fclose(fid);
-            disp(['... written ' simuDirs(s).name])    
+            disp(['--> written in ' filename])    
         else
-            disp('... already done ')
+            disp('--> already done ')
         end
     end
     
