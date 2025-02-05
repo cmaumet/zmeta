@@ -164,7 +164,7 @@ function export_full_simulations(ndatapoints, simuDir, redo, pattern, split_in, 
                         pvalues = [pvalues iter_pval(:)];
                     else
                         this_warn = ["\tMissing " methods(m).name ...
-                                     " for " this_simu_dir ": job OAR_ jid];
+                                     " for " this_simu_dir ": job OAR_" jid];
                         warning_msg = [warning_msg "\n" this_warn];
                     end
                 end
