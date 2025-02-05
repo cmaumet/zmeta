@@ -148,7 +148,8 @@ function export_full_simulations(ndatapoints, simuDir, redo, pattern, split_in, 
                         regpval = ['^' regexptranslate('escape', methods(m).pValueFile) '(\.gz)?$'];
                         pValueFile = spm_select('FPList', methodDir, regpval);
                         if isempty(pValueFile)
-                            this_warn = ["\t pValueFile not found for " methodDir ": job OAR_" jid];
+                            this_warn = ["\t pValueFile not found for " ...
+                                methods(m).name ":\n job OAR_" jid];
                             warning_msg = [warning_msg "\n" this_warn];
                             
                             if exist(simu_file, 'file')
@@ -178,9 +179,9 @@ function export_full_simulations(ndatapoints, simuDir, redo, pattern, split_in, 
 
                 if sample_size ~= ndatapoints
                     if sample_size < ndatapoints
-                        warning(['Incomplete simulation: ' simu_file ...
+                        warning(['Incomplete simulation: ' methods(m).name ...
                             ': expected=' num2str(ndatapoints)...
-                             ' this=' num2str(sample_size) "\n" warning_msg]);
+                             ' this=' num2str(sample_size) warning_msg]);
                         warning_msg = '';
                         if exist(simu_file)
                             delete(simu_file)
