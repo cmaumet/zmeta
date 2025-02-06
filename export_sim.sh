@@ -24,7 +24,7 @@ EOF
 cat $tempfile
 
 export PATH=/home/cmaumet/fsl/share/fsl/bin:$PATH
-guix shell octave -- octave $tempfile > log_export_$1.out 2> log_export_$1.err
+guix shell octave -- octave $tempfile
 
 # rm $tempfile
 
