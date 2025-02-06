@@ -10,19 +10,23 @@ set -x
 
 echo "params " $1 
 
+cwd=`pwd`
+cd $HOME/code/zmeta
 
 tempfile=$(mktemp)
 
 cat > $tempfile <<EOF
 addpath(pwd);
 
-run_export($1)
+export_sim($1)
 EOF
 
 cat $tempfile
 
 export PATH=/home/cmaumet/fsl/share/fsl/bin:$PATH
-guix shell octave -- octave $tempfile
+guix shell octave -- octave $tempfile > log_export_$1.out 2> log_export_$1.err
 
-rm $tempfile
+# rm $tempfile
+
+cd $cwd
 
