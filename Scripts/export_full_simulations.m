@@ -151,7 +151,8 @@ function export_full_simulations(ndatapoints, simuDir, redo, pattern, split_in, 
                         pValueFile = spm_select('FPList', methodDir, regpval);
                         if isempty(pValueFile)
                             this_warn = ["\t pValueFile not found for " ...
-                                methods(m).name ":\n job OAR_" jid];
+                                    methods(m).name " " iter_dirs(it).name ...
+                                    ": job OAR_" jid];
                             warning_msg = [warning_msg "\n" this_warn];
                             
                             if exist(simu_file, 'file')
@@ -181,7 +182,7 @@ function export_full_simulations(ndatapoints, simuDir, redo, pattern, split_in, 
 
                 if sample_size ~= ndatapoints
                     if sample_size < ndatapoints
-                        warning(['Incomplete simulation: ' methods(m).name ...
+                        disp(['Incomplete simulation: ' methods(m).name ...
                             ': expected=' num2str(ndatapoints)...
                              ' this=' num2str(sample_size) warning_msg]);
                         warning_msg = '';
@@ -311,10 +312,10 @@ function check_pvalues(methodName, pvalues)
     pvalues = 10.^(-pvalues);
     errmsg = '';
     if any(isinf(pvalues(:)))
-       errmsg = 'infinite p-value';
+       errmsg = 'err: infinite p-value';
     end
     if any(pvalues(:)==0)
-        errmsg = 'Null p-value';
+        errmsg = 'err: Null p-value';
     end
 %     if any(pvalues(:)==1) && ~strcmp(methodName, 'PermutZ') ...
 %             && ~strcmp(methodName, 'PermutCon') ...
@@ -325,6 +326,6 @@ function check_pvalues(methodName, pvalues)
 %         errmsg = 'P-value equal to 1';
 %     end
     if ~isempty(errmsg)
-        warning([methodName ': ' errmsg])
+        disp([methodName ': ' errmsg])
     end
 end
