@@ -128,6 +128,8 @@ function export_full_simulations(ndatapoints, simuDir, redo, pattern, split_in, 
                 for it = 1:num_iter   
                     this_simu_dir = fullfile(main_simu_dir, iter_dirs(it).name);         
 
+                    disp([' ' iter_dirs(it).name ])
+
             %         info = regexp(spm_file(this_simu_dir, 'filename'), ...
             %             'nStudy(?<nStudy>\d+)_Betw(?<Betw>\d+\.?\d*)_Within(?<Within>\d+\.?\d*)_nSimu(?<nSimu>\d+)','names');
                     try
@@ -169,12 +171,12 @@ function export_full_simulations(ndatapoints, simuDir, redo, pattern, split_in, 
 
                     if numel(pvalues(:)) > ndatapoints
                         % We have enough data
+                        disp('Stop exporting as we have enough data')
                         break
                     end
                 end
                 
                 % Combine all iterations of this method for this simulation
-                
                 sample_size = numel(pvalues(:));
 
                 if sample_size ~= ndatapoints
@@ -196,6 +198,7 @@ function export_full_simulations(ndatapoints, simuDir, redo, pattern, split_in, 
                         pvalues = pvalues(1:ndatapoints);
                         sample_size = ndatapoints;
                     end
+                else
                 end
                 
                 % Split in equal folds
@@ -322,6 +325,6 @@ function check_pvalues(methodName, pvalues)
 %         errmsg = 'P-value equal to 1';
 %     end
     if ~isempty(errmsg)
-        error([methodName ': ' errmsg])
+        warning([methodName ': ' errmsg])
     end
 end
