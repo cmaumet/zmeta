@@ -50,6 +50,10 @@ unused*
 # data
 # Ignore all directories called data
 data/*.csv
+
+# Ignore all simulation results
+results/simus/*
+
 fsl_design/*.ppm
 fsl_design/*.fsf
 
