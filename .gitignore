@@ -1,4 +1,5 @@
 *.pdf
+logoctave.txt
 logs/*
 
 # notebooks checkpoints
