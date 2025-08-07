@@ -15,10 +15,9 @@
 
 ## How to cite?
 
-See [CITATION](CITATION).
+To cite this repository, please cite the corresponding manuscript:
 
-<!--@include:./CITATION.md-->
-
+"Minimal Data Needed for Valid & Accurate Image-Based fMRI Meta-Analysis" Camille Maumet, Thomas E. Nichols. doi:  bioRxiv; doi: [10.1101/048249](https://doi.org/10.1101/048249)
 # Contents overview
 
 <Summarise what's in this repository>
