@@ -52,6 +52,19 @@ and Fig.S2. with:
 ```
 
 ### Fig. 2
+From a Terminal:
+```console
+$ cd figures/units_mismatch
+$ R
+```
+
+Then in the R console, Fig.1 can be generated with:
+```R
+> source("plot_simulations.R")
+```
+
+
+### Fig. 2
 
 ## Reproducing full analysis
 
