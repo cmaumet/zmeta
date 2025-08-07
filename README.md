@@ -17,6 +17,8 @@
 
 See [CITATION](CITATION).
 
+<!--@include:./CITATION.md-->
+
 # Contents overview
 
 <Summarise what's in this repository>
