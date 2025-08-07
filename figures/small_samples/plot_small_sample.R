@@ -41,7 +41,11 @@ plot_small_sample <- function(test_type=1) {
                         allsimudat_k50
     )
 
-    # # colorblind-friendly palette
+    # Method names in the dataframe
+    # "fishers"      "stouffers"    "stouffersMFX" "weightedZ"    "megaRFX"     
+    # "permutZ"      "permutCon"    "megaMFX"      "megaFFX_FSL"
+
+    # colorblind-friendly palette
     # # Source: http://www.cookbook-r.com/Graphs/Colors_(ggplot2)/
     cbfPalette <- c("#999999", "#000000", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
 
@@ -56,9 +60,9 @@ plot_small_sample <- function(test_type=1) {
     robutness_plot <- function(data){
         
         data_positive_z <- subset(data, expectedz>0 & (unitMism=="nominal"))
-            
+
         large_sample_methods <- c("megaMFX","megaFFX_FSL")
-        homoscedasticity_methods <- c("megaRFX","permutCon")
+        homoscedasticity_methods <- c("megaRFX","permutCon","stouffersMFX")
         homogeneity_methods <- c("megaFFX_FSL","fishers", "stouffers", "weightedZ")
 
         # Data verifying random/fixed-effect assumption for each method    
