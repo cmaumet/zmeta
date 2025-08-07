@@ -1,13 +1,13 @@
 method_labels <- function(string) {
-    string[string=="megaMFX"] <- "MFX"
-    string[string=="megaRFX"] <- "RFX"
-    string[string=="permutCon"] <- "Perm. E"
-    string[string=="permutZ"] <- "Perm. Z"
-    string[string=="stouffers"] <- "Stouffer's"
-    string[string=="fishers"] <- "Fisher's"
-    string[string=="fishers"] <- "Fisher's"
+    string[string=="megaMFX"] <- "MFX GLM"
+    string[string=="megaRFX"] <- "RFX GLM"
+    string[string=="permutCon"] <- "Contrast Perm."
+    string[string=="permutZ"] <- "Z Perm."
+    string[string=="stouffers"] <- "Stouffer"
+    string[string=="fishers"] <- "Fisher"
     string[string=="weightedZ"] <- "Weighted Z"
-    string[string=="megaFFX_FSL"] <- "FFX"
+    string[string=="megaFFX_FSL"] <- "FFX GLM"
+    string[string=="stouffersMFX"] <- "Z RFX"
     string
 }
 
@@ -78,8 +78,9 @@ load_data_from_csv <- function(pattern, folder, iter){
     }
     simudata <- read.csv(csv_file, header=T, sep=",")
     # Reorder unit mismatch factor levels
-    simudata$unitMism = factor(simudata$unitMism,c('nominal', 'datascl', 'contscl'))
-    
+    # simudata$unitMism = factor(simudata$unitMism,c('nominal', 'datascl', 'contscl'))
+
+
     return(simudata)
 }
 
