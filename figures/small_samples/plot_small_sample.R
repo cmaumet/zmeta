@@ -17,6 +17,8 @@ plot_small_sample <- function(test_type=1) {
     source(file.path('..', 'commons','plot_blandaldman_z.R'))
     source(file.path('..', 'commons','plot_grid_methods_color_within.R'))
     source(file.path('..', 'commons','plot_qq_p.R'))
+
+    simu_dir = file.path('..', '..', 'results', 'simus')
     # theme_set(theme_gray()) # switch to default ggplot2 theme for good
     # theme_update(panel.background = element_rect(fill = "grey95"))
     # library(scales)
@@ -25,11 +27,11 @@ plot_small_sample <- function(test_type=1) {
 
     # # One-sample tests
     # # Load data from CSV
-    allsimudat_k05 <- load_data_from_csv(paste('^', test_type, 'k005_n20.*_nominal', sep=""), '/Users/camaumet/simus/', iter)
-    allsimudat_k10 <- load_data_from_csv(paste('^', test_type, 'k010_n20.*_nominal', sep=""), '/Users/camaumet/simus/', iter)
-    allsimudat_k25 <- load_data_from_csv(paste('^', test_type, 'k025_n20.*_nominal*', sep=""), '/Users/camaumet/simus/', iter)
-    allsimudat_k50 <- load_data_from_csv(paste('^', test_type, 'k050_n20.*_nominal*', sep=""), '/Users/camaumet/simus/', iter)
-    allsimudat_k25_n100 <- load_data_from_csv(paste('^', test_type, 'k025_n100.*_nominal', sep=""), '/Users/camaumet/simus/', iter)
+    allsimudat_k05 <- load_data_from_csv(paste('^', test_type, 'k005_n20.*_nominal', sep=""), simu_dir, iter)
+    allsimudat_k10 <- load_data_from_csv(paste('^', test_type, 'k010_n20.*_nominal', sep=""), simu_dir, iter)
+    allsimudat_k25 <- load_data_from_csv(paste('^', test_type, 'k025_n20.*_nominal*', sep=""), simu_dir, iter)
+    allsimudat_k50 <- load_data_from_csv(paste('^', test_type, 'k050_n20.*_nominal*', sep=""), simu_dir, iter)
+    allsimudat_k25_n100 <- load_data_from_csv(paste('^', test_type, 'k025_n100.*_nominal', sep=""), simu_dir, iter)
 
     allsimudat <- rbind(
                         allsimudat_k05, 
