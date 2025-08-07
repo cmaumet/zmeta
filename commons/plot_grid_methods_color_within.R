@@ -37,11 +37,13 @@ plot_grid_methods_color_within <- function(data, aes_main, aes_line, aes_ribbon,
          # + scale_colour_manual(values = joint_palette)
     
         if (! is.na(lim)){
-            p <- p + coord_cartesian(ylim=c(-lim, lim))
+            p <- p + coord_cartesian(ylim=c(-0.5, lim))
         } else {
             # Limit plot to max of 95% CI ribbon
-            max_ribbon = max(with(data[[1]], eval(aes_ribbon$ymax)))
-            min_ribbon = min(with(data[[1]], eval(aes_ribbon$ymin)))
+            # max_ribbon = max(with(data[[1]], eval(aes_ribbon$ymax)))
+            # min_ribbon = min(with(data[[1]], eval(aes_ribbon$ymin)))
+            max_ribbon=1.5
+            min_ribbon=-0.5
             p <- p + coord_cartesian(ylim=c(min_ribbon, max_ribbon))
         }
     } else {
