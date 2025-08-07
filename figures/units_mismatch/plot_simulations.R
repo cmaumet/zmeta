@@ -1,3 +1,6 @@
+# # Robustness to units mismatch
+
+
 require('cowplot')
 library('ggplot2')
 source(file.path('..', 'commons','get_expected_pval_and_equiv_z.R'))
@@ -15,11 +18,19 @@ theme_update(panel.background = element_rect(fill = "grey95"))
 # Source: http://www.cookbook-r.com/Graphs/Colors_(ggplot2)/
 cbfPalette <- c("#999999", "#000000", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
 
+# - We look how contrast-based methods are affected by the units issue.
+# ## One-sample tests
+
 iter = 38
 
-# allsimudat_btw0 <- load_data_from_csv('^test1_k025_n20_btw0_.*', '/Users/camaumet/simus/')
+# - Load data from the CSV files
+
+# allsimudat_btw0 <- load_data_from_csv('^test1_k025_n20_btw0_.*', '/Users/camaumet/simus/', iter)
 allsimudat_btw1 <- load_data_from_csv('^test1_k025_n20_btw1_.*', '/Users/camaumet/simus/', iter)
 allsimudat <- rbind(allsimudat_btw1)
+
+# - Select contrast-based methods.
+# - We look at \tau=1 and only valid scenarii for each method
 
 # best_con_data_1 <- subset(con_data_1, 
 #     (methods %in% c("megaMFX") & Between==1) | 
@@ -38,6 +49,10 @@ allsimudat <- rbind(allsimudat_btw1)
 #      (methods %in% c("megaFFX_FSL") & Between==0) |
 #      (methods %in% c("permutCon"))
 #     ) & nStudies==50)
+
+# ## Plots
+# ### Main figure
+
 
 source(file.path('..', 'commons','plot_grid_methods_color_within.R'))
 units_plot <- function(data, max_z=NA, lim=NA){
@@ -70,8 +85,14 @@ pdf(paste("units.pdf", sep=""))
 print(p)
 dev.off()
 
-# allsimudat2_btw0 <- load_data_from_csv('^test2_k025_n20_btw0_.*', '/Users/camaumet/simus/')
-allsimudat2_btw1 <- load_data_from_csv('^test2_k025_n20_btw1_.*', '/Users/camaumet/simus/')
+
+# # Two-sample tests
+
+# ## Load data from the CSV files
+
+
+# allsimudat2_btw0 <- load_data_from_csv('^test2_k025_n20_btw0_.*', '/Users/camaumet/simus/', iter)
+allsimudat2_btw1 <- load_data_from_csv('^test2_k025_n20_btw1_.*', '/Users/camaumet/simus/', iter)
 allsimudat2 <- rbind(allsimudat2_btw1)
 
 
@@ -87,6 +108,8 @@ best_con_data_2 <- subset(allsimudat2,
 #     (methods %in% c("megaMFX") & withinVariation<4) |
 #     (methods %in% setdiff(methods, c("megaFFX_FSL", "megaMFX"))))
 
+# ## Main figure
+
 p <- units_plot(best_con_data_2)
 
 # print on screen
@@ -97,7 +120,10 @@ pdf(paste("units_test2.pdf", sep=""))
 print(p)
 dev.off()
 
-allsimudat3_btw1 <- load_data_from_csv('^test3_k025_n20_btw1_.*', '/Users/camaumet/simus/')
+# # Unbalanced two-sample tests
+# ## Load data from the CSV files
+
+allsimudat3_btw1 <- load_data_from_csv('^test3_k025_n20_btw1_.*', '/Users/camaumet/simus/', iter)
 allsimudat3 <- rbind(allsimudat3_btw1)
 
 # con_data_3 <- subset(allsimudat3, is.finite(expectedz) & expectedz>0 & methods %in% con_methods)
