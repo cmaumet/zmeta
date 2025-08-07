@@ -1,4 +1,4 @@
-get_expected_pval_and_equiv_z <- function(pattern="^nStudy50_subNumidentical_varidentical_Betw1", csv_file, study_dir) {
+get_expected_pval_and_equiv_z <- function(pattern="^nStudy50_subNumidentical_varidentical_Betw1", csv_file, study_dir, iter=5) {
 
 suffix <- gsub('[^a-zA-Z_0-9]', '', pattern)
 print(pattern)
@@ -18,9 +18,8 @@ if (tot_num_simu == 0){
 
 first = T
 for (simunum in seq(tot_num_simu, 1, -1)){
-	print(paste('Reading ', simunum, ' / ', tot_num_simu))	
-	simu_file = paste(study_dir, study_dirs[simunum], 'simu_400.csv', sep="/")
-	print(simu_file)
+	simu_file = paste(study_dir, study_dirs[simunum], paste('simu_', iter, '.csv', sep=""), sep="/")
+	print(paste('Reading ', simunum, ' / ', tot_num_simu, 'in...', simu_file))	
 
 	if (! file.exists(simu_file)){
 		print(paste('/!\ ', simu_file, 'does not exist.'))			

@@ -63,14 +63,15 @@ soft2_labels <- function(value){
     out_value
 }
 
-load_data_from_csv <- function(pattern, folder){
+load_data_from_csv <- function(pattern, folder, iter){
     suffix <- gsub('[^a-zA-Z_0-9]', '', pattern)
+    suffix <- paste(suffix, '_', iter, sep="")
     csv_file = paste(getwd(), '/../data/allsimudat_', suffix,'.csv', sep="")
 
     if (! file.exists(csv_file)){
         print(paste('pattern=', suffix))
         print(paste('CSV file', csv_file,' not found, reprocessing the data.'))
-        get_expected_pval_and_equiv_z(pattern, csv_file, folder)
+        get_expected_pval_and_equiv_z(pattern, csv_file, folder, iter)
     } else {
         print(paste('Reading from ', csv_file))
     }
