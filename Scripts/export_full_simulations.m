@@ -80,7 +80,8 @@ function export_full_simulations(ndatapoints, simuDir, redo, pattern, split_in, 
         iter_dirs = dir(fullfile(simuDir, simuDirs(s).name, '0*'));
         
         num_iter = numel(iter_dirs);
-        
+        expected_iter = ndatapoints/30/30/30;
+
         if split_in == 10
             csv_suffix = '_wrep';
         elseif split_in == 1
@@ -127,6 +128,12 @@ function export_full_simulations(ndatapoints, simuDir, redo, pattern, split_in, 
                 
                 for it = 1:num_iter   
                     this_simu_dir = fullfile(main_simu_dir, iter_dirs(it).name);         
+
+                    % for the first iter check if the total number of iterations 
+                    % is enough, if not display job info
+                    if (it==1) && (num_iter < expected_iter)
+                        
+                    end
 
                     disp([' ' iter_dirs(it).name ])
 
