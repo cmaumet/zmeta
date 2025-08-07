@@ -28,9 +28,28 @@ To cite this repository, please cite the corresponding manuscript:
 
 <Specify precise steps, including any datasets that need to be downloaded and path variables that need to be set>
 
-### Table 1
+### Fig. 1, S1 and S2
+From a Terminal:
+```console
+$ cd figures/small_samples
+$ R
+```
 
-### Fig. 1
+Then in the R console, Fig.1 can be generated with:
+```R
+> source("plot_small_sample.R")
+> plot_small_sample(1)
+```
+
+Fig.S1. with:
+```R
+> plot_small_sample(2)
+```
+
+and Fig.S2. with:
+```R
+> plot_small_sample(3)
+```
 
 ### Fig. 2
 
