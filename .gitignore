@@ -49,7 +49,7 @@ unused*
 
 # data
 # Ignore all directories called data
-data/
+data/*.csv
 fsl_design/*.ppm
 fsl_design/*.fsf
 
