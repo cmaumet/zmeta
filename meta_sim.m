@@ -55,7 +55,7 @@ function meta_sim(base_dir, redo, path_to_spm, task_id, within_id, k_id, test_id
     % ---------------
     
     % Number of studies per meta-analysis
-    settings.ks_all = [5 10 25 50];
+    settings.ks_all = [5 10 25 50 100];
     settings.ks = settings.ks_all(k_id);
   
     % Within-study variance either constant or factor when varying
