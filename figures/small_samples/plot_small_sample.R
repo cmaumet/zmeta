@@ -1,10 +1,5 @@
-plot_small_sample <- function(test_type=1) {
+plot_small_sample <- function(test_type=1, allsimudat=NA) {
     # Robustness under assumption violations
-
-    if (is.numeric(test_type)) {
-        test_type = as.character(test_type)
-    }
-    test_type = paste("test", test_type, "_", sep="")
 
     # # for all methods
     require('cowplot')
@@ -17,6 +12,7 @@ plot_small_sample <- function(test_type=1) {
     source(file.path('..', 'commons','plot_blandaldman_z.R'))
     source(file.path('..', 'commons','plot_grid_methods_color_within.R'))
     source(file.path('..', 'commons','plot_qq_p.R'))
+    source(file.path('..', 'commons','load_data_from_files.R'))
 
     simu_dir = file.path('..', '..', 'results', 'simus')
     # theme_set(theme_gray()) # switch to default ggplot2 theme for good
@@ -24,22 +20,9 @@ plot_small_sample <- function(test_type=1) {
     # library(scales)
 
     iter = 38
-
-    # # One-sample tests
-    # # Load data from CSV
-    allsimudat_k05 <- load_data_from_csv(paste('^', test_type, 'k005_n20.*_nominal', sep=""), simu_dir, iter)
-    allsimudat_k10 <- load_data_from_csv(paste('^', test_type, 'k010_n20.*_nominal', sep=""), simu_dir, iter)
-    allsimudat_k25 <- load_data_from_csv(paste('^', test_type, 'k025_n20.*_nominal*', sep=""), simu_dir, iter)
-    allsimudat_k50 <- load_data_from_csv(paste('^', test_type, 'k050_n20.*_nominal*', sep=""), simu_dir, iter)
-    allsimudat_k25_n100 <- load_data_from_csv(paste('^', test_type, 'k025_n100.*_nominal', sep=""), simu_dir, iter)
-
-    allsimudat <- rbind(
-                        allsimudat_k05, 
-                        allsimudat_k10, 
-                        allsimudat_k25, 
-                        allsimudat_k25_n100,
-                        allsimudat_k50
-    )
+    if (all(is.na(allsimudat))){
+        allsimudat = load_data_from_files(simu_dir, iter, test_type)
+    }
 
     # Method names in the dataframe
     # "fishers"      "stouffers"    "stouffersMFX" "weightedZ"    "megaRFX"     
@@ -75,32 +58,40 @@ plot_small_sample <- function(test_type=1) {
         ((methods %in% homogeneity_methods & Between==1) | 
          (!(methods %in% homogeneity_methods) & Between==0)) )
                   
-        # Panel A: small samples
+        # Panel A: small samples - homoscedasticity
         p1 <- plot_qq_p(
-                subset(data_rfx_assumption, methods %in% large_sample_methods),
-                formula=methods~nStudies+nSubjects, "Small sample sizes") +
+                subset(data_rfx_assumption, methods %in% large_sample_methods & withinVariation==1),
+                formula=methods~nStudies+nSubjects, "Small sample sizes: homoscedasticity") +
+            theme(legend.position="right")  +
+            scale_fill_manual(values=cbfPalette) + 
+            scale_colour_manual(values=cbfPalette)
+
+        # Panel B: small samples - heteroscedasticity
+        p2 <- plot_qq_p(
+                subset(data_rfx_assumption, methods %in% large_sample_methods & withinVariation!=1),
+                formula=methods~nStudies+nSubjects, "Small sample sizes: heteroscedasticity") +
             theme(legend.position="right")  +
             scale_fill_manual(values=cbfPalette) + 
             scale_colour_manual(values=cbfPalette)
         
-        # Panel B: heteroscedasticity
-        p2 <- plot_qq_p(
-                subset(data_rfx_assumption, methods %in% homoscedasticity_methods &
-                                            nSubjects==20 & nStudies==25+25*(data$glm[1] > 1)),
-                formula=.~methods, "Heteroscedasticity", short=TRUE) + 
-            theme(legend.position="none") + 
-            scale_fill_manual(values=cbfPalette) + 
-            scale_colour_manual(values=cbfPalette)
+        # # Panel B: heteroscedasticity
+        # p2 <- plot_qq_p(
+        #         subset(data_rfx_assumption, methods %in% homoscedasticity_methods &
+        #                                     nSubjects==20 & nStudies==25+25*(data$glm[1] > 1)),
+        #         formula=.~methods, "Heteroscedasticity", short=TRUE) + 
+        #     theme(legend.position="none") + 
+        #     scale_fill_manual(values=cbfPalette) + 
+        #     scale_colour_manual(values=cbfPalette)
 
-        # Panel C: heterogeneity
-        p3 <- plot_qq_p(
-                subset(data_not_rfx_assumption, methods %in% homogeneity_methods & 
-                                                nStudies==25+25*(data$glm[1] > 1) & nSubjects==20), 
-                formula=.~methods, 
-                title="Heterogeneity", short=TRUE, lim=10) + 
-            theme(legend.position="none") + ylab(NULL) + 
-            scale_fill_manual(values=cbfPalette) + 
-            scale_colour_manual(values=cbfPalette)
+        # # Panel C: heterogeneity
+        # p3 <- plot_qq_p(
+        #         subset(data_not_rfx_assumption, methods %in% homogeneity_methods & 
+        #                                         nStudies==25+25*(data$glm[1] > 1) & nSubjects==20), 
+        #         formula=.~methods, 
+        #         title="Heterogeneity", short=TRUE, lim=10) + 
+        #     theme(legend.position="none") + ylab(NULL) + 
+        #     scale_fill_manual(values=cbfPalette) + 
+        #     scale_colour_manual(values=cbfPalette)
         
         # Organise the figure: title, panel A at the top, panel B and C in a second row
         top_row <- plot_grid(p1, labels = 'A', ncol=1)
@@ -113,9 +104,10 @@ plot_small_sample <- function(test_type=1) {
             widths = c(0.6, 0.4)
         }
         
-        bottom_row <- plot_grid(p2, p3, labels = c('B', 'C'), ncol=2, rel_widths=widths)
+        # bottom_row <- plot_grid(p2, p3, labels = c('B', 'C'), ncol=2, rel_widths=widths)
+        bottom_row <- plot_grid(p2, labels = c('B'), ncol=1)
         
-        p <- plot_grid(top_row, bottom_row, labels = ' ', ncol=1, rel_heights=c(1.7, 1))
+        p <- plot_grid(top_row, bottom_row, labels = ' ', ncol=1)
         title <- ggdraw() + draw_label(
             'Robustness of the meta-analytic estimators under assumption violations')
         p <- plot_grid(title, p, ncol=1, rel_heights=c(0.1, 1)) + 
