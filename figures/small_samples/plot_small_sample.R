@@ -64,7 +64,8 @@ plot_small_sample <- function(test_type=1, allsimudat=NA) {
                 formula=methods~nStudies+nSubjects, "Homoscedasticity") +
             theme(legend.position="right")  +
             scale_fill_manual(values=cbfPalette) + 
-            scale_colour_manual(values=cbfPalette)
+            scale_colour_manual(values=cbfPalette, name = expression(sigma[i]^2))
+          # labels = expression(P[M1](tilde(z)>0),P[M0](tilde(z)>0)))
 
         # Panel B: small samples - heteroscedasticity
         p2 <- plot_qq_p(
@@ -72,7 +73,7 @@ plot_small_sample <- function(test_type=1, allsimudat=NA) {
                 formula=methods~nStudies+nSubjects, "Heteroscedasticity") +
             theme(legend.position="right")  +
             scale_fill_manual(values=cbfPalette) + 
-            scale_colour_manual(values=cbfPalette)
+            scale_colour_manual(values=cbfPalette, name = expression(alpha))
         
         # # Panel B: heteroscedasticity
         # p2 <- plot_qq_p(
