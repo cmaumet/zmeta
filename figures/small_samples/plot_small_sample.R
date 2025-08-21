@@ -61,7 +61,7 @@ plot_small_sample <- function(test_type=1, allsimudat=NA) {
         # Panel A: small samples - homoscedasticity
         p1 <- plot_qq_p(
                 subset(data_rfx_assumption, methods %in% large_sample_methods & withinVariation==1),
-                formula=methods~nStudies+nSubjects, "Small sample sizes: homoscedasticity") +
+                formula=methods~nStudies+nSubjects, "Homoscedasticity") +
             theme(legend.position="right")  +
             scale_fill_manual(values=cbfPalette) + 
             scale_colour_manual(values=cbfPalette)
@@ -69,7 +69,7 @@ plot_small_sample <- function(test_type=1, allsimudat=NA) {
         # Panel B: small samples - heteroscedasticity
         p2 <- plot_qq_p(
                 subset(data_rfx_assumption, methods %in% large_sample_methods & withinVariation!=1),
-                formula=methods~nStudies+nSubjects, "Small sample sizes: heteroscedasticity") +
+                formula=methods~nStudies+nSubjects, "Heteroscedasticity") +
             theme(legend.position="right")  +
             scale_fill_manual(values=cbfPalette) + 
             scale_colour_manual(values=cbfPalette)
@@ -109,7 +109,7 @@ plot_small_sample <- function(test_type=1, allsimudat=NA) {
         
         p <- plot_grid(top_row, bottom_row, labels = ' ', ncol=1)
         title <- ggdraw() + draw_label(
-            'Robustness of the meta-analytic estimators under assumption violations')
+            'Robustness in small samples')
         p <- plot_grid(title, p, ncol=1, rel_heights=c(0.1, 1)) + 
             theme(plot.title=element_text(size=12), text=element_text(size=10))
 

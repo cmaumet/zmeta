@@ -1,5 +1,8 @@
 plot_qq_p <- function(data, formula, title, mult=FALSE, lim=NA, filename=NA, max_z=NA, short=FALSE){
 
+    homoscedastic = all(data$withinVariation==1)
+    heteroscedastic = all(data$withinVariation!=1)
+
     if (inherits(data, "data.frame"))  {
         org_data <- data
         data <- list()
@@ -24,12 +27,37 @@ plot_qq_p <- function(data, formula, title, mult=FALSE, lim=NA, filename=NA, max
         ylab = "Observed P - Cumulative P"
     }
 
-    plot_grid_methods_color_within(data,
-        aes_main=aes(x=-log10(expectedP), y=-log10(P/expectedP), group=allgroups, colour=factor(withinInfo)),
-        aes_line=aes(x=-log10(expectedP), y=0),
-        aes_ribbon=aes(ymin=-log10(p_lower/expectedP), ymax=-log10(p_upper/expectedP), group=glm), 
-        formula, title, mult, lim, filename, max_z,
-        xlabel=bquote("Cumulative P"), ylabel=ylab)
+
+
+    # plot_grid_methods_color_within(data,
+    #     aes_main=aes(x=-log10(expectedP), y=-log10(P/expectedP), group=allgroups, colour=factor(withinInfo)),
+    #     aes_line=aes(x=-log10(expectedP), y=0),
+    #     aes_ribbon=aes(ymin=-log10(p_lower/expectedP), ymax=-log10(p_upper/expectedP), group=glm), 
+    #     formula, title, mult, lim, filename, max_z,
+    #     xlabel=bquote("Cumulative P"), ylabel=ylab)
+
+    if (homoscedastic) {
+        plot_grid_methods_color_within(data,
+            aes_main=aes(x=-log10(expectedP), y=-log10(P/expectedP), group=allgroups, colour=factor(withinVar)),
+            aes_line=aes(x=-log10(expectedP), y=0),
+            aes_ribbon=aes(ymin=-log10(p_lower/expectedP), ymax=-log10(p_upper/expectedP), group=glm), 
+            formula, title, mult, lim, filename, max_z,
+            xlabel=bquote("Cumulative P"), ylabel=ylab)
+    } else if (heteroscedastic) {
+        plot_grid_methods_color_within(data,
+            aes_main=aes(x=-log10(expectedP), y=-log10(P/expectedP), group=allgroups, colour=factor(withinVariation)),
+            aes_line=aes(x=-log10(expectedP), y=0),
+            aes_ribbon=aes(ymin=-log10(p_lower/expectedP), ymax=-log10(p_upper/expectedP), group=glm), 
+            formula, title, mult, lim, filename, max_z,
+            xlabel=bquote("Cumulative P"), ylabel=ylab)
+    } else {
+        plot_grid_methods_color_within(data,
+            aes_main=aes(x=-log10(expectedP), y=-log10(P/expectedP), group=allgroups, colour=factor(withinInfo)),
+            aes_line=aes(x=-log10(expectedP), y=0),
+            aes_ribbon=aes(ymin=-log10(p_lower/expectedP), ymax=-log10(p_upper/expectedP), group=glm), 
+            formula, title, mult, lim, filename, max_z,
+            xlabel=bquote("Cumulative P"), ylabel=ylab)
+    }
     
 #     data <- prepare_data(data, max_z, min_z=0)
     
