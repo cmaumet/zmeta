@@ -61,7 +61,7 @@ plot_small_sample <- function(test_type=1, allsimudat=NA) {
         # Panel A: small samples - homoscedasticity
         p1 <- plot_qq_p(
                 subset(data_rfx_assumption, methods %in% large_sample_methods & withinVariation==1),
-                formula=methods~nStudies+nSubjects, "Homoscedasticity") +
+                formula=methods~nStudies+nSubjects, "Within study variance - Homogneous Value (Homoscedasticity)") +
             theme(legend.position="right")  +
             scale_fill_manual(values=cbfPalette) + 
             scale_colour_manual(values=cbfPalette, name = expression(sigma[i]^2))
@@ -70,7 +70,7 @@ plot_small_sample <- function(test_type=1, allsimudat=NA) {
         # Panel B: small samples - heteroscedasticity
         p2 <- plot_qq_p(
                 subset(data_rfx_assumption, methods %in% large_sample_methods & withinVariation!=1),
-                formula=methods~nStudies+nSubjects, "Heteroscedasticity") +
+                formula=methods~nStudies+nSubjects, "Within study variance - Heterogeneous Value (Heteroscedasticity)") +
             theme(legend.position="right")  +
             scale_fill_manual(values=cbfPalette) + 
             scale_colour_manual(values=cbfPalette, name = expression(alpha))
