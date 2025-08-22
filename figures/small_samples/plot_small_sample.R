@@ -123,7 +123,7 @@ plot_small_sample <- function(test_type=1, allsimudat=NA) {
     print(p)
 
     # Save to pdf
-    pdf(paste("robustness_2.pdf", sep=""))
+    pdf(paste("robustness_small_samples.pdf", sep=""))
     print(p)
     dev.off()
 }
