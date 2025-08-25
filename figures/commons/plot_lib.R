@@ -80,7 +80,16 @@ load_data_from_csv <- function(pattern, folder, iter){
     # Reorder unit mismatch factor levels
     # simudata$unitMism = factor(simudata$unitMism,c('nominal', 'datascl', 'contscl'))
 
-
+    # Recompute the confidence bounds
+    # percent = 0.05/(30*30*30*38)
+    percent = 0.001
+    if (percent!=0.05){
+        simudata$p_upper <- qbeta(percent/2, simudata$rankP, simudata$nSimu-simudata$rankP +1)
+        simudata$z_upper <- qnorm(simudata$p_upper, lower.tail=FALSE)
+        simudata$p_lower <- qbeta(1-(percent/2), simudata$rankP, simudata$nSimu-simudata$rankP +1)
+        simudata$z_lower <- qnorm(simudata$p_lower, lower.tail=FALSE)
+        print("updated conf")
+    }
     return(simudata)
 }
 
