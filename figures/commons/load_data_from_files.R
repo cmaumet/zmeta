@@ -22,5 +22,10 @@ load_data_from_files <- function(simu_dir, iter, test_type=1) {
     )
 
     allsimudat$withinVar <- allsimudat$Within/allsimudat$nSubjects
+
+    allsimudat$methods <- factor(allsimudat$methods, levels=c("fishers",
+        "stouffers", "weightedZ", "megaRFX", "permutCon", 
+        "stouffersMFX", "permutZ", "megaMFX", "megaFFX_FSL"))
+
     return(allsimudat)
 }
