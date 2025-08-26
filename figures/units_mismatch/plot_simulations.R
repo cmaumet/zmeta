@@ -1,3 +1,4 @@
+plot_simulations <- function(test_type=1, allsimudat=NA) {
 # # Robustness to units mismatch
 
 
@@ -9,6 +10,8 @@ source(file.path('..', 'commons','multiplot.R'))
 source(file.path('..', 'commons','prepare_data.R'))
 source(file.path('..', 'commons','plot_lib.R'))
 source(file.path('..', 'commons','plot_qq_p.R'))
+source(file.path('..', 'commons','load_data_from_files.R'))
+
 theme_set(theme_gray()) # switch to default ggplot2 theme for good
 theme_update(panel.background = element_rect(fill = "grey95"))
 # theme_set(theme_gray() + theme(panel.background = element_blank()))
@@ -28,9 +31,23 @@ iter = 38
 # - Load data from the CSV files
 
 kn = "k025_n20"
-allsimudat_btw1 <- load_data_from_csv(paste('^test1_', kn, '_btw1.*', sep=""), simu_dir, iter)
-allsimudat <- rbind(allsimudat_btw1)
+if (all(is.na(allsimudat))){
+    allsimudat_btw1 <- load_data_from_csv(paste('^test1_', kn, '_btw1.*', sep=""), simu_dir, iter)
+    allsimudat <- rbind(allsimudat_btw1)
 
+    allsimudat$withinVar <- allsimudat$Within/allsimudat$nSubjects
+
+    allsimudat$methods <- factor(allsimudat$methods, levels=c("fishers",
+        "stouffers", "weightedZ", "megaRFX", "permutCon", 
+        "stouffersMFX", "permutZ", "megaMFX", "megaFFX_FSL"))
+
+    allsimudat$unitMism <- factor(allsimudat$unitMism, 
+        levels=c("nominal", "datascl", "contscl"))
+}
+
+# if (all(is.na(allsimudat))){
+#     allsimudat = load_data_from_files(simu_dir, iter, test_type)
+# }
 
 # ## Plots
 # ### Main figure
@@ -40,15 +57,63 @@ units_plot <- function(data, max_z=NA, lim=NA){
     
     con_methods <- c("megaMFX","megaRFX","permutCon")
     con_data <- subset(data, is.finite(expectedz) & expectedz>0  &  methods %in% con_methods)
-    
-    p <- plot_qq_p(list(con_data),  
-              methods~unitMism+soft2, 
-              '', 
-              mult=FALSE, lim=lim, filename=NA, max_z=max_z) + 
-        theme(legend.position="bottom") + 
-        scale_fill_manual(values=cbfPalette) + 
-        scale_colour_manual(values=cbfPalette)
 
+
+    # # Panel A: heteroscedasticity
+    # p1 <- plot_qq_p(
+    #          subset(data_positive_z, methods %in% homoscedasticity_methods &
+    #                                      nSubjects==20 & nStudies==25+25*(data$glm[1] > 1) &
+    #                                      withinVariation!=1),
+    #         formula=Between~methods, "Heteroscedasticity", short=TRUE) + 
+    #     theme(legend.position="right") + 
+    #     scale_fill_manual(values=cbfPalette) + 
+    #     scale_colour_manual(values=cbfPalette, name = expression(alpha))
+
+    # # Panel B: homoscedasticity (under ass)
+    # p2 <- plot_qq_p(
+    #         subset(data_positive_z, methods %in% homoscedasticity_methods &
+    #                                      nSubjects==20 & nStudies==25+25*(data$glm[1] > 1) &
+    #                                      withinVariation==1),
+    #         formula=Between~methods, "Homoscedasticity", short=TRUE) + 
+    #     theme(legend.position="right") + 
+    #     scale_fill_manual(values=cbfPalette) + 
+    #     scale_colour_manual(values=cbfPalette, name = expression(sigma[i]^2))
+
+    
+    p1 <- plot_qq_p(subset(con_data, nSubjects==20 & nStudies==25+25*(data$glm[1] > 1) &
+                                         withinVariation==1),  
+              methods~unitMism+soft2, 
+              "Within study variance - Homogneous Value (Homoscedasticity)",
+              mult=FALSE, lim=lim, filename=NA, max_z=max_z) +  
+        theme(legend.position="right") + 
+        scale_fill_manual(values=cbfPalette) + 
+        scale_colour_manual(values=cbfPalette, name = expression(sigma[i]^2))
+
+    p2 <- plot_qq_p(subset(con_data, nSubjects==20 & nStudies==25+25*(data$glm[1] > 1) &
+                                         withinVariation!=1),  
+              methods~unitMism+soft2, 
+              "Within study variance - Heterogeneous Value (Heteroscedasticity)", 
+              mult=FALSE, lim=lim, filename=NA, max_z=max_z) + 
+        theme(legend.position="right") + 
+        scale_fill_manual(values=cbfPalette) + 
+        scale_colour_manual(values=cbfPalette, name = expression(alpha))
+
+
+    # Organise the figure: title, panel A at the top, panel B and C in a second row
+    top_row <- plot_grid(p1, labels = 'A', ncol=1)
+   
+    if (data$glm[1] == 1){
+        # For one-sample tests we have many methods to check under heterogeneity        
+        widths = c(0.4, 0.75)
+    } else {
+        # For two-sample tests we only have one method to check under heterogeneity
+        widths = c(0.6, 0.4)
+    }
+    
+    # bottom_row <- plot_grid(p2, p3, labels = c('B', 'C'), ncol=2, rel_widths=widths)
+    bottom_row <- plot_grid(p2, labels = c('B'), ncol=1)
+
+    p <- plot_grid(top_row, bottom_row, labels = ' ', ncol=1)
     title <- ggdraw() + draw_label(
         'Robustness under contrasts with mismatched units, one-sample') 
     p <- plot_grid(title, p, ncol=1, rel_heights=c(0.1, 1)) 
@@ -58,13 +123,13 @@ units_plot <- function(data, max_z=NA, lim=NA){
 
 p <- units_plot(allsimudat)
 
-# print on screen
-print(p)
+    # print on screen
+    print(p)
 
-# Save to pdf
-pdf(paste("units_", kn, ".pdf", sep=""))
-print(p)
-dev.off()
+    # Save to pdf
+    pdf(paste("robustness_unitmismatch.pdf", sep=""))
+    print(p)
+    dev.off()
 
 
 # # # Two-sample tests
@@ -154,4 +219,5 @@ dev.off()
 
 # print(p)
 
-
+    return(allsimudat)
+}
