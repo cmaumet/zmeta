@@ -67,8 +67,11 @@ Then in the R console, Fig.3 can be generated with:
 <Instructions on how to (1) obtain raw data; (2) process it to create summary/derived data in the `results`>
 
 <Specify precise steps, including any datasets that need to be downloaded and path variables that need to be set>
+### Real data
+Download the data
+similar command for 1-9
 
-
+for i in $(seq 10 21); do  curl --ssl-no-revoke -L "https://neurovault.org/collections/1425/pain_$i.nidm.zip" -o "pain_$i.nidm.zip";  done
 
 ##### Simulations
  1. Run the simulations on buster (cf. [zmeta_buster](https://github.com/cmaumet/zmeta_buster))
