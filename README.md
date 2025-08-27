@@ -28,7 +28,7 @@ To cite this repository, please cite the corresponding manuscript:
 
 <Specify precise steps, including any datasets that need to be downloaded and path variables that need to be set>
 
-### Fig. 1, S1 and S2
+### Fig. 1, 2 and S1
 From a Terminal:
 ```console
 $ cd figures/small_samples
@@ -37,34 +37,30 @@ $ R
 
 Then in the R console, Fig.1 can be generated with:
 ```R
-> source("plot_small_sample.R")
-> plot_small_sample(1)
+> source("plot_small_sample.R"); plot_small_sample(1)
+```
+
+Fig.2 can be generated with:
+```R
+> source("plot_heteroscedasticity.R"); plot_heteroscedasticity(1)
 ```
 
 Fig.S1. with:
 ```R
-> plot_small_sample(2)
+> source("plot_heterogeneity.R"); plot_heterogeneity(1)
 ```
 
-and Fig.S2. with:
-```R
-> plot_small_sample(3)
-```
-
-### Fig. 2
+### Fig. 3
 From a Terminal:
 ```console
 $ cd figures/units_mismatch
 $ R
 ```
 
-Then in the R console, Fig.1 can be generated with:
+Then in the R console, Fig.3 can be generated with:
 ```R
-> source("plot_simulations.R")
+> source("plot_simulations.R"); plot_simulation(1)
 ```
-
-
-### Fig. 2
 
 ## Reproducing full analysis
 
