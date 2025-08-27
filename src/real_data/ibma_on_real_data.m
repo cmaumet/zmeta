@@ -1,15 +1,66 @@
-function ibma_on_real_data(analysisDir, recomputeZ)
-    if nargin < 2
+function matlabbatch=ibma_on_real_data(analysisDir, recomputeZ)
+    if nargin < 1
         recomputeZ = false;
-        if nargin < 1
-            analysisDir = pwd;
+    end
+
+    filedir = fileparts(which('ibma_on_real_data.m'));
+    analysisDir = fullfile(filedir, '..', '..', 'data');
+
+    realDataDir = fullfile(analysisDir, 'real_data');
+
+    if ! isfolder(realDataDir)
+        mkdir(realDataDir)
+    end
+
+    nStudies = 2;
+    nSubjects = [25 25 20 20 9 9 9 12 12 12 12 13 32 24 14 14 12 12 16 16 16];
+
+    if length(dir(realDataDir))==2
+        disp('Empty folder');
+
+        for k = 1:nStudies
+            baseurl = 'https://neurovault.org/collections/1425/';
+            nidmzip = strcat('pain_', num2str(k, '%02d'), '.nidm.zip');
+            url = strcat(baseurl, nidmzip);
+            unzip(url, fullfile(realDataDir, strrep(nidmzip, '.zip', '')));
+        end
+    end
+    
+    conFiles = cellstr(nStudies);
+    stdConFiles = cellstr(nStudies);
+    varConFiles = cellstr(nStudies);
+    % studyDirs = cell{nStudies, 1};
+    for k = 1:nStudies
+        studyDirs{k} = fullfile(realDataDir, ...
+            strcat('pain_', num2str(k, '%02d'), '.nidm'));
+        conFiles{k} = spm_select('FPList', studyDirs{k}, 'Contrast.nii.gz');
+        stdConFiles{k} = spm_select('FPList', studyDirs{k}, 'ContrastStandardError.nii.gz');
+        if isempty(conFiles{k})
+            conFiles{k} = spm_select('FPList', studyDirs{k}, 'Contrast_T001.nii.gz');
+            stdConFiles{k} = spm_select('FPList', studyDirs{k}, 'ContrastStandardError_T001.nii.gz');
         end
     end
 
-    realDataDir = fullfile(analysisDir, 'real_data');
-    nSubjects = [25 25 20 20 9 9 9 12 12 12 12 13 32 24 14 14 12 12 16 16 16];
-    nStudies = numel(nSubjects);
+    % Compute contrast variance from standard error
+    matlabbatch = {};
+    disp(cellstr(stdConFiles{k}))
+    for k = 1:nStudies
+        gunzip(stdConFiles{k})
+        stdConFiles{k} = strrep(stdConFiles{k}, '.gz', '')
+        disp(stdConFiles{k})
+
+        matlabbatch{1}.spm.util.imcalc.input = cellstr(stdConFiles{k});
+        matlabbatch{1}.spm.util.imcalc.output = 'ContrastVariance.nii';
+        matlabbatch{1}.spm.util.imcalc.outdir = studyDirs(k);
+        matlabbatch{1}.spm.util.imcalc.expression = 'i1.^2';
+        spm_jobman('run', matlabbatch);
+
+        varConFiles{k} = fullfile(studyDirs{k}, 'ContrastVariance.nii');
+    end
+
     
+    return;
+
     con4dFileName = 'conweighted_filtered_func_data.nii';
     varCon4dFileName = 'conweighted_var_filtered_func_data.nii';
     z4dFileName = 'conweighted_z_func_data.nii';
