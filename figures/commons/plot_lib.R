@@ -1,13 +1,13 @@
 method_labels <- function(string) {
-    string[string=="megaMFX"] <- "MFX"
-    string[string=="megaRFX"] <- "RFX"
-    string[string=="permutCon"] <- "Perm. E"
-    string[string=="permutZ"] <- "Perm. Z"
-    string[string=="stouffers"] <- "Stouffer's"
-    string[string=="fishers"] <- "Fisher's"
-    string[string=="fishers"] <- "Fisher's"
+    string[string=="megaMFX"] <- "MFX GLM"
+    string[string=="megaRFX"] <- "RFX GLM"
+    string[string=="permutCon"] <- "Contrast Perm."
+    string[string=="permutZ"] <- "Z Perm."
+    string[string=="stouffers"] <- "Stouffer"
+    string[string=="fishers"] <- "Fisher"
     string[string=="weightedZ"] <- "Weighted Z"
-    string[string=="megaFFX_FSL"] <- "FFX"
+    string[string=="megaFFX_FSL"] <- "FFX GLM"
+    string[string=="stouffersMFX"] <- "Z RFX"
     string
 }
 
@@ -66,19 +66,30 @@ soft2_labels <- function(value){
 load_data_from_csv <- function(pattern, folder, iter){
     suffix <- gsub('[^a-zA-Z_0-9]', '', pattern)
     suffix <- paste(suffix, '_', iter, sep="")
-    csv_file = paste(getwd(), '/../data/allsimudat_', suffix,'.csv', sep="")
+    simufilename <- paste('allsimudat_', suffix,'.csv', sep="")
+    csv_file = paste(getwd(), '/../../results/', simufilename, sep="")
 
     if (! file.exists(csv_file)){
         print(paste('pattern=', suffix))
         print(paste('CSV file', csv_file,' not found, reprocessing the data.'))
         get_expected_pval_and_equiv_z(pattern, csv_file, folder, iter)
     } else {
-        print(paste('Reading from ', csv_file))
+        print(paste('Reading from ', simufilename))
     }
     simudata <- read.csv(csv_file, header=T, sep=",")
     # Reorder unit mismatch factor levels
-    simudata$unitMism = factor(simudata$unitMism,c('nominal', 'datascl', 'contscl'))
-    
+    # simudata$unitMism = factor(simudata$unitMism,c('nominal', 'datascl', 'contscl'))
+
+    # Recompute the confidence bounds
+    # percent = 0.05/(30*30*30*38)
+    percent = 0.001
+    if (percent!=0.05){
+        simudata$p_upper <- qbeta(percent/2, simudata$rankP, simudata$nSimu-simudata$rankP +1)
+        simudata$z_upper <- qnorm(simudata$p_upper, lower.tail=FALSE)
+        simudata$p_lower <- qbeta(1-(percent/2), simudata$rankP, simudata$nSimu-simudata$rankP +1)
+        simudata$z_lower <- qnorm(simudata$p_lower, lower.tail=FALSE)
+        print("updated conf")
+    }
     return(simudata)
 }
 

@@ -19,7 +19,8 @@ plot_grid_methods_color_within <- function(data, aes_main, aes_line, aes_ribbon,
                            Between=between_labels,
                            glm=test_labels,
                            unitMism = units_labels)) + 
-            theme(strip.text.x = element_text(size = 10)) +
+            theme(strip.text.x = element_text(size = 8)) +
+            theme(strip.text.y = element_text(size = 6)) +
             ylab(ylabel) + xlab(xlabel) + 
             geom_line(aes_line, colour="black") + theme(legend.position="bottom")
     #         geom_point(size=0.5) + 
@@ -63,7 +64,8 @@ plot_grid_methods_color_within <- function(data, aes_main, aes_line, aes_ribbon,
                            Between=between_labels,
                            glm=test_labels,
                            unitMism = units_labels)) + 
-            theme(strip.text.x = element_text(size = 10))  + theme(aspect.ratio = 1) +
+            theme(strip.text.x = element_text(size = 8))  +
+            theme(strip.text.y = element_text(size = 6)) + theme(aspect.ratio = 1) +
             ylab(ylabel) + xlab(xlabel) + 
             geom_line(aes_line, colour="black") + 
             geom_line() +
