@@ -1,4 +1,4 @@
-function matlabbatch=ibma_on_real_data(:recomputeZ)
+function matlabbatch=ibma_on_real_data(recomputeZ)
     if nargin < 1
         recomputeZ = false;
     end
