@@ -70,6 +70,9 @@ Then in the R console, Fig.3 can be generated with:
 ### Real data
 Download the data
 
+mkdir data/read_data
+cd data/real_data
+
 for i in {01..21}; do  mkdir "pain_$i.nidm"; cd "pain_$i.nidm"; curl --ssl-no-revoke -L "https://neurovault.org/collections/1425/pain_$i.nidm.zip" -o "pain_$i.nidm.zip"; unzip "pain_$i.nidm.zip"; cd ..; done
 
 
