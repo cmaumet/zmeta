@@ -37,7 +37,6 @@ function matlabbatch=ibma_on_real_data(:recomputeZ)
 
     % Compute contrast variance from standard error
     matlabbatch = {};
-    disp(cellstr(stdConFiles{k}))
     for k = 1:nStudies
         gunzip(stdConFiles{k})
         stdConFiles{k} = strrep(stdConFiles{k}, '.gz', '')
