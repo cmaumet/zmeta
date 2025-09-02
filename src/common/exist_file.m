@@ -9,7 +9,9 @@
 %  This file is part of AutoMRI12. For copyright details, see copyright.txt
 function [existOrNot, indexFilesDoNotExist] = exist_file(filePath, ignoreIfEmpty)
     % --- Default values ---
-    ignoreIfEmpty = default_value_if_empty_parameter('ignoreIfEmpty', false);
+    if nargin < 2
+        ignoreIfEmpty = false;
+    end
     
     % --- Outputs ---
     indexFilesDoNotExist = [];
