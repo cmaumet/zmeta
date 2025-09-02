@@ -16,8 +16,10 @@ function matlabbatch=ibma_on_real_data(analysisDir, recomputeZ)
     nSubjects = [25 25 20 20 9 9 9 12 12 12 12 13 32 24 14 14 12 12 16 16 16];
 
     if length(dir(realDataDir))==2
-        disp('Empty folder');
+        error('Empty folder, NIDM zips should be downloaded first (see README)');
+    end
 
+    
         for k = 1:nStudies
             baseurl = 'https://neurovault.org/collections/1425/';
             nidmzip = strcat('pain_', num2str(k, '%02d'), '.nidm.zip');
