@@ -69,9 +69,9 @@ Then in the R console, Fig.3 can be generated with:
 <Specify precise steps, including any datasets that need to be downloaded and path variables that need to be set>
 ### Real data
 Download the data
-similar command for 1-9
 
-for i in $(seq 10 21); do  curl --ssl-no-revoke -L "https://neurovault.org/collections/1425/pain_$i.nidm.zip" -o "pain_$i.nidm.zip";  done
+for i in {01..21}; do  mkdir "pain_$i.nidm"; cd "pain_$i.nidm"; curl --ssl-no-revoke -L "https://neurovault.org/collections/1425/pain_$i.nidm.zip" -o "pain_$i.nidm.zip"; unzip "pain_$i.nidm.zip"; cd ..; done
+
 
 ##### Simulations
  1. Run the simulations on buster (cf. [zmeta_buster](https://github.com/cmaumet/zmeta_buster))
