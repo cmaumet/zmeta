@@ -1,4 +1,4 @@
-function matlabbatch=ibma_on_real_data(analysisDir, recomputeZ)
+function matlabbatch=ibma_on_real_data(recomputeZ)
     if nargin < 1
         recomputeZ = false;
     end
@@ -20,12 +20,11 @@ function matlabbatch=ibma_on_real_data(analysisDir, recomputeZ)
     end
 
     
-        for k = 1:nStudies
-            baseurl = 'https://neurovault.org/collections/1425/';
-            nidmzip = strcat('pain_', num2str(k, '%02d'), '.nidm.zip');
-            url = strcat(baseurl, nidmzip);
-            unzip(url, fullfile(realDataDir, strrep(nidmzip, '.zip', '')));
-        end
+    for k = 1:nStudies
+        baseurl = 'https://neurovault.org/collections/1425/';
+        nidmzip = strcat('pain_', num2str(k, '%02d'), '.nidm.zip');
+        url = strcat(baseurl, nidmzip);
+        unzip(url, fullfile(realDataDir, strrep(nidmzip, '.zip', '')));
     end
     
     conFiles = cellstr(nStudies);
