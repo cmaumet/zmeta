@@ -68,12 +68,22 @@ Then in the R console, Fig.3 can be generated with:
 
 <Specify precise steps, including any datasets that need to be downloaded and path variables that need to be set>
 ### Real data
-Download the data
+#### Download the data
 
 mkdir data/read_data
 cd data/real_data
 
-for i in {01..21}; do  mkdir "pain_$i.nidm"; cd "pain_$i.nidm"; curl --ssl-no-revoke -L "https://neurovault.org/collections/1425/pain_$i.nidm.zip" -o "pain_$i.nidm.zip"; unzip "pain_$i.nidm.zip"; cd ..; done
+for i in {01..21}; do  mkdir "pain_$i.nidm"; cd "pain_$i.nidm"; curl --ssl-no-revoke -L "https://neurovault.org/collections/1425/pain_$i.nidm.zip" -o "pain_$i.nidm.zip"; unzip "pain_$i.nidm.zip"; gunzip *.gz; cd ..; done
+
+
+#### Run analysis
+
+cd src/real_data
+
+octave
+
+addpath('<PATH_TO_SPM>')
+ibma_on_real_data
 
 
 ##### Simulations

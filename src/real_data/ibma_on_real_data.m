@@ -25,13 +25,13 @@ function matlabbatch=ibma_on_real_data(recomputeZ)
     varConFiles = cellstr(nStudies);
     % studyDirs = cell{nStudies, 1};
     for k = 1:nStudies
-        studyDirs{k} = gunzip_if_gz(fullfile(realDataDir, ...
-            strcat('pain_', num2str(k, '%02d'), '.nidm')));
-        conFiles{k} = gunzip_if_gz(spm_select('FPList', studyDirs{k}, 'Contrast.nii.gz'));
-        stdConFiles{k} = gunzip_if_gz(spm_select('FPList', studyDirs{k}, 'ContrastStandardError.nii.gz'));
+        studyDirs{k} = fullfile(realDataDir, ...
+            strcat('pain_', num2str(k, '%02d'), '.nidm'));
+        conFiles{k} = spm_select('FPList', studyDirs{k}, 'Contrast.nii');
+        stdConFiles{k} = spm_select('FPList', studyDirs{k}, 'ContrastStandardError.nii');
         if isempty(conFiles{k})
-            conFiles{k} = gunzip_if_gz(spm_select('FPList', studyDirs{k}, 'Contrast_T001.nii.gz'));
-            stdConFiles{k} = gunzip_if_gz(spm_select('FPList', studyDirs{k}, 'ContrastStandardError_T001.nii.gz'));
+            conFiles{k} = spm_select('FPList', studyDirs{k}, 'Contrast_T001.nii');
+            stdConFiles{k} = spm_select('FPList', studyDirs{k}, 'ContrastStandardError_T001.nii');
         end
     end
 
