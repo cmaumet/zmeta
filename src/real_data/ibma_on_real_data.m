@@ -83,7 +83,7 @@ function matlabbatch=ibma_on_real_data(recomputeZ)
         zNifti.dat(:,:,:,:) = zData;
     end
     
-    zFiles = cellstr(spm_select('ExtFPList', analysisDir, z4dFileName), 1:100);
+    zFiles = cellstr(spm_select('ExtFPList', analysisDir, z4dFileName, 1:100));
     disp(zFiles)
     
     % --- Compute meta-analysis ---
