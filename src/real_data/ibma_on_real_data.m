@@ -49,15 +49,15 @@ function matlabbatch=ibma_on_real_data(recomputeZ)
     end
 
     
-    return;
+    % return;
 
-    con4dFileName = 'conweighted_filtered_func_data.nii';
-    varCon4dFileName = 'conweighted_var_filtered_func_data.nii';
+    % con4dFileName = 'conweighted_filtered_func_data.nii';
+    % varCon4dFileName =  'conweighted_var_filtered_func_data.nii';
     z4dFileName = 'conweighted_z_func_data.nii';
     
     if recomputeZ
-        con4dFile = spm_select('FPList', analysisDir, con4dFileName);
-        varCon4dFile = spm_select('FPList', analysisDir, varCon4dFileName);
+        con4dFile = conFiles; %spm_select('FPList', analysisDir, con4dFileName);
+        varCon4dFile = varConFiles; %spm_select('FPList', analysisDir, varCon4dFileName);
 
         % Create z-stat
         conData = spm_read_vols(spm_vol(con4dFile));
