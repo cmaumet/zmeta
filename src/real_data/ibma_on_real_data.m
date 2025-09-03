@@ -83,6 +83,8 @@ function matlabbatch=ibma_on_real_data(recomputeZ)
         zNifti.dat(:,:,:,:) = zData;
     end
     
+    disp(analysisDir)
+    disp(z4dFileName)
     zFiles = cellstr(spm_select('ExtFPList', analysisDir, z4dFileName, 1:100));
     disp(zFiles)
     
