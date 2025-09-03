@@ -53,7 +53,7 @@ function matlabbatch=ibma_on_real_data(recomputeZ)
 
     % con4dFileName = 'conweighted_filtered_func_data.nii';
     % varCon4dFileName =  'conweighted_var_filtered_func_data.nii';
-    z4dFileName = 'conweighted_z_func_data.nii';
+    z4dFileName = 'z_file.nii';
     
     if recomputeZ
         con4dFile = conFiles; %spm_select('FPList', analysisDir, con4dFileName);
@@ -83,9 +83,8 @@ function matlabbatch=ibma_on_real_data(recomputeZ)
         zNifti.dat(:,:,:,:) = zData;
     end
     
-    zFiles = cellstr(spm_select('ExtFPList', analysisDir, ['^' string_to_regexp(z4dFileName)], 1:100));
-    conFiles = cellstr(spm_select('ExtFPList', analysisDir, ['^' string_to_regexp(con4dFileName)], 1:100));
-    varConFiles = cellstr(spm_select('ExtFPList', analysisDir, ['^' string_to_regexp(varCon4dFileName)], 1:100));
+    zFiles = cellstr(spm_select('ExtFPList', analysisDir, z4dFileName), 1:100);
+    disp(zFiles)
     
     % --- Compute meta-analysis ---
     matlabbatch = {};
