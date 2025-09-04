@@ -12,8 +12,8 @@
         mkdir(realDataDir)
     end
 
-    nStudies = 2;
     nSubjects = [25 25 20 20 9 9 9 12 12 12 12 13 32 24 14 14 12 12 16 16 16];
+    nStudies = numel(nSubjects);
 
     if length(dir(realDataDir))==2
         error('Empty folder, NIDM zips should be downloaded first (see README)');
@@ -99,10 +99,7 @@
         zNifti.dat(:,:,:,:) = zData;
     end
     
-    disp(realDataDir)
-    disp(z4dFileName)
     zFiles = cellstr(spm_select('ExtFPList', realDataDir, z4dFileName, 1:100));
-    disp(zFiles)
     
     % --- Compute meta-analysis ---
     matlabbatch = {};
