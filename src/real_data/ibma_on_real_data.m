@@ -145,7 +145,7 @@ function matlabbatch=ibma_on_real_data(recomputeZ)
     matlabbatch{end}.spm.tools.ibma.megaffx.samplesize.unequal.nsubjects = nSubjects;
 
     % Permutation on conFiles
-    matlabbatch{1}.spm.tools.snpm.des.OneSampT.DesignName = 'MultiSub: One Sample T test on diffs/contrasts';
+    matlabbatch{end+1}.spm.tools.snpm.des.OneSampT.DesignName = 'MultiSub: One Sample T test on diffs/contrasts';
     matlabbatch{end}.spm.tools.snpm.des.OneSampT.DesignFile = 'snpm_bch_ui_OneSampT';
     permutConDir = fullfile(realDataDir, 'permutCon');
     mkdir(permutConDir);
