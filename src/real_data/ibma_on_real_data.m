@@ -60,6 +60,7 @@
     end
 
     % Convert contrast variance images to a single 4D nii
+    clear matlabbatch
     matlabbatch{1}.spm.util.cat.vols = varConFiles;
     matlabbatch{1}.spm.util.cat.name = fullfile(realDataDir, varCon4dFileName);
     matlabbatch{1}.spm.util.cat.dtype = 0; % keep same type as input
