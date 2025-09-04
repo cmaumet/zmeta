@@ -93,7 +93,7 @@
         end
 
         zFile = fullfile(realDataDir, z4dFileName);
-        copy_nii_image(con4dFile, zFile);
+        copyfile(con4dFile, zFile);
         zNifti = nifti(zFile);
         zNifti.dat(:) = NaN;
         zNifti.dat(:,:,:,:) = zData;
