@@ -42,6 +42,7 @@
     matlabbatch{1}.spm.util.cat.vols = conFiles;
     matlabbatch{1}.spm.util.cat.name = fullfile(realDataDir, con4dFileName);
     matlabbatch{1}.spm.util.cat.dtype = 0; % keep same type as input
+    spm_jobman('run', matlabbatch)
 
     % Compute contrast variance from standard error
     varCon4dFileName =  'conweighted_var_filtered_func_data.nii';
@@ -62,6 +63,7 @@
     matlabbatch{1}.spm.util.cat.vols = varConFiles;
     matlabbatch{1}.spm.util.cat.name = fullfile(realDataDir, varCon4dFileName);
     matlabbatch{1}.spm.util.cat.dtype = 0; % keep same type as input
+    spm_jobman('run', matlabbatch)
 
     % return;
 
