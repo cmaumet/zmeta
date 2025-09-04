@@ -134,19 +134,18 @@
     megaRfxDir = fullfile(realDataDir, 'megaRFX');
     mkdir(megaRfxDir);
     matlabbatch{end+1}.spm.tools.ibma.megarfx.dir = {megaRfxDir};
-    matlabbatch{end}.spm.tools.ibma.megarfx.confiles = conFiles;
-    matlabbatch{end}.spm.tools.ibma.megarfx.nsubjects = nSubjects;
+    matlabbatch{end}.spm.tools.ibma.megarfx.model.one.confiles = conFiles;
 
     % Mega-analysis FFX
     megaFfxDir = fullfile(realDataDir, 'megaFFX');
     mkdir(megaFfxDir);
     matlabbatch{end+1}.spm.tools.ibma.megaffx.dir = {megaFfxDir};
-    matlabbatch{end}.spm.tools.ibma.megaffx.nsubjects = nSubjects;
     matlabbatch{end}.spm.tools.ibma.megaffx.confiles = conFiles;
     matlabbatch{end}.spm.tools.ibma.megaffx.varconfiles = varConFiles;
+    matlabbatch{end}.spm.tools.ibma.megaffx.samplesize.unequal.nsubjects = nSubjects;
 
     % Permutation on conFiles
-    matlabbatch{end+1}.spm.tools.snpm.des.OneSampT.DesignName = 'MultiSub: One Sample T test on diffs/contrasts';
+    matlabbatch{1}.spm.tools.snpm.des.OneSampT.DesignName = 'MultiSub: One Sample T test on diffs/contrasts';
     matlabbatch{end}.spm.tools.snpm.des.OneSampT.DesignFile = 'snpm_bch_ui_OneSampT';
     permutConDir = fullfile(realDataDir, 'permutCon');
     mkdir(permutConDir);
