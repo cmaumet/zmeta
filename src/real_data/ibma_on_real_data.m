@@ -1,4 +1,4 @@
-function matlabbatch=ibma_on_real_data(recomputeZ)
+%function matlabbatch=ibma_on_real_data(recomputeZ)
     if nargin < 1
         recomputeZ = true;
     end
@@ -165,4 +165,4 @@ function matlabbatch=ibma_on_real_data(recomputeZ)
 
     spm_jobman('run', matlabbatch)
 
-end
+%end
