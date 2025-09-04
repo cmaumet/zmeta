@@ -1,6 +1,6 @@
 function matlabbatch=ibma_on_real_data(recomputeZ)
     if nargin < 1
-        recomputeZ = false;
+        recomputeZ = true;
     end
 
     filedir = fileparts(which('ibma_on_real_data.m'));
@@ -35,10 +35,20 @@ function matlabbatch=ibma_on_real_data(recomputeZ)
         end
     end
 
+    con4dFileName = 'conweighted_filtered_func_data.nii';
+    
+    % Convert contrast images to a single 4D nii
+    clear matlabbatch
+    matlabbatch{1}.spm.util.cat.vols = conFiles;
+    matlabbatch{1}.spm.util.cat.name = fullfile(realDataDir, con4dFileName);
+    matlabbatch{1}.spm.util.cat.dtype = 0; % keep same type as input
+
     % Compute contrast variance from standard error
+    varCon4dFileName =  'conweighted_var_filtered_func_data.nii';
+
     matlabbatch = {};
     for k = 1:nStudies
-        disp(stdConFiles{k})
+        clear matlabbatch
         matlabbatch{1}.spm.util.imcalc.input = cellstr(stdConFiles{k});
         matlabbatch{1}.spm.util.imcalc.output = 'ContrastVariance.nii';
         matlabbatch{1}.spm.util.imcalc.outdir = studyDirs(k);
@@ -48,18 +58,21 @@ function matlabbatch=ibma_on_real_data(recomputeZ)
         varConFiles{k} = fullfile(studyDirs{k}, 'ContrastVariance.nii');
     end
 
-    
+    % Convert contrast variance images to a single 4D nii
+    matlabbatch{1}.spm.util.cat.vols = varConFiles;
+    matlabbatch{1}.spm.util.cat.name = fullfile(realDataDir, varCon4dFileName);
+    matlabbatch{1}.spm.util.cat.dtype = 0; % keep same type as input
+
     % return;
 
-    % con4dFileName = 'conweighted_filtered_func_data.nii';
-    % varCon4dFileName =  'conweighted_var_filtered_func_data.nii';
     z4dFileName = 'z_file.nii';
     
     if recomputeZ
-        con4dFile = conFiles; %spm_select('FPList', analysisDir, con4dFileName);
-        varCon4dFile = varConFiles; %spm_select('FPList', analysisDir, varCon4dFileName);
+        con4dFile = spm_select('FPList', realDataDir, con4dFileName);
+        varCon4dFile = spm_select('FPList', realDataDir, varCon4dFileName);
 
         % Create z-stat
+        disp(con4dFile)
         conData = spm_read_vols(spm_vol(con4dFile));
         varConData = spm_read_vols(spm_vol(varCon4dFile));
 
@@ -76,16 +89,16 @@ function matlabbatch=ibma_on_real_data(recomputeZ)
             zData(:,:,:,v) = currZ;
         end
 
-        zFile = fullfile(analysisDir, z4dFileName);
+        zFile = fullfile(realDataDir, z4dFileName);
         copy_nii_image(con4dFile, zFile);
         zNifti = nifti(zFile);
         zNifti.dat(:) = NaN;
         zNifti.dat(:,:,:,:) = zData;
     end
     
-    disp(analysisDir)
+    disp(realDataDir)
     disp(z4dFileName)
-    zFiles = cellstr(spm_select('ExtFPList', analysisDir, z4dFileName, 1:100));
+    zFiles = cellstr(spm_select('ExtFPList', realDataDir, z4dFileName, 1:100));
     disp(zFiles)
     
     % --- Compute meta-analysis ---
