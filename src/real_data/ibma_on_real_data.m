@@ -20,18 +20,18 @@
     end
 
     
-    conFiles = cellstr(1,nStudies);
-    stdConFiles = cellstr(1,nStudies);
-    varConFiles = cellstr(1,nStudies);
+    conFiles = cell(nStudies,1);
+    stdConFiles = cell(nStudies,1);
+    varConFiles = cell(nStudies,1);
     % studyDirs = cell{nStudies, 1};
     for k = 1:nStudies
-        studyDirs{1,k} = fullfile(realDataDir, ...
+        studyDirs{k,1} = fullfile(realDataDir, ...
             strcat('pain_', num2str(k, '%02d'), '.nidm'));
-        conFiles{1,k} = spm_select('FPList', studyDirs{k}, 'Contrast.nii');
-        stdConFiles{1,k} = spm_select('FPList', studyDirs{k}, 'ContrastStandardError.nii');
+        conFiles{k,1} = spm_select('FPList', studyDirs{k}, 'Contrast.nii');
+        stdConFiles{k,1} = spm_select('FPList', studyDirs{k}, 'ContrastStandardError.nii');
         if isempty(conFiles{1,k})
-            conFiles{1,k} = spm_select('FPList', studyDirs{k}, 'Contrast_T001.nii');
-            stdConFiles{1,k} = spm_select('FPList', studyDirs{k}, 'ContrastStandardError_T001.nii');
+            conFiles{k,1} = spm_select('FPList', studyDirs{k}, 'Contrast_T001.nii');
+            stdConFiles{k,1} = spm_select('FPList', studyDirs{k}, 'ContrastStandardError_T001.nii');
         end
     end
 
