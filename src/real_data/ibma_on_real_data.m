@@ -29,7 +29,7 @@
             strcat('pain_', num2str(k, '%02d'), '.nidm'));
         conFiles{k,1} = spm_select('FPList', studyDirs{k}, 'Contrast.nii');
         stdConFiles{k,1} = spm_select('FPList', studyDirs{k}, 'ContrastStandardError.nii');
-        if isempty(conFiles{1,k})
+        if isempty(conFiles{k,1})
             conFiles{k,1} = spm_select('FPList', studyDirs{k}, 'Contrast_T001.nii');
             stdConFiles{k,1} = spm_select('FPList', studyDirs{k}, 'ContrastStandardError_T001.nii');
         end
