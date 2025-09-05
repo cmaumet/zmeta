@@ -1,24 +1,81 @@
-function ibma_on_real_data(analysisDir, recomputeZ)
-    if nargin < 2
-        recomputeZ = false;
-        if nargin < 1
-            analysisDir = pwd;
+function matlabbatch=ibma_on_real_data(recomputeZ)
+    if nargin < 1
+        recomputeZ = true;
+    end
+
+    filedir = fileparts(which('ibma_on_real_data.m'));
+    analysisDir = fullfile(filedir, '..', '..', 'data');
+
+    realDataDir = fullfile(analysisDir, 'real_data');
+
+    if ! isfolder(realDataDir)
+        mkdir(realDataDir)
+    end
+
+    nSubjects = [25 25 20 20 9 9 9 12 12 12 12 13 32 24 14 14 12 12 16 16 16];
+    nStudies = numel(nSubjects);
+
+    if length(dir(realDataDir))==2
+        error('Empty folder, NIDM zips should be downloaded first (see README)');
+    end
+
+    
+    conFiles = cell(nStudies,1);
+    stdConFiles = cell(nStudies,1);
+    varConFiles = cell(nStudies,1);
+    % studyDirs = cell{nStudies, 1};
+    for k = 1:nStudies
+        studyDirs{k,1} = fullfile(realDataDir, ...
+            strcat('pain_', num2str(k, '%02d'), '.nidm'));
+        conFiles{k,1} = spm_select('FPList', studyDirs{k}, 'Contrast.nii');
+        stdConFiles{k,1} = spm_select('FPList', studyDirs{k}, 'ContrastStandardError.nii');
+        if isempty(conFiles{k,1})
+            conFiles{k,1} = spm_select('FPList', studyDirs{k}, 'Contrast_T001.nii');
+            stdConFiles{k,1} = spm_select('FPList', studyDirs{k}, 'ContrastStandardError_T001.nii');
         end
     end
 
-    realDataDir = fullfile(analysisDir, 'real_data');
-    nSubjects = [25 25 20 20 9 9 9 12 12 12 12 13 32 24 14 14 12 12 16 16 16];
-    nStudies = numel(nSubjects);
-    
     con4dFileName = 'conweighted_filtered_func_data.nii';
-    varCon4dFileName = 'conweighted_var_filtered_func_data.nii';
-    z4dFileName = 'conweighted_z_func_data.nii';
+    
+    % Convert contrast images to a single 4D nii
+    clear matlabbatch
+    matlabbatch{1}.spm.util.cat.vols = conFiles;
+    matlabbatch{1}.spm.util.cat.name = fullfile(realDataDir, con4dFileName);
+    matlabbatch{1}.spm.util.cat.dtype = 0; % keep same type as input
+    spm_jobman('run', matlabbatch)
+
+    % Compute contrast variance from standard error
+    varCon4dFileName =  'conweighted_var_filtered_func_data.nii';
+
+    matlabbatch = {};
+    for k = 1:nStudies
+        clear matlabbatch
+        matlabbatch{1}.spm.util.imcalc.input = cellstr(stdConFiles{k});
+        matlabbatch{1}.spm.util.imcalc.output = 'ContrastVariance.nii';
+        matlabbatch{1}.spm.util.imcalc.outdir = studyDirs(k);
+        matlabbatch{1}.spm.util.imcalc.expression = 'i1.^2';
+        matlabbatch{1}.spm.util.imcalc.options.dtype = 64;
+        spm_jobman('run', matlabbatch);
+
+        varConFiles{k,1} = fullfile(studyDirs{k}, 'ContrastVariance.nii');
+    end
+
+    % Convert contrast variance images to a single 4D nii
+    clear matlabbatch
+    matlabbatch{1}.spm.util.cat.vols = varConFiles;
+    matlabbatch{1}.spm.util.cat.name = fullfile(realDataDir, varCon4dFileName);
+    matlabbatch{1}.spm.util.cat.dtype = 0; % keep same type as input
+    spm_jobman('run', matlabbatch)
+
+    z4dFileName = 'z_file.nii';
+
     
     if recomputeZ
-        con4dFile = spm_select('FPList', analysisDir, con4dFileName);
-        varCon4dFile = spm_select('FPList', analysisDir, varCon4dFileName);
+        con4dFile = spm_select('FPList', realDataDir, con4dFileName);
+        varCon4dFile = spm_select('FPList', realDataDir, varCon4dFileName);
 
         % Create z-stat
+        disp(con4dFile)
         conData = spm_read_vols(spm_vol(con4dFile));
         varConData = spm_read_vols(spm_vol(varCon4dFile));
 
@@ -35,16 +92,14 @@ function ibma_on_real_data(analysisDir, recomputeZ)
             zData(:,:,:,v) = currZ;
         end
 
-        zFile = fullfile(analysisDir, z4dFileName);
-        copy_nii_image(con4dFile, zFile);
+        zFile = fullfile(realDataDir, z4dFileName);
+        copyfile(con4dFile, zFile);
         zNifti = nifti(zFile);
         zNifti.dat(:) = NaN;
         zNifti.dat(:,:,:,:) = zData;
     end
     
-    zFiles = cellstr(spm_select('ExtFPList', analysisDir, ['^' string_to_regexp(z4dFileName)], 1:100));
-    conFiles = cellstr(spm_select('ExtFPList', analysisDir, ['^' string_to_regexp(con4dFileName)], 1:100));
-    varConFiles = cellstr(spm_select('ExtFPList', analysisDir, ['^' string_to_regexp(varCon4dFileName)], 1:100));
+    zFiles = cellstr(spm_select('ExtFPList', realDataDir, z4dFileName, 1:100));
     
     % --- Compute meta-analysis ---
     matlabbatch = {};
@@ -79,16 +134,15 @@ function ibma_on_real_data(analysisDir, recomputeZ)
     megaRfxDir = fullfile(realDataDir, 'megaRFX');
     mkdir(megaRfxDir);
     matlabbatch{end+1}.spm.tools.ibma.megarfx.dir = {megaRfxDir};
-    matlabbatch{end}.spm.tools.ibma.megarfx.confiles = conFiles;
-    matlabbatch{end}.spm.tools.ibma.megarfx.nsubjects = nSubjects;
+    matlabbatch{end}.spm.tools.ibma.megarfx.model.one.confiles = conFiles;
 
     % Mega-analysis FFX
     megaFfxDir = fullfile(realDataDir, 'megaFFX');
     mkdir(megaFfxDir);
     matlabbatch{end+1}.spm.tools.ibma.megaffx.dir = {megaFfxDir};
-    matlabbatch{end}.spm.tools.ibma.megaffx.nsubjects = nSubjects;
     matlabbatch{end}.spm.tools.ibma.megaffx.confiles = conFiles;
     matlabbatch{end}.spm.tools.ibma.megaffx.varconfiles = varConFiles;
+    matlabbatch{end}.spm.tools.ibma.megaffx.samplesize.unequal.nsubjects = nSubjects;
 
     % Permutation on conFiles
     matlabbatch{end+1}.spm.tools.snpm.des.OneSampT.DesignName = 'MultiSub: One Sample T test on diffs/contrasts';
