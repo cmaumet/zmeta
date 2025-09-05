@@ -69,7 +69,6 @@ function matlabbatch=ibma_on_real_data(recomputeZ)
 
     z4dFileName = 'z_file.nii';
 
-    return;
     
     if recomputeZ
         con4dFile = spm_select('FPList', realDataDir, con4dFileName);
