@@ -56,7 +56,7 @@ function matlabbatch=ibma_on_real_data(recomputeZ)
         matlabbatch{1}.spm.util.imcalc.expression = 'i1.^2';
         spm_jobman('run', matlabbatch);
 
-        varConFiles{k} = fullfile(studyDirs{k}, 'ContrastVariance.nii');
+        varConFiles{k,1} = fullfile(studyDirs{k}, 'ContrastVariance.nii');
     end
 
     % Convert contrast variance images to a single 4D nii
