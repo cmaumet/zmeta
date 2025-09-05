@@ -54,6 +54,7 @@ function matlabbatch=ibma_on_real_data(recomputeZ)
         matlabbatch{1}.spm.util.imcalc.output = 'ContrastVariance.nii';
         matlabbatch{1}.spm.util.imcalc.outdir = studyDirs(k);
         matlabbatch{1}.spm.util.imcalc.expression = 'i1.^2';
+        matlabbatch{1}.spm.util.imcalc.options.dtype = 64;
         spm_jobman('run', matlabbatch);
 
         varConFiles{k,1} = fullfile(studyDirs{k}, 'ContrastVariance.nii');
@@ -66,9 +67,9 @@ function matlabbatch=ibma_on_real_data(recomputeZ)
     matlabbatch{1}.spm.util.cat.dtype = 0; % keep same type as input
     spm_jobman('run', matlabbatch)
 
-    % return;
-
     z4dFileName = 'z_file.nii';
+
+    return;
     
     if recomputeZ
         con4dFile = spm_select('FPList', realDataDir, con4dFileName);
