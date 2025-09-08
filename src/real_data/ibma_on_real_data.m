@@ -13,16 +13,25 @@ function matlabbatch=ibma_on_real_data(recomputeZ)
     end
 
     nSubjects = [25 25 20 20 9 9 9 12 12 12 12 13 32 24 14 14 12 12 16 16 16];
+    spm_studies = [repmat(true, 1, 10) repmat(false, 1, 11)]
+
+    sum_weights = [1 1 1 1 1 1 1 2 2 2 2 1 2 4 4 4 2 2 1 2 1];
+
+    % [('pain_01', 1), ('pain_02', 1), ('pain_03', 1), ('pain_04', 1),
+    %                ('pain_05', 1), ('pain_06', 1), ('pain_07', 1), ('pain_08', 2),
+    %                ('pain_09', 2), ('pain_10', 2), ('pain_11', 2), ('pain_12', 1),
+    %                ('pain_13', 2), ('pain_14', 4), ('pain_15', 4), ('pain_16', 4),
+    %                ('pain_17', 2), ('pain_18', 2), ('pain_19', 1), ('pain_20', 2),
+    %                ('pain_21', 1)]
+
     nStudies = numel(nSubjects);
 
     if length(dir(realDataDir))==2
         error('Empty folder, NIDM zips should be downloaded first (see README)');
     end
-
     
     conFiles = cell(nStudies,1);
     stdConFiles = cell(nStudies,1);
-    varConFiles = cell(nStudies,1);
     % studyDirs = cell{nStudies, 1};
     for k = 1:nStudies
         studyDirs{k,1} = fullfile(realDataDir, ...
@@ -36,6 +45,41 @@ function matlabbatch=ibma_on_real_data(recomputeZ)
     end
 
     con4dFileName = 'conweighted_filtered_func_data.nii';
+
+    % Re-scale contrast map and sterr maps
+    varConFiles_norm = cell(nStudies,1);
+    conFiles_norm = cell(nStudies,1);
+    for k = 1:nStudies
+        if spm_studies(k)
+            soft_factor = 2 % SPM study
+        else
+            soft_factor = 100 % FSL study
+        end
+
+        conweights = sum_weights(k);
+
+        fact = conweights*soft_factor;
+
+        clear matlabbatch
+        matlabbatch{1}.spm.util.imcalc.input = cellstr(conFiles{k});
+        matlabbatch{1}.spm.util.imcalc.output = 'Contrast_norm.nii';
+        matlabbatch{1}.spm.util.imcalc.outdir = studyDirs(k);
+        matlabbatch{1}.spm.util.imcalc.expression = ['i1./' fact];
+        matlabbatch{1}.spm.util.imcalc.options.dtype = 64;
+        spm_jobman('run', matlabbatch);
+
+        conFiles_norm{k,1} = fullfile(studyDirs{k}, 'Contrast_norm.nii');
+
+        clear matlabbatch
+        matlabbatch{1}.spm.util.imcalc.input = cellstr(stdConFiles{k});
+        matlabbatch{1}.spm.util.imcalc.output = 'ContrastVariance_norm.nii';
+        matlabbatch{1}.spm.util.imcalc.outdir = studyDirs(k);
+        matlabbatch{1}.spm.util.imcalc.expression = ['(i1./' fact ').^2'];
+        matlabbatch{1}.spm.util.imcalc.options.dtype = 64;
+        spm_jobman('run', matlabbatch);
+
+        varConFiles_norm{k,1} = fullfile(studyDirs{k}, 'ContrastVariance_norm.nii');
+    end
     
     % Convert contrast images to a single 4D nii
     clear matlabbatch
