@@ -73,7 +73,10 @@ Then in the R console, Fig.3 can be generated with:
 mkdir data/real_data
 cd data/real_data
 for i in {01..21}; do  mkdir "pain_$i.nidm"; cd "pain_$i.nidm"; curl --ssl-no-revoke -L "https://neurovault.org/collections/1425/pain_$i.nidm.zip" -o "pain_$i.nidm.zip"; unzip "pain_$i.nidm.zip"; gunzip *.gz; cd ..; done
-cd ../..
+mkdir GT
+cd GT
+curl -L "https://neurosynth.org/api/images/402/download/" -o pain_gt.nii.gz ; gunzip *.gz;
+cd ../../..
 ```
 
 #### Run analysis
