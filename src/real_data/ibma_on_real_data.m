@@ -7,9 +7,13 @@ function matlabbatch=ibma_on_real_data(recomputeZ)
     analysisDir = fullfile(filedir, '..', '..', 'data');
 
     realDataDir = fullfile(analysisDir, 'real_data');
+    resRealDataDir = fullfile('real_data', 'processed');
 
     if ! isfolder(realDataDir)
         mkdir(realDataDir)
+    end
+    if ! isfolder(resRealDataDir)
+        mkdir(resRealDataDir)
     end
 
     nSubjects = [25 25 20 20 9 9 9 12 12 12 12 13 32 24 14 14 12 12 16 16 16];
@@ -34,7 +38,7 @@ function matlabbatch=ibma_on_real_data(recomputeZ)
     stdConFiles = cell(nStudies,1);
     % studyDirs = cell{nStudies, 1};
     for k = 1:nStudies
-        studyDirs{k,1} = fullfile(realDataDir, ...
+        studyDirs{k,1} = fullfile(resRealDataDir, ...
             strcat('pain_', num2str(k, '%02d'), '.nidm'));
         conFiles{k,1} = spm_select('FPList', studyDirs{k}, 'Contrast.nii');
         stdConFiles{k,1} = spm_select('FPList', studyDirs{k}, 'ContrastStandardError.nii');
