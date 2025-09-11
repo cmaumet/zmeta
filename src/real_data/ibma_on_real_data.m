@@ -7,7 +7,7 @@ function matlabbatch=ibma_on_real_data(recomputeZ)
     rootdir = fileparts(fileparts(filedir));
 
     realDataDir = fullfile(rootdir, 'data', 'real_data');
-    resRealDataDir = fullfile(realDataDir 'processed');
+    resRealDataDir = fullfile(realDataDir, 'processed');
 
     if ! isfolder(realDataDir)
         mkdir(realDataDir)
