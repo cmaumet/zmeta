@@ -7,7 +7,7 @@ function matlabbatch=ibma_on_real_data(recomputeZ)
     analysisDir = fullfile(filedir, '..', '..', 'data');
 
     realDataDir = fullfile(analysisDir, 'real_data');
-    resRealDataDir = fullfile(realDataDir, 'processed');
+    resRealDataDir = fullfile(analysisDir, '..', '..', 'results', 'real_data');
 
     if ! isfolder(realDataDir)
         mkdir(realDataDir)
@@ -38,11 +38,9 @@ function matlabbatch=ibma_on_real_data(recomputeZ)
     
     conFiles = cell(nStudies,1);
     stdConFiles = cell(nStudies,1);
-    % studyDirs = cell{nStudies, 1};
+    % Select contrast and standard error maps within NIDM packs
     for k = 1:nStudies
         studyDirs{k,1} = fullfile(realDataDir, ...
-            strcat('pain_', num2str(k, '%02d'), '.nidm'));
-        studyDirsRes{k,1} = fullfile(resRealDataDir, ...
             strcat('pain_', num2str(k, '%02d'), '.nidm'));
         conFiles{k,1} = spm_select('FPList', studyDirs{k}, 'Contrast.nii');
         stdConFiles{k,1} = spm_select('FPList', studyDirs{k}, 'ContrastStandardError.nii');
@@ -52,73 +50,58 @@ function matlabbatch=ibma_on_real_data(recomputeZ)
         end
     end
 
-    con4dFileName = 'conweighted_filtered_func_data.nii';
-
-    % Re-scale contrast map and sterr maps
+    % Intensity normalization of the contrast and sterr maps (soft + conweights)
     varConFiles_norm = cell(nStudies,1);
     conFiles_norm = cell(nStudies,1);
     for k = 1:nStudies
-        if ! isfolder(studyDirsRes{k,1})
-            mkdir(studyDirsRes{k,1})
-        end
+        study = strcat('pain_', num2str(k, '%02d'));
 
+        % Normalise contrast maps
+        con_map_norm = strcat('con_', study, '_norm.nii');
         clear matlabbatch
         matlabbatch{1}.spm.util.imcalc.input = cellstr(conFiles{k});
-        matlabbatch{1}.spm.util.imcalc.output = 'Contrast_norm.nii';
-        matlabbatch{1}.spm.util.imcalc.outdir = studyDirsRes(k,1);
+        matlabbatch{1}.spm.util.imcalc.output = con_map;
+        matlabbatch{1}.spm.util.imcalc.outdir = resRealDataDir;
         matlabbatch{1}.spm.util.imcalc.expression = ['i1/' num2str(fact(k))];
         matlabbatch{1}.spm.util.imcalc.options.dtype = 64;
         spm_jobman('run', matlabbatch);
 
-        conFiles_norm{k,1} = fullfile(studyDirsRes{k}, 'Contrast_norm.nii');
+        conFiles_norm{k,1} = fullfile(resRealDataDir, con_map_norm);
 
+        % Compute contrast variance from standard error + normalise
+        varcon_map_norm = strcat('varcon_', study, '_norm.nii');
         clear matlabbatch
         matlabbatch{1}.spm.util.imcalc.input = cellstr(stdConFiles{k});
-        matlabbatch{1}.spm.util.imcalc.output = 'ContrastVariance_norm.nii';
-        matlabbatch{1}.spm.util.imcalc.outdir = studyDirsRes(k,1);
+        matlabbatch{1}.spm.util.imcalc.output = varcon_map_norm;
+        matlabbatch{1}.spm.util.imcalc.outdir = resRealDataDir;
         matlabbatch{1}.spm.util.imcalc.expression = ['(i1/' num2str(fact(k)) ').^2'];
         matlabbatch{1}.spm.util.imcalc.options.dtype = 64;
         spm_jobman('run', matlabbatch);
 
-        varConFiles_norm{k,1} = fullfile(studyDirsRes{k}, 'ContrastVariance_norm.nii');
+        varConFiles_norm{k,1} = fullfile(resRealDataDir, varcon_map_norm);
     end
     
     % Convert contrast images to a single 4D nii
+    con4dFileName = 'con_allstudies_norm.nii';
     clear matlabbatch
     matlabbatch{1}.spm.util.cat.vols = conFiles;
-    matlabbatch{1}.spm.util.cat.name = fullfile(realDataDir, con4dFileName);
+    matlabbatch{1}.spm.util.cat.name = fullfile(resRealDataDir, con4dFileName);
     matlabbatch{1}.spm.util.cat.dtype = 0; % keep same type as input
     spm_jobman('run', matlabbatch)
-
-    % Compute contrast variance from standard error
-    varCon4dFileName =  'conweighted_var_filtered_func_data.nii';
-
-    matlabbatch = {};
-    for k = 1:nStudies
-        clear matlabbatch
-        matlabbatch{1}.spm.util.imcalc.input = cellstr(stdConFiles{k});
-        matlabbatch{1}.spm.util.imcalc.output = 'ContrastVariance.nii';
-        matlabbatch{1}.spm.util.imcalc.outdir = studyDirs(k);
-        matlabbatch{1}.spm.util.imcalc.expression = 'i1.^2';
-        matlabbatch{1}.spm.util.imcalc.options.dtype = 64;
-        spm_jobman('run', matlabbatch);
-
-        varConFiles{k,1} = fullfile(studyDirs{k}, 'ContrastVariance.nii');
-    end
 
     % Convert contrast variance images to a single 4D nii
+    varCon4dFileName =  'varcon_allstudies_norm.nii';
     clear matlabbatch
     matlabbatch{1}.spm.util.cat.vols = varConFiles;
-    matlabbatch{1}.spm.util.cat.name = fullfile(realDataDir, varCon4dFileName);
+    matlabbatch{1}.spm.util.cat.name = fullfile(resRealDataDir, varCon4dFileName);
     matlabbatch{1}.spm.util.cat.dtype = 0; % keep same type as input
     spm_jobman('run', matlabbatch)
 
-    z4dFileName = 'z_file.nii';
-
+    z4dFileName = 'z_allstudies.nii';
     
     if recomputeZ
-        con4dFile = spm_select('FPList', realDataDir, con4dFileName);
-        varCon4dFile = spm_select('FPList', realDataDir, varCon4dFileName);
+        con4dFile = spm_select('FPList', resRealDataDir, con4dFileName);
+        varCon4dFile = spm_select('FPList', resRealDataDir, varCon4dFileName);
 
         % Create z-stat
         disp(con4dFile)
@@ -138,52 +121,52 @@ function matlabbatch=ibma_on_real_data(recomputeZ)
             zData(:,:,:,v) = currZ;
         end
 
-        zFile = fullfile(realDataDir, z4dFileName);
+        zFile = fullfile(resRealDataDir, z4dFileName);
         copyfile(con4dFile, zFile);
         zNifti = nifti(zFile);
         zNifti.dat(:) = NaN;
         zNifti.dat(:,:,:,:) = zData;
     end
     
-    zFiles = cellstr(spm_select('ExtFPList', realDataDir, z4dFileName, 1:100));
+    zFiles = cellstr(spm_select('ExtFPList', resRealDataDir, z4dFileName, 1:100));
     
     % --- Compute meta-analysis ---
     matlabbatch = {};
     % Fisher's
-    fisherDir = fullfile(realDataDir, 'fishers');
+    fisherDir = fullfile(resRealDataDir, 'fishers');
     mkdir(fisherDir);
     matlabbatch{1}.spm.tools.ibma.fishers.dir = {fisherDir};
     matlabbatch{1}.spm.tools.ibma.fishers.zimages = zFiles;
 
     % Stouffer's
-    stoufferDir = fullfile(realDataDir, 'stouffers');
+    stoufferDir = fullfile(resRealDataDir, 'stouffers');
     mkdir(stoufferDir);
     matlabbatch{end+1}.spm.tools.ibma.stouffers.dir = {stoufferDir};
     matlabbatch{end}.spm.tools.ibma.stouffers.zimages = zFiles;
     matlabbatch{end}.spm.tools.ibma.stouffers.rfx.RFX_no = 1;
 
     % Stouffer's MFX
-    stoufferMFXDir = fullfile(realDataDir, 'stouffersMFX');
+    stoufferMFXDir = fullfile(resRealDataDir, 'stouffersMFX');
     mkdir(stoufferMFXDir);
     matlabbatch{end+1}.spm.tools.ibma.stouffers.dir = {stoufferMFXDir};
     matlabbatch{end}.spm.tools.ibma.stouffers.zimages = zFiles;
     matlabbatch{end}.spm.tools.ibma.stouffers.rfx.RFX_yes = 0;
 
     % Optimally weighted z
-    weightedZDir = fullfile(realDataDir, 'weightedZ');
+    weightedZDir = fullfile(resRealDataDir, 'weightedZ');
     mkdir(weightedZDir);
     matlabbatch{end+1}.spm.tools.ibma.weightedz.dir = {weightedZDir};
     matlabbatch{end}.spm.tools.ibma.weightedz.zimages = zFiles;
     matlabbatch{end}.spm.tools.ibma.weightedz.nsubjects = nSubjects;
 
     % Mega-analysis RFX
-    megaRfxDir = fullfile(realDataDir, 'megaRFX');
+    megaRfxDir = fullfile(resRealDataDir, 'megaRFX');
     mkdir(megaRfxDir);
     matlabbatch{end+1}.spm.tools.ibma.megarfx.dir = {megaRfxDir};
     matlabbatch{end}.spm.tools.ibma.megarfx.model.one.confiles = conFiles;
 
     % Mega-analysis FFX
-    megaFfxDir = fullfile(realDataDir, 'megaFFX');
+    megaFfxDir = fullfile(resRealDataDir, 'megaFFX');
     mkdir(megaFfxDir);
     matlabbatch{end+1}.spm.tools.ibma.megaffx.dir = {megaFfxDir};
     matlabbatch{end}.spm.tools.ibma.megaffx.confiles = conFiles;
@@ -193,7 +176,7 @@ function matlabbatch=ibma_on_real_data(recomputeZ)
     % Permutation on conFiles
     matlabbatch{end+1}.spm.tools.snpm.des.OneSampT.DesignName = 'MultiSub: One Sample T test on diffs/contrasts';
     matlabbatch{end}.spm.tools.snpm.des.OneSampT.DesignFile = 'snpm_bch_ui_OneSampT';
-    permutConDir = fullfile(realDataDir, 'permutCon');
+    permutConDir = fullfile(resRealDataDir, 'permutCon');
     mkdir(permutConDir);
     matlabbatch{end}.spm.tools.snpm.des.OneSampT.dir = {permutConDir};
     matlabbatch{end}.spm.tools.snpm.des.OneSampT.P = conFiles;
@@ -202,7 +185,7 @@ function matlabbatch=ibma_on_real_data(recomputeZ)
     % Permutation on zFiles
     matlabbatch{end+1}.spm.tools.snpm.des.OneSampT.DesignName = 'MultiSub: One Sample T test on diffs/contrasts';
     matlabbatch{end}.spm.tools.snpm.des.OneSampT.DesignFile = 'snpm_bch_ui_OneSampT';
-    permutZDir = fullfile(realDataDir, 'permutZ');
+    permutZDir = fullfile(resRealDataDir, 'permutZ');
     mkdir(permutZDir);
     matlabbatch{end}.spm.tools.snpm.des.OneSampT.dir = {permutZDir};
     matlabbatch{end}.spm.tools.snpm.des.OneSampT.P = zFiles;
