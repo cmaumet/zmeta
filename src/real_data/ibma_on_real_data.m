@@ -139,22 +139,22 @@ function matlabbatch=ibma_on_real_data(recomputeZ)
     zFiles = cellstr(spm_select('ExtFPList', resRealDataDir, z4dFileName, 1:100));
 
     maskFileName = 'mask.nii';
-    for k = 1:nStudies
-        varcon = os.path.join(export_dir, 'varcon_' + study_name + '_scaled.nii')
-        varcon_img = nib.load(varcon)
-        zero_positions = np.nonzero(np.logical_or(
-            varcon_img.get_data()==0,
-            np.isnan(varcon_img.get_data())))
+    % for k = 1:nStudies
+    %     varcon = os.path.join(export_dir, 'varcon_' + study_name + '_scaled.nii')
+    %     varcon_img = nib.load(varcon)
+    %     zero_positions = np.nonzero(np.logical_or(
+    %         varcon_img.get_data()==0,
+    %         np.isnan(varcon_img.get_data())))
         
-        if mask is None:
-            mask = np.ones(varcon_img.shape)
-            mask[zero_positions] = 0
-        else:
-            mask[zero_positions] = 0
+    %     if mask is None:
+    %         mask = np.ones(varcon_img.shape)
+    %         mask[zero_positions] = 0
+    %     else:
+    %         mask[zero_positions] = 0
 
-    any_img = nib.load(varcon)
-    mask_img = nib.Nifti1Image(mask, any_img.get_qform())
-    nib.save(mask_img, os.path.join(export_dir, 'mask.nii.gz'))
+    % any_img = nib.load(varcon)
+    % mask_img = nib.Nifti1Image(mask, any_img.get_qform())
+    % nib.save(mask_img, os.path.join(export_dir, 'mask.nii.gz'))
 
 
     return;
