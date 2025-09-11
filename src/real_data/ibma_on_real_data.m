@@ -4,10 +4,10 @@ function matlabbatch=ibma_on_real_data(recomputeZ)
     end
 
     filedir = fileparts(which('ibma_on_real_data.m'));
-    analysisDir = fullfile(filedir, '..', '..', 'data');
+    rootdir = fileparts(fileparts(filedir));
 
-    realDataDir = fullfile(analysisDir, 'real_data');
-    resRealDataDir = fullfile(analysisDir, '..', '..', 'results', 'real_data');
+    realDataDir = fullfile(rootdir, 'data', 'real_data');
+    resRealDataDir = fullfile(rootdir, 'results', 'real_data');
 
     if ! isfolder(realDataDir)
         mkdir(realDataDir)
@@ -60,8 +60,8 @@ function matlabbatch=ibma_on_real_data(recomputeZ)
         con_map_norm = strcat('con_', study, '_norm.nii');
         clear matlabbatch
         matlabbatch{1}.spm.util.imcalc.input = cellstr(conFiles{k});
-        matlabbatch{1}.spm.util.imcalc.output = con_map;
-        matlabbatch{1}.spm.util.imcalc.outdir = resRealDataDir;
+        matlabbatch{1}.spm.util.imcalc.output = con_map_norm;
+        matlabbatch{1}.spm.util.imcalc.outdir = {resRealDataDir};
         matlabbatch{1}.spm.util.imcalc.expression = ['i1/' num2str(fact(k))];
         matlabbatch{1}.spm.util.imcalc.options.dtype = 64;
         spm_jobman('run', matlabbatch);
@@ -73,7 +73,7 @@ function matlabbatch=ibma_on_real_data(recomputeZ)
         clear matlabbatch
         matlabbatch{1}.spm.util.imcalc.input = cellstr(stdConFiles{k});
         matlabbatch{1}.spm.util.imcalc.output = varcon_map_norm;
-        matlabbatch{1}.spm.util.imcalc.outdir = resRealDataDir;
+        matlabbatch{1}.spm.util.imcalc.outdir = {resRealDataDir};
         matlabbatch{1}.spm.util.imcalc.expression = ['(i1/' num2str(fact(k)) ').^2'];
         matlabbatch{1}.spm.util.imcalc.options.dtype = 64;
         spm_jobman('run', matlabbatch);
@@ -84,24 +84,32 @@ function matlabbatch=ibma_on_real_data(recomputeZ)
     % Convert contrast images to a single 4D nii
     con4dFileName = 'con_allstudies_norm.nii';
     clear matlabbatch
-    matlabbatch{1}.spm.util.cat.vols = conFiles;
+    matlabbatch{1}.spm.util.cat.vols = conFiles_norm;
     matlabbatch{1}.spm.util.cat.name = fullfile(resRealDataDir, con4dFileName);
     matlabbatch{1}.spm.util.cat.dtype = 0; % keep same type as input
     spm_jobman('run', matlabbatch)
 
+    % Remove Nan's (for FSL)
+    con4dFile = spm_select('FPList', resRealDataDir, ['^' con4dFileName]);
+    con4dImg = nifti(con4dFile);
+    con4dImg.dat(find(isnan(con4dImg.dat(:))))=0;
+
     % Convert contrast variance images to a single 4D nii
     varCon4dFileName =  'varcon_allstudies_norm.nii';
     clear matlabbatch
-    matlabbatch{1}.spm.util.cat.vols = varConFiles;
+    matlabbatch{1}.spm.util.cat.vols = varConFiles_norm;
     matlabbatch{1}.spm.util.cat.name = fullfile(resRealDataDir, varCon4dFileName);
     matlabbatch{1}.spm.util.cat.dtype = 0; % keep same type as input
     spm_jobman('run', matlabbatch)
 
+    % Remove Nan's (for FSL)
+    varCon4dFile = spm_select('FPList', resRealDataDir, ['^' varCon4dFileName]);
+    varCon4dImg = nifti(varCon4dFile);
+    varCon4dImg.dat(find(isnan(varCon4dImg.dat(:))))=0;
+
     z4dFileName = 'z_allstudies.nii';
     
     if recomputeZ
-        con4dFile = spm_select('FPList', resRealDataDir, con4dFileName);
-        varCon4dFile = spm_select('FPList', resRealDataDir, varCon4dFileName);
 
         % Create z-stat
         disp(con4dFile)
@@ -129,25 +137,46 @@ function matlabbatch=ibma_on_real_data(recomputeZ)
     end
     
     zFiles = cellstr(spm_select('ExtFPList', resRealDataDir, z4dFileName, 1:100));
+
+    maskFileName = 'mask.nii';
+    for k = 1:nStudies
+        varcon = os.path.join(export_dir, 'varcon_' + study_name + '_scaled.nii')
+        varcon_img = nib.load(varcon)
+        zero_positions = np.nonzero(np.logical_or(
+            varcon_img.get_data()==0,
+            np.isnan(varcon_img.get_data())))
+        
+        if mask is None:
+            mask = np.ones(varcon_img.shape)
+            mask[zero_positions] = 0
+        else:
+            mask[zero_positions] = 0
+
+    any_img = nib.load(varcon)
+    mask_img = nib.Nifti1Image(mask, any_img.get_qform())
+    nib.save(mask_img, os.path.join(export_dir, 'mask.nii.gz'))
+
+
     return;
     
     % --- Compute meta-analysis ---
     % GLM MFX (FLAME 1)
     megaMFXDir = fullfile(resRealDataDir, 'megaMFX');
+    fsl_design_dir = fullfile(rootdir, 'src', 'real_data', 'fsl_design');
     mkdir(megaMFXDir);
-    if ~exist(fullfile(megaMFX_dir, 'stats', 'zstat1.nii.gz'), 'file')
+    if ~exist(fullfile(megaMFXDir, 'stats', 'zstat1.nii.gz'), 'file')
         cwd = pwd;
         cd(resRealDataDir);
         system('fslmerge -t copes.nii.gz `ls | grep "^con_*"`');
-        movefile('copes.nii.gz', megaMFX_dir)
+        movefile('copes.nii.gz', megaMFXDir)
         system('fslmerge -t varcopes.nii.gz `ls | grep "^varcon_*"`');
-        movefile('varcopes.nii.gz', megaMFX_dir)
-        cd(megaMFX_dir)
+        movefile('varcopes.nii.gz', megaMFXDir)
+        cd(megaMFXDir)
         
         design = 'design_ones_21st';   
-        cmd = ['flameo --cope=' fullfile(megaMFX_dir, 'copes.nii.gz') ...
-                ' --vc=' fullfile(megaMFX_dir, 'varcopes.nii.gz') ...
-                ' --ld=stats --mask=' fullfile(path_to, 'mask.nii.gz')...
+        cmd = ['flameo --cope=' fullfile(megaMFXDir, 'copes.nii.gz') ...
+                ' --vc=' fullfile(megaMFXDir, 'varcopes.nii.gz') ...
+               ... % ' --ld=stats --mask=' fullfile(megaMFXDir, 'mask.nii.gz')...
                 ' --dm=' fullfile(fsl_design_dir, [design '.mat']) ...
                 ' --cs=' fullfile(fsl_design_dir, [design '.grp']) ...
                 ' --tc=' fullfile(fsl_design_dir, [design '.con']) ...
@@ -168,8 +197,8 @@ function matlabbatch=ibma_on_real_data(recomputeZ)
         cwd = pwd;
         cd(megaFFXDir)
         
-        copyfile(fullfile(megaMFX_dir, 'copes.nii.gz'), megaFFXDir)
-        copyfile(fullfile(megaMFX_dir, 'varcopes.nii.gz'), megaFFXDir)
+        copyfile(fullfile(megaMFXDir, 'copes.nii.gz'), megaFFXDir)
+        copyfile(fullfile(megaMFXDir, 'varcopes.nii.gz'), megaFFXDir)
         
         design = 'design_ones_21st';   
         cmd = ['flameo --cope=' fullfile(megaFFXDir, 'copes.nii.gz') ...
