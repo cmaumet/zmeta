@@ -136,12 +136,14 @@ function matlabbatch=ibma_on_real_data(recomputeZ)
         zNifti.dat(:,:,:,:) = zData;
     end
     
-    zFiles = cellstr(spm_select('ExtFPList', resRealDataDir, z4dFileName, 1:100));
+    z4dFile_allvols = cellstr(spm_select('ExtFPList', resRealDataDir, z4dFileName, 1:100));
+    con4dFile_allvols = cellstr(spm_select('ExtFPList', resRealDataDir, con4dFile, 1:100));
+    varCon4dFile_allvols = cellstr(spm_select('ExtFPList', resRealDataDir, varCon4dFile, 1:100));
 
     % Compute mask
     maskFileName = 'mask.nii';
     clear matlabbatch
-    matlabbatch{1}.spm.util.imcalc.input = cellstr(varConFiles_norm{k});
+    matlabbatch{1}.spm.util.imcalc.input = varCon4dFile_allvols;
     matlabbatch{1}.spm.util.imcalc.output = maskFileName;
     matlabbatch{1}.spm.util.imcalc.outdir = {resRealDataDir};
     matlabbatch{1}.spm.util.imcalc.expression = ['all(i1, 4)'];
@@ -212,34 +214,34 @@ function matlabbatch=ibma_on_real_data(recomputeZ)
     fisherDir = fullfile(resRealDataDir, 'fishers');
     mkdir(fisherDir);
     matlabbatch{1}.spm.tools.ibma.fishers.dir = {fisherDir};
-    matlabbatch{1}.spm.tools.ibma.fishers.zimages = zFiles;
+    matlabbatch{1}.spm.tools.ibma.fishers.zimages = z4dFile_allvols;
 
     % Stouffer's
     stoufferDir = fullfile(resRealDataDir, 'stouffers');
     mkdir(stoufferDir);
     matlabbatch{end+1}.spm.tools.ibma.stouffers.dir = {stoufferDir};
-    matlabbatch{end}.spm.tools.ibma.stouffers.zimages = zFiles;
+    matlabbatch{end}.spm.tools.ibma.stouffers.zimages = z4dFile_allvols;
     matlabbatch{end}.spm.tools.ibma.stouffers.rfx.RFX_no = 1;
 
     % Stouffer's MFX
     stoufferMFXDir = fullfile(resRealDataDir, 'stouffersMFX');
     mkdir(stoufferMFXDir);
     matlabbatch{end+1}.spm.tools.ibma.stouffers.dir = {stoufferMFXDir};
-    matlabbatch{end}.spm.tools.ibma.stouffers.zimages = zFiles;
+    matlabbatch{end}.spm.tools.ibma.stouffers.zimages = z4dFile_allvols;
     matlabbatch{end}.spm.tools.ibma.stouffers.rfx.RFX_yes = 0;
 
     % Optimally weighted z
     weightedZDir = fullfile(resRealDataDir, 'weightedZ');
     mkdir(weightedZDir);
     matlabbatch{end+1}.spm.tools.ibma.weightedz.dir = {weightedZDir};
-    matlabbatch{end}.spm.tools.ibma.weightedz.zimages = zFiles;
+    matlabbatch{end}.spm.tools.ibma.weightedz.zimages = z4dFile_allvols;
     matlabbatch{end}.spm.tools.ibma.weightedz.nsubjects = nSubjects;
 
     % Mega-analysis RFX
     megaRfxDir = fullfile(resRealDataDir, 'megaRFX');
     mkdir(megaRfxDir);
     matlabbatch{end+1}.spm.tools.ibma.megarfx.dir = {megaRfxDir};
-    matlabbatch{end}.spm.tools.ibma.megarfx.model.one.confiles = conFiles;
+    matlabbatch{end}.spm.tools.ibma.megarfx.model.one.confiles = con4dFile_allvols;
 
     % Permutation on conFiles
     matlabbatch{end+1}.spm.tools.snpm.des.OneSampT.DesignName = 'MultiSub: One Sample T test on diffs/contrasts';
@@ -247,16 +249,16 @@ function matlabbatch=ibma_on_real_data(recomputeZ)
     permutConDir = fullfile(resRealDataDir, 'permutCon');
     mkdir(permutConDir);
     matlabbatch{end}.spm.tools.snpm.des.OneSampT.dir = {permutConDir};
-    matlabbatch{end}.spm.tools.snpm.des.OneSampT.P = conFiles;
+    matlabbatch{end}.spm.tools.snpm.des.OneSampT.P = con4dFile_allvols;
     matlabbatch{end+1}.spm.tools.snpm.cp.snpmcfg = {fullfile(permutConDir, 'SnPMcfg.mat')};
 
-    % Permutation on zFiles
+    % Permutation on z4dFile_allvols
     matlabbatch{end+1}.spm.tools.snpm.des.OneSampT.DesignName = 'MultiSub: One Sample T test on diffs/contrasts';
     matlabbatch{end}.spm.tools.snpm.des.OneSampT.DesignFile = 'snpm_bch_ui_OneSampT';
     permutZDir = fullfile(resRealDataDir, 'permutZ');
     mkdir(permutZDir);
     matlabbatch{end}.spm.tools.snpm.des.OneSampT.dir = {permutZDir};
-    matlabbatch{end}.spm.tools.snpm.des.OneSampT.P = zFiles;
+    matlabbatch{end}.spm.tools.snpm.des.OneSampT.P = z4dFile_allvols;
     matlabbatch{end+1}.spm.tools.snpm.cp.snpmcfg = {fullfile(permutZDir, 'SnPMcfg.mat')};
 
     spm_jobman('run', matlabbatch)
