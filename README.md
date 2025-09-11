@@ -90,6 +90,12 @@ cd src/real_data
 > ibma_on_real_data
 ```
 
+Compute the true positive rates
+```console
+cd src/real_data
+python compute_TPR.py 
+```
+
 
 ##### Simulations
  1. Run the simulations on buster (cf. [zmeta_buster](https://github.com/cmaumet/zmeta_buster))
