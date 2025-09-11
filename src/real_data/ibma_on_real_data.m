@@ -138,45 +138,40 @@ function matlabbatch=ibma_on_real_data(recomputeZ)
     
     zFiles = cellstr(spm_select('ExtFPList', resRealDataDir, z4dFileName, 1:100));
 
-    maskFileName = 'mask.nii';
-    % for k = 1:nStudies
-    %     varcon = os.path.join(export_dir, 'varcon_' + study_name + '_scaled.nii')
-    %     varcon_img = nib.load(varcon)
-    %     zero_positions = np.nonzero(np.logical_or(
-    %         varcon_img.get_data()==0,
-    %         np.isnan(varcon_img.get_data())))
-        
-    %     if mask is None:
-    %         mask = np.ones(varcon_img.shape)
-    %         mask[zero_positions] = 0
-    %     else:
-    %         mask[zero_positions] = 0
-
-    % any_img = nib.load(varcon)
-    % mask_img = nib.Nifti1Image(mask, any_img.get_qform())
-    % nib.save(mask_img, os.path.join(export_dir, 'mask.nii.gz'))
-
-
-    return;
     
+    
+    copyfile(varCon4dFile, maskFile);
+    maskImg = nifti(maskFile);
+    maskImg.dat(:,:,:) = all(spm_read_vols(spm_vol(varCon4dFile)),4);
+
+    % Compute mask
+    maskFileName = 'mask.nii';
+    clear matlabbatch
+    matlabbatch{1}.spm.util.imcalc.input = cellstr(varConFiles_norm{k});
+    matlabbatch{1}.spm.util.imcalc.output = maskFileName;
+    matlabbatch{1}.spm.util.imcalc.outdir = {resRealDataDir};
+    matlabbatch{1}.spm.util.imcalc.expression = ['all(i1, 4)'];
+    matlabbatch{1}.spm.util.imcalc.options.dtype = 4; % signed short
+    spm_jobman('run', matlabbatch);
+    maskFile = fullfile(resRealDataDir, maskFileName);
+
     % --- Compute meta-analysis ---
     % GLM MFX (FLAME 1)
     megaMFXDir = fullfile(resRealDataDir, 'megaMFX');
     fsl_design_dir = fullfile(rootdir, 'src', 'real_data', 'fsl_design');
     mkdir(megaMFXDir);
     if ~exist(fullfile(megaMFXDir, 'stats', 'zstat1.nii.gz'), 'file')
+
+        copyfile(con4dFile, fullfile(megaMFXDir, 'copes.nii'));
+        copyfile(varCon4dFile, fullfile(megaMFXDir, 'varcopes.nii'));
+
         cwd = pwd;
-        cd(resRealDataDir);
-        system('fslmerge -t copes.nii.gz `ls | grep "^con_*"`');
-        movefile('copes.nii.gz', megaMFXDir)
-        system('fslmerge -t varcopes.nii.gz `ls | grep "^varcon_*"`');
-        movefile('varcopes.nii.gz', megaMFXDir)
         cd(megaMFXDir)
         
         design = 'design_ones_21st';   
-        cmd = ['flameo --cope=' fullfile(megaMFXDir, 'copes.nii.gz') ...
-                ' --vc=' fullfile(megaMFXDir, 'varcopes.nii.gz') ...
-               ... % ' --ld=stats --mask=' fullfile(megaMFXDir, 'mask.nii.gz')...
+        cmd = ['flameo --cope=' fullfile(megaMFXDir, 'copes.nii') ...
+                ' --vc=' fullfile(megaMFXDir, 'varcopes.nii') ...
+                ' --ld=stats --mask=' maskFile ...
                 ' --dm=' fullfile(fsl_design_dir, [design '.mat']) ...
                 ' --cs=' fullfile(fsl_design_dir, [design '.grp']) ...
                 ' --tc=' fullfile(fsl_design_dir, [design '.con']) ...
@@ -194,16 +189,16 @@ function matlabbatch=ibma_on_real_data(recomputeZ)
     megaFFXDir = fullfile(resRealDataDir, 'megaFFX');
     mkdir(megaFFXDir)
     if ~exist(fullfile(megaFFXDir, 'stats', 'zstat1.nii.gz'), 'file')
+        copyfile(fullfile(megaMFXDir, 'copes.nii'), megaFFXDir)
+        copyfile(fullfile(megaMFXDir, 'varcopes.nii'), megaFFXDir)
+
         cwd = pwd;
         cd(megaFFXDir)
-        
-        copyfile(fullfile(megaMFXDir, 'copes.nii.gz'), megaFFXDir)
-        copyfile(fullfile(megaMFXDir, 'varcopes.nii.gz'), megaFFXDir)
-        
+
         design = 'design_ones_21st';   
-        cmd = ['flameo --cope=' fullfile(megaFFXDir, 'copes.nii.gz') ...
-                ' --vc=' fullfile(megaFFXDir, 'varcopes.nii.gz') ...
-                ' --ld=stats --mask=' fullfile(path_to, 'mask.nii.gz')...
+        cmd = ['flameo --cope=' fullfile(megaFFXDir, 'copes.nii') ...
+                ' --vc=' fullfile(megaFFXDir, 'varcopes.nii') ...
+                ' --ld=stats --mask=' fullfile(path_to, 'mask.nii')...
                 ' --dm=' fullfile(fsl_design_dir, [design '.mat']) ...
                 ' --cs=' fullfile(fsl_design_dir, [design '.grp']) ...
                 ' --tc=' fullfile(fsl_design_dir, [design '.con']) ...
@@ -217,9 +212,8 @@ function matlabbatch=ibma_on_real_data(recomputeZ)
         disp('Mega MFX already computed')
     end
 
-
-
     matlabbatch = {};
+
     % Fisher's
     fisherDir = fullfile(resRealDataDir, 'fishers');
     mkdir(fisherDir);
