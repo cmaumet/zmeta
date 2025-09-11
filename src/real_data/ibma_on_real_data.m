@@ -129,8 +129,67 @@ function matlabbatch=ibma_on_real_data(recomputeZ)
     end
     
     zFiles = cellstr(spm_select('ExtFPList', resRealDataDir, z4dFileName, 1:100));
+    return;
     
     % --- Compute meta-analysis ---
+    % GLM MFX (FLAME 1)
+    megaMFXDir = fullfile(resRealDataDir, 'megaMFX');
+    mkdir(megaMFXDir);
+    if ~exist(fullfile(megaMFX_dir, 'stats', 'zstat1.nii.gz'), 'file')
+        cwd = pwd;
+        cd(resRealDataDir);
+        system('fslmerge -t copes.nii.gz `ls | grep "^con_*"`');
+        movefile('copes.nii.gz', megaMFX_dir)
+        system('fslmerge -t varcopes.nii.gz `ls | grep "^varcon_*"`');
+        movefile('varcopes.nii.gz', megaMFX_dir)
+        cd(megaMFX_dir)
+        
+        design = 'design_ones_21st';   
+        cmd = ['flameo --cope=' fullfile(megaMFX_dir, 'copes.nii.gz') ...
+                ' --vc=' fullfile(megaMFX_dir, 'varcopes.nii.gz') ...
+                ' --ld=stats --mask=' fullfile(path_to, 'mask.nii.gz')...
+                ' --dm=' fullfile(fsl_design_dir, [design '.mat']) ...
+                ' --cs=' fullfile(fsl_design_dir, [design '.grp']) ...
+                ' --tc=' fullfile(fsl_design_dir, [design '.con']) ...
+                ' --runmode=flame1'];
+        disp(cmd)
+        save('cmd.mat', 'cmd')
+        system(cmd);
+        
+        cd(cwd) 
+    else
+        disp('Mega MFX already computed')
+    end
+
+    % GLM FFX (via FSL)
+    megaFFXDir = fullfile(resRealDataDir, 'megaFFX');
+    mkdir(megaFFXDir)
+    if ~exist(fullfile(megaFFXDir, 'stats', 'zstat1.nii.gz'), 'file')
+        cwd = pwd;
+        cd(megaFFXDir)
+        
+        copyfile(fullfile(megaMFX_dir, 'copes.nii.gz'), megaFFXDir)
+        copyfile(fullfile(megaMFX_dir, 'varcopes.nii.gz'), megaFFXDir)
+        
+        design = 'design_ones_21st';   
+        cmd = ['flameo --cope=' fullfile(megaFFXDir, 'copes.nii.gz') ...
+                ' --vc=' fullfile(megaFFXDir, 'varcopes.nii.gz') ...
+                ' --ld=stats --mask=' fullfile(path_to, 'mask.nii.gz')...
+                ' --dm=' fullfile(fsl_design_dir, [design '.mat']) ...
+                ' --cs=' fullfile(fsl_design_dir, [design '.grp']) ...
+                ' --tc=' fullfile(fsl_design_dir, [design '.con']) ...
+                ' --runmode=fe'];
+        disp(cmd)
+        save('cmd.mat', 'cmd')
+        system(cmd);
+        
+        cd(cwd) 
+    else
+        disp('Mega MFX already computed')
+    end
+
+
+
     matlabbatch = {};
     % Fisher's
     fisherDir = fullfile(resRealDataDir, 'fishers');
@@ -164,14 +223,6 @@ function matlabbatch=ibma_on_real_data(recomputeZ)
     mkdir(megaRfxDir);
     matlabbatch{end+1}.spm.tools.ibma.megarfx.dir = {megaRfxDir};
     matlabbatch{end}.spm.tools.ibma.megarfx.model.one.confiles = conFiles;
-
-    % Mega-analysis FFX
-    megaFfxDir = fullfile(resRealDataDir, 'megaFFX');
-    mkdir(megaFfxDir);
-    matlabbatch{end+1}.spm.tools.ibma.megaffx.dir = {megaFfxDir};
-    matlabbatch{end}.spm.tools.ibma.megaffx.confiles = conFiles;
-    matlabbatch{end}.spm.tools.ibma.megaffx.varconfiles = varConFiles;
-    matlabbatch{end}.spm.tools.ibma.megaffx.samplesize.unequal.nsubjects = nSubjects;
 
     % Permutation on conFiles
     matlabbatch{end+1}.spm.tools.snpm.des.OneSampT.DesignName = 'MultiSub: One Sample T test on diffs/contrasts';
