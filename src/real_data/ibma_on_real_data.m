@@ -138,12 +138,6 @@ function matlabbatch=ibma_on_real_data(recomputeZ)
     
     zFiles = cellstr(spm_select('ExtFPList', resRealDataDir, z4dFileName, 1:100));
 
-    
-    
-    copyfile(varCon4dFile, maskFile);
-    maskImg = nifti(maskFile);
-    maskImg.dat(:,:,:) = all(spm_read_vols(spm_vol(varCon4dFile)),4);
-
     % Compute mask
     maskFileName = 'mask.nii';
     clear matlabbatch
