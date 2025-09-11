@@ -7,7 +7,7 @@ function matlabbatch=ibma_on_real_data(recomputeZ)
     analysisDir = fullfile(filedir, '..', '..', 'data');
 
     realDataDir = fullfile(analysisDir, 'real_data');
-    resRealDataDir = fullfile('real_data', 'processed');
+    resRealDataDir = fullfile(realDataDir, 'processed');
 
     if ! isfolder(realDataDir)
         mkdir(realDataDir)
@@ -17,9 +17,11 @@ function matlabbatch=ibma_on_real_data(recomputeZ)
     end
 
     nSubjects = [25 25 20 20 9 9 9 12 12 12 12 13 32 24 14 14 12 12 16 16 16];
-    spm_studies = [repmat(true, 1, 10) repmat(false, 1, 11)]
+    % spm_studies = [repmat(true, 1, 10) repmat(false, 1, 11)];
 
     sum_weights = [1 1 1 1 1 1 1 2 2 2 2 1 2 4 4 4 2 2 1 2 1];
+    soft_weights =  [repmat(2, 1, 10) repmat(100, 1, 11)];
+    fact = sum_weights.*soft_weights
 
     % [('pain_01', 1), ('pain_02', 1), ('pain_03', 1), ('pain_04', 1),
     %                ('pain_05', 1), ('pain_06', 1), ('pain_07', 1), ('pain_08', 2),
@@ -38,7 +40,9 @@ function matlabbatch=ibma_on_real_data(recomputeZ)
     stdConFiles = cell(nStudies,1);
     % studyDirs = cell{nStudies, 1};
     for k = 1:nStudies
-        studyDirs{k,1} = fullfile(resRealDataDir, ...
+        studyDirs{k,1} = fullfile(realDataDir, ...
+            strcat('pain_', num2str(k, '%02d'), '.nidm'));
+        studyDirsRes{k,1} = fullfile(resRealDataDir, ...
             strcat('pain_', num2str(k, '%02d'), '.nidm'));
         conFiles{k,1} = spm_select('FPList', studyDirs{k}, 'Contrast.nii');
         stdConFiles{k,1} = spm_select('FPList', studyDirs{k}, 'ContrastStandardError.nii');
@@ -54,35 +58,29 @@ function matlabbatch=ibma_on_real_data(recomputeZ)
     varConFiles_norm = cell(nStudies,1);
     conFiles_norm = cell(nStudies,1);
     for k = 1:nStudies
-        if spm_studies(k)
-            soft_factor = 2 % SPM study
-        else
-            soft_factor = 100 % FSL study
+        if ! isfolder(studyDirsRes{k,1})
+            mkdir(studyDirsRes{k,1})
         end
-
-        conweights = sum_weights(k);
-
-        fact = conweights*soft_factor;
 
         clear matlabbatch
         matlabbatch{1}.spm.util.imcalc.input = cellstr(conFiles{k});
         matlabbatch{1}.spm.util.imcalc.output = 'Contrast_norm.nii';
-        matlabbatch{1}.spm.util.imcalc.outdir = studyDirs(k);
-        matlabbatch{1}.spm.util.imcalc.expression = ['i1./' fact];
+        matlabbatch{1}.spm.util.imcalc.outdir = studyDirsRes(k,1);
+        matlabbatch{1}.spm.util.imcalc.expression = ['i1/' num2str(fact(k))];
         matlabbatch{1}.spm.util.imcalc.options.dtype = 64;
         spm_jobman('run', matlabbatch);
 
-        conFiles_norm{k,1} = fullfile(studyDirs{k}, 'Contrast_norm.nii');
+        conFiles_norm{k,1} = fullfile(studyDirsRes{k}, 'Contrast_norm.nii');
 
         clear matlabbatch
         matlabbatch{1}.spm.util.imcalc.input = cellstr(stdConFiles{k});
         matlabbatch{1}.spm.util.imcalc.output = 'ContrastVariance_norm.nii';
-        matlabbatch{1}.spm.util.imcalc.outdir = studyDirs(k);
-        matlabbatch{1}.spm.util.imcalc.expression = ['(i1./' fact ').^2'];
+        matlabbatch{1}.spm.util.imcalc.outdir = studyDirsRes(k,1);
+        matlabbatch{1}.spm.util.imcalc.expression = ['(i1/' num2str(fact(k)) ').^2'];
         matlabbatch{1}.spm.util.imcalc.options.dtype = 64;
         spm_jobman('run', matlabbatch);
 
-        varConFiles_norm{k,1} = fullfile(studyDirs{k}, 'ContrastVariance_norm.nii');
+        varConFiles_norm{k,1} = fullfile(studyDirsRes{k}, 'ContrastVariance_norm.nii');
     end
     
     % Convert contrast images to a single 4D nii
