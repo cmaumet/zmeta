@@ -21,7 +21,7 @@ function matlabbatch=ibma_on_real_data(recomputeZ)
 
     sum_weights = [1 1 1 1 1 1 1 2 2 2 2 1 2 4 4 4 2 2 1 2 1];
     soft_weights =  [repmat(2, 1, 10) repmat(100, 1, 11)];
-    fact = sum_weights.*soft_weights
+    fact = sum_weights.*soft_weights;
 
     % [('pain_01', 1), ('pain_02', 1), ('pain_03', 1), ('pain_04', 1),
     %                ('pain_05', 1), ('pain_06', 1), ('pain_07', 1), ('pain_08', 2),
