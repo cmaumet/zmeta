@@ -136,9 +136,9 @@ function matlabbatch=ibma_on_real_data(recomputeZ)
         zNifti.dat(:,:,:,:) = zData;
     end
     
-    z4dFile_allvols = cellstr(spm_select('ExtFPList', resRealDataDir, z4dFileName, 1:100));
-    con4dFile_allvols = cellstr(spm_select('ExtFPList', resRealDataDir, con4dFileName, 1:100));
-    varCon4dFile_allvols = cellstr(spm_select('ExtFPList', resRealDataDir, varCon4dFileName, 1:100));
+    z4dFile_allvols = cellstr(spm_select('ExtFPList', resRealDataDir, ['^' z4dFileName], 1:100));
+    con4dFile_allvols = cellstr(spm_select('ExtFPList', resRealDataDir, ['^' con4dFileName], 1:100));
+    varCon4dFile_allvols = cellstr(spm_select('ExtFPList', resRealDataDir, ['^' varCon4dFileName], 1:100));
 
     % Compute mask
     maskFileName = 'mask.nii';
