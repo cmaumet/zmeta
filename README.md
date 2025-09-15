@@ -69,17 +69,26 @@ Then in the R console, Fig.3 can be generated with:
 <Specify precise steps, including any datasets that need to be downloaded and path variables that need to be set>
 ### Simulations
 
- - Set the path to output folder in config_path
+#### Install
+ - Set the path to output folder in config_path ==> script should be updated !!
  - change the command to launch octave (as per your OAR cluster)
  - install spm for Octave
- 
+
+#### Run
 ```console
 cd src/simus
 run_simulation.sh 
 ```
 
+- need to run though all the sets of parameters in files within paramarrays folder
+
+Useful commands see (in another file)
 check job running 
 oarstat | grep cmaumet
+how to check for any error in an OAR file and how to retreive parameters from those in order to reset new jobs
+
+#### Export results
+
 
 ### Real data
 #### Download the data
