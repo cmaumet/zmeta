@@ -17,7 +17,7 @@ scriptDir = os.path.dirname(os.path.abspath(__file__))
 rootDir = os.path.abspath(os.path.join(scriptDir, os.pardir, os.pardir))
 
 
-pain_GT_img = nib.load(os.path.join(rootDir, 'data', 'real_data', 'GT', 'pain_gt.nii'))
+pain_GT_img = nib.load(os.path.join(rootDir, 'data', 'raw', 'real_data', 'GT', 'pain_uniformity-test_z_FDR_0.01.nii'))
 
 
 # ### Save true positive rate for each p-value threshold
@@ -42,7 +42,7 @@ GT[np.nonzero(pain_GT_img.get_fdata()>0)] = 1
 # In[5]:
 
 
-def save_TPR_to_csv(meth, csv_file, GT, p_log10_file=None, z_file=None):
+def save_TPR_to_csv(meth, csv_file, GT, p_log10_file=None, z_file=None, mask_file=None):
     if not p_log10_file:
         if not z_file:
             raise Exception('One of p_log10_file or z_file must be specified')
@@ -56,7 +56,8 @@ def save_TPR_to_csv(meth, csv_file, GT, p_log10_file=None, z_file=None):
 
        
     # Mask out NaN values    
-    in_mask = np.nonzero(np.logical_not(np.isnan(minuslog10p_values)))
+    mask_img = nib.load(mask_file)
+    in_mask = np.nonzero(mask_img.get_fdata()) #np.nonzero(np.logical_not(np.isnan(minuslog10p_values)))
     minuslog10p_values = minuslog10p_values[in_mask]
     GT = GT[in_mask]
     
@@ -73,33 +74,44 @@ def save_TPR_to_csv(meth, csv_file, GT, p_log10_file=None, z_file=None):
             if p<=1:
                 spamwriter.writerow([meth, p, TruePositives/Positives])
 
-real_data_resdir = os.path.join(rootDir, 'results', 'real_data')
+real_data_resdir = os.path.join(rootDir, 'data', 'derived', 'real_data')
 
-csv_file=os.path.join(real_data_resdir, 'realdata_TPR.csv')
+csv_file=os.path.join(rootDir, 'results', 'realdata_TPR.csv')
 
 # Write csv file header
 with open(csv_file,'w') as csvf:
     spamwriter = csv.writer(csvf)
     spamwriter.writerow(['Method', 'p', 'TPR'])   
     
+mask_file = os.path.join(real_data_resdir, 'mask.nii');
+
 save_TPR_to_csv('fishers', csv_file, GT, 
-                p_log10_file=os.path.join(real_data_resdir, 'fishers', 'fishers_ffx_minus_log10_p.nii'))
+                p_log10_file=os.path.join(real_data_resdir, 'fishers', 'fishers_ffx_minus_log10_p.nii'),
+                mask_file=mask_file)
 save_TPR_to_csv('stouffers', csv_file, GT, 
-                p_log10_file=os.path.join(real_data_resdir, 'stouffers', 'stouffers_ffx_minus_log10_p.nii'))
+                p_log10_file=os.path.join(real_data_resdir, 'stouffers', 'stouffers_ffx_minus_log10_p.nii'),
+                mask_file=mask_file)
 save_TPR_to_csv('weightedZ', csv_file, GT, 
-                p_log10_file=os.path.join(real_data_resdir, 'WeightedZ', 'weightedz_ffx_minus_log10_p.nii'))
+                p_log10_file=os.path.join(real_data_resdir, 'WeightedZ', 'weightedz_ffx_minus_log10_p.nii'),
+                mask_file=mask_file)
 save_TPR_to_csv('stouffersMFX', csv_file, GT, 
-                p_log10_file=os.path.join(real_data_resdir, 'StouffersMFX', 'stouffers_rfx_minus_log10_p.nii'))
+                p_log10_file=os.path.join(real_data_resdir, 'StouffersMFX', 'stouffers_rfx_minus_log10_p.nii'),
+                mask_file=mask_file)
 save_TPR_to_csv('megaFFX', csv_file, GT, 
-                z_file=os.path.join(real_data_resdir, 'megaFFX', 'stats', 'zstat1.nii.gz'))
+                z_file=os.path.join(real_data_resdir, 'megaFFX', 'stats', 'zstat1.nii.gz'),
+                mask_file=mask_file)
 save_TPR_to_csv('megaMFX', csv_file, GT, 
-                z_file=os.path.join(real_data_resdir, 'megaMFX', 'stats', 'zstat1.nii.gz'))
+                z_file=os.path.join(real_data_resdir, 'megaMFX', 'stats', 'zstat1.nii.gz'),
+                mask_file=mask_file)
 save_TPR_to_csv('megaRFX', csv_file, GT, 
-                p_log10_file=os.path.join(real_data_resdir, 'megaRFX', 'mega_rfx_minus_log10_p.nii'))
+                p_log10_file=os.path.join(real_data_resdir, 'megaRFX', 'mega_rfx_minus_log10_p.nii'),
+                mask_file=mask_file)
 save_TPR_to_csv('permutCon', csv_file, GT, 
-                p_log10_file=os.path.join(real_data_resdir, 'permutCon', 'lP+.img'))
+                p_log10_file=os.path.join(real_data_resdir, 'permutCon', 'lP+.img'),
+                mask_file=mask_file)
 save_TPR_to_csv('permutZ', csv_file, GT, 
-                p_log10_file=os.path.join(real_data_resdir, 'permutZ', 'lP+.img'))
+                p_log10_file=os.path.join(real_data_resdir, 'permutZ', 'lP+.img'),
+                mask_file=mask_file)
 
 
 # In[ ]:
