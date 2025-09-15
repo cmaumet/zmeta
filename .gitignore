@@ -62,10 +62,16 @@ fsl_design/*.fsf
 
 *.DS_Store
 
-# For now do not store figures in pdf format (only png)
-Paper/figures/*.pdf
 
 *.pyc
 
 # Backup data folder
 data_safe/**
+
+*.m~
+
+src/simus/fsl_designs/*.png
+src/simus/fsl_designs/*/*.ppm
+
+*.DS_Store
+
