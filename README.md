@@ -70,10 +70,14 @@ Then in the R console, Fig.3 can be generated with:
 ### Real data
 #### Download the data
 ```console
-mkdir data/real_data
-cd data/real_data
+mkdir data/raw
+mkdir data/raw/real_data
+cd data/raw/real_data/
 for i in {01..21}; do  mkdir "pain_$i.nidm"; cd "pain_$i.nidm"; curl --ssl-no-revoke -L "https://neurovault.org/collections/1425/pain_$i.nidm.zip" -o "pain_$i.nidm.zip"; unzip "pain_$i.nidm.zip"; gunzip *.gz; cd ..; done
-cd ../..
+mkdir GT
+cd GT
+curl -L "https://neurosynth.org/api/images/402/download/" -o pain_gt.nii.gz ; gunzip *.gz;
+cd ../../../..
 ```
 
 #### Run analysis
@@ -85,6 +89,12 @@ cd src/real_data
 > addpath('<PATH_TO_SPM>')
 > pkg load statistics
 > ibma_on_real_data
+```
+
+Compute the true positive rates
+```console
+cd src/real_data
+python compute_TPR.py 
 ```
 
 

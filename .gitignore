@@ -49,7 +49,7 @@ unused*
 
 # data
 # Ignore all directories called data
-data/*.csv
+data/*
 
 # Ignore all simulation results
 results/simus/*
