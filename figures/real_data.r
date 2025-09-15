@@ -3,14 +3,15 @@ library('cowplot')
 theme_set(theme_gray()) # switch to default ggplot2 theme for good
 theme_update(panel.background = element_rect(fill = "grey95"))
 
-realdata <- read.csv(file.path('..', 'zmeta_rocs', 'results', 'realdata_TPR.csv'), header=T, sep=",")
+realdata <- read.csv(file.path('..', 'results', 'realdata_TPR.csv'), header=T, sep=",")
+realdata$Method <- as.factor(realdata$Method)
 
 p <- ggplot(data=subset(realdata, p<0.1),aes(x=(p), y=TPR, group=Method, colour=factor(Method))) + 
 geom_line() + ggtitle('real data: ROC curve using theoretical FPR') + theme(legend.position = 'bottom')
 
 print(p)
 
-simufpr <- read.csv(file.path('data', 'allsimudat_test1_k025_n20_nominal.csv'))
+simufpr <- read.csv(file.path('..', 'results', 'allsimudat_test1_k025_n20_nominal_38.csv'))
 
 # Only looking at nominal data under some heterogeneity
 simufpr <- subset(simufpr, Between==1 & unitMism=='nominal')
@@ -20,9 +21,9 @@ head(simufpr)
 realdata_withsimuFPR = data.frame()
 
 for (within in unique(simufpr$Within)){
-#     print(within)
+     print(within)
 for (variation in unique(simufpr$withinVariation)){
-#     print(variation)
+     print(variation)
     currdat <- realdata
     currdat$withinVariation <- variation
     currdat$Between <- 1
@@ -33,25 +34,31 @@ for (variation in unique(simufpr$withinVariation)){
     length(methods)
     
     for (meth in methods){
-#         print(paste('Currently: ', meth))
+        print(paste('Currently: ', meth))
         th_p = currdat[currdat$Method==meth,]$p
        
         sub_df = subset(simufpr, Between==1 & Within==within & withinVariation==variation & methods == meth)
         
         if (nrow(sub_df)>0){
+            print("we approx")
             approximated = approx(x=sub_df$P, y=sub_df$expectedP, xout=th_p, yleft=0)
-    #         plot(sub_df$P, sub_df$expectedP, main = "approx")
-    #         points(approximated, col = 2, pch = "*")
+             plot(sub_df$P, sub_df$expectedP, main = "approx")
+             points(approximated, col = 2, pch = "*")
             currdat[currdat$Method==meth,]$FPR <- approximated$y
+        } else {
+            print("sub_df no rows")
+            return('stopping here')
         }
     }
     
 #     currdat[currdat$p==0,]$FPR <- 0
 #     print(currdat[currdat$p==0,]$FPR) 
     if (! all(is.na(currdat$FPR))){
+        print("not all nan")
         currdat[currdat$p==1,]$FPR <- 1
-        realdata_withsimuFPR <- rbind(realdata_withsimuFPR, currdat)
-
+        realdata_withsimuFPR <- rbind(realdata_withsimuFPR, currdat) } 
+    else {
+        print("ALL nan")
     }
     
 }
@@ -169,7 +176,7 @@ roc_plots_with_zoom <- function(data, facet_formula, ttl=''){
      # Panel B: Against simulated FPR & under varying levels of heterogenerity
     p2 <- roc_plot(data, aes(x=FPR, y=TPR)) + 
             facet_grid(facet_formula, labeller = labeller(heterogeneity = heterogeneity_labels,
-                           withinVariation = heteroscedasticity_labels)) + theme(legend.position="none") + 
+                           withinVariation = heteroscedasticity_labels)) + 
         geom_rect(aes(xmin=0, xmax=2.5, ymin=85,ymax=95), alpha=0.2, color="grey", fill=NA, size=0.1) +   
                 ggtitle(ttl)
 #         geom_rect(mapping=aes(xmin=0, xmax=2.5, ymin=85, ymax=95), color="black", alpha=0.5, fill=NA)
@@ -177,7 +184,7 @@ roc_plots_with_zoom <- function(data, facet_formula, ttl=''){
     p3 <- roc_plot(data, aes(x=FPR, y=TPR), 
                    c(.85, .95), c(0, 0.025)) + 
             facet_grid(facet_formula, labeller = labeller(heterogeneity = heterogeneity_labels,
-                           withinVariation = heteroscedasticity_labels)) + theme(legend.position="none") 
+                           withinVariation = heteroscedasticity_labels)) 
     
     rect <- data.frame(xmin=0, xmax=0.025, ymin=.85, ymax=.95)
 
@@ -249,7 +256,8 @@ roc_plots <- function(data){
     return(p)
 }
 
-p <- roc_plots(realdata)
+realdata_withsimuFPR = subset(realdata_withsimuFPR, Method=="megaFFX")
+p <- roc_plots(subset(realdata, Method=="megaFFX")); print(p)
 
 # print on screen
 print(p)
@@ -279,6 +287,7 @@ for (within in unique(realdata_withsimuFPR$Within)){
     for (variation in unique(realdata_withsimuFPR$withinVariation)){
 
         methods <- levels(realdata_withsimuFPR$Method)
+        print(methods)
 
         for (meth in methods){
 
@@ -305,22 +314,22 @@ print(auc_df[(auc_df$auc)>1,])
 # p <- ggplot(data=auc_df, aes=aes(x=Within, y=auc_value)) + geom_point()
 # print(p)
 
-p1 <- ggplot(data=subset(auc_df,withinVariation==1),aes(x=Within, y=auc, group=methods, colour=methods)) + 
-geom_line() + ggtitle('heterogeneity') + theme(legend.position = 'none') + 
+p1 <- ggplot(data=subset(auc_df,withinVariation==1 & methods=="megaFFX"),aes(x=Within, y=auc, group=methods, colour=methods)) + 
+geom_line() + ggtitle('heterogeneity') + 
 coord_cartesian(ylim = c(0.94, 0.96)) 
 
-p2 <- ggplot(data=subset(auc_df,withinVariation>1),aes(x=withinVariation, y=auc, group=methods, colour=methods)) + 
-geom_line() + ggtitle('heteroscedasticity') + theme(legend.position = 'none') + 
+p2 <- ggplot(data=subset(auc_df,withinVariation>1 & methods=="megaFFX"),aes(x=withinVariation, y=auc, group=methods, colour=methods)) + 
+geom_line() + ggtitle('heteroscedasticity') + 
 coord_cartesian(ylim = c(0.945, 0.9555)) 
 
 row <- plot_grid(p1, p2, labels = c('A', 'B'), ncol=1)
     
-title <- ggdraw() + draw_label('AUC plots')
-legend <- get_legend(p1 + theme(legend.position="bottom"))
-#     p <- plot_grid(p, legend, ncol = 1, rel_heights = c(1, .2))
+# title <- ggdraw() + draw_label('AUC plots')
+# legend <- get_legend(p1 + theme(legend.position="bottom"))
+# #     p <- plot_grid(p, legend, ncol = 1, rel_heights = c(1, .2))
     
-p <- plot_grid(title, row, legend, ncol=1, rel_heights=c(0.1, 1, 0.1)) + 
-        theme(plot.title=element_text(size=12), text=element_text(size=10))
+# p <- plot_grid(title, row, legend, ncol=1, rel_heights=c(0.1, 1, 0.1)) + 
+#         theme(plot.title=element_text(size=12), text=element_text(size=10))
 
 
 print(p)
