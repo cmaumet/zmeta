@@ -2,6 +2,8 @@
 logoctave.txt
 logs/*
 
+src/simus/config_path.m
+
 # notebooks checkpoints
 *checkpoint.ipynb
 
