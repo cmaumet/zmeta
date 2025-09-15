@@ -1,4 +1,4 @@
-function export_sim(spm_path, niter)
+function export_sim(path_to_spm, niter)
   code_dir = fileparts(mfilename('fullpath'));
     
   addpath(fullfile(code_dir, 'lib'))
