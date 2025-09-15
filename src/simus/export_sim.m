@@ -11,5 +11,5 @@ function export_sim(path_to_spm, niter)
   base_dir = config_path();
 
   ndatapoints = 30*30*30*niter
-  export_full_simulations(ndatapoints, base_dir, false)
+  export_full_simulations(ndatapoints, base_dir, false, 'test1_k025_n20*_nominal')
 end
