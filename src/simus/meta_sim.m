@@ -1,4 +1,4 @@
-function meta_sim(base_dir, redo, path_to_spm, task_id, within_id, k_id, test_id, btw_id, avgn_id)
+function meta_sim(redo, path_to_spm, task_id, within_id, k_id, test_id, btw_id, avgn_id)
     % META_SIM  Simulate meta-analyses results under the null
     %   META_SIM(base_dir, REDO) Create simulation results in a 
     %       'simulations' folder under base_dir. Overwrite existing
@@ -26,11 +26,14 @@ function meta_sim(base_dir, redo, path_to_spm, task_id, within_id, k_id, test_id
     end
     script_dir = fileparts(mfilename('fullpath'));
     
-    addpath(fullfile(script_dir, 'lib'))    
+    addpath(fullfile(script_dir, 'lib'))
     if dofsl
         fsl_designs_dir = fullfile(script_dir, 'fsl_designs')
     end
     
+    % ----- Load configuration file ----
+    base_dir = config_path();
+
     % ----- Simulation parameters --------
 
     % ---------------
