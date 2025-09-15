@@ -16,8 +16,11 @@ cd $HOME/code/zmeta
 tempfile=$(mktemp)
 
 cat > $tempfile <<EOF
+pwd
 addpath(pwd);
 addpath(fullfile(pwd, 'lib'));
+
+which export_sim
 
 export_sim(fullfile(pwd, '..', '..', '..', 'spm12-r7771'), $1)
 EOF
