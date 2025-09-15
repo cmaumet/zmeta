@@ -63,16 +63,18 @@ soft2_labels <- function(value){
     out_value
 }
 
-load_data_from_csv <- function(pattern, folder, iter){
+load_data_from_csv <- function(pattern, simu_dir, iter){
     suffix <- gsub('[^a-zA-Z_0-9]', '', pattern)
     suffix <- paste(suffix, '_', iter, sep="")
     simufilename <- paste('allsimudat_', suffix,'.csv', sep="")
-    csv_file = paste(getwd(), '/../../results/', simufilename, sep="")
+    csvdir = file.path(simu_dir, "..");
+    print(csvdir)
+    csv_file = file.path(csvdir, simufilename)
 
     if (! file.exists(csv_file)){
         print(paste('pattern=', suffix))
         print(paste('CSV file', csv_file,' not found, reprocessing the data.'))
-        get_expected_pval_and_equiv_z(pattern, csv_file, folder, iter)
+        get_expected_pval_and_equiv_z(pattern, csv_file, simu_dir, iter)
     } else {
         print(paste('Reading from ', simufilename))
     }
@@ -82,7 +84,7 @@ load_data_from_csv <- function(pattern, folder, iter){
 
     # Recompute the confidence bounds
     # percent = 0.05/(30*30*30*38)
-    percent = 0.001
+    percent = 0.05
     if (percent!=0.05){
         simudata$p_upper <- qbeta(percent/2, simudata$rankP, simudata$nSimu-simudata$rankP +1)
         simudata$z_upper <- qnorm(simudata$p_upper, lower.tail=FALSE)
