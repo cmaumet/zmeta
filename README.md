@@ -67,6 +67,20 @@ Then in the R console, Fig.3 can be generated with:
 <Instructions on how to (1) obtain raw data; (2) process it to create summary/derived data in the `results`>
 
 <Specify precise steps, including any datasets that need to be downloaded and path variables that need to be set>
+### Simulations
+
+ - Set the path to output folder in config_path
+ - change the command to launch octave (as per your OAR cluster)
+ - install spm for Octave
+ 
+```console
+cd src/simus
+run_simulation.sh 
+```
+
+check job running 
+oarstat | grep cmaumet
+
 ### Real data
 #### Download the data
 ```console
