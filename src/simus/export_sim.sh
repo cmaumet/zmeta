@@ -28,7 +28,7 @@ EOF
 cat $tempfile
 
 export PATH=/home/cmaumet/fsl/share/fsl/bin:$PATH
-guix shell octave -- octave $tempfile
+guix time-machine -C ~/.config/guix/channels_octave_9.2.0.scm -- shell octave -- octave $tempfile
 
 # rm $tempfile
 
