@@ -88,6 +88,11 @@ oarstat | grep cmaumet
 how to check for any error in an OAR file and how to retreive parameters from those in order to reset new jobs
 
 #### Export results
+```console
+cd src/simus
+run_export.sh 
+```
+
 
 
 ### Real data
