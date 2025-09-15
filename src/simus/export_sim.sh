@@ -17,8 +17,9 @@ tempfile=$(mktemp)
 
 cat > $tempfile <<EOF
 addpath(pwd);
+addpath(fullfile(pwd, 'lib'));
 
-export_sim($1)
+export_sim(fullfile(pwd, '..', '..', '..', 'spm12-r7771'), $1)
 EOF
 
 cat $tempfile
