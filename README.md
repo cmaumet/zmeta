@@ -71,7 +71,7 @@ Then in the R console, Fig.3 can be generated with:
 
 #### Install
  - Set the path to output folder in config_path ==> script should be updated !!
- - change the command to launch octave (as per your OAR cluster)
+ - change the command to launch octave (as per your OAR cluster) in both run_sim and run_export scripts
  - install spm for Octave
 
 #### Run
