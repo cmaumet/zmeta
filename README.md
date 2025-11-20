@@ -99,6 +99,13 @@ python compute_TPR.py
 
 
 ##### Simulations
+```console
+cd src/simus
+```
+For each parameter file found in parameterarrays (can create a custom using create_param_array), update `run_simulations.sh` to point to the parameter array file.
+```console
+./run_simulations.sh
+```
  1. Run the simulations on buster (cf. [zmeta_buster](https://github.com/cmaumet/zmeta_buster))
  2. Export p-values into csv file in Matlab
 
