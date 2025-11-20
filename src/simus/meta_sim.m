@@ -100,7 +100,7 @@ function meta_sim(redo, path_to_spm, task_id, within_id, k_id, test_id, btw_id, 
         rng_seed = 1;
     else
         cluster = true;
-        rng_seed = task_id;
+        rng_seed = task_id*2;
         disp('This simulation is run on a cluster')
         disp(['This is job ' job_id])
     end
