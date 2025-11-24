@@ -11,7 +11,7 @@ set -x
 echo "params " $1 
 
 cwd=`pwd`
-cd $HOME/code/zmeta
+cd $HOME/code/zmeta/src/simus
 
 tempfile=$(mktemp)
 
