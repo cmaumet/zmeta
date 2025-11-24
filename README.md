@@ -106,6 +106,15 @@ For each parameter file found in parameterarrays (can create a custom using crea
 ```console
 ./run_simulations.sh
 ```
+
+Check if some runs have errors
+cat `grep -l OAR_*.err -e error`
+
+Retreive the corresponding parameter sets and rerun :
+cat `grep -l OAR_*.err -e error` | grep params | tr "' " " " | tr "+ echo params " " " | tr -s " " > paramtorerun
+
+
+
  1. Run the simulations on buster (cf. [zmeta_buster](https://github.com/cmaumet/zmeta_buster))
  2. Export p-values into csv file in Matlab
 
