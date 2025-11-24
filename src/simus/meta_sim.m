@@ -1,4 +1,4 @@
-function meta_sim(redo, path_to_spm, task_id, within_id, k_id, test_id, btw_id, avgn_id)
+function meta_sim(redo, path_to_spm, task_id, within_id, k_id, test_id, btw_id, avgn_id, mismatch_id)
     % META_SIM  Simulate meta-analyses results under the null
     %   META_SIM(base_dir, REDO) Create simulation results in a 
     %       'simulations' folder under base_dir. Overwrite existing
@@ -18,6 +18,9 @@ function meta_sim(redo, path_to_spm, task_id, within_id, k_id, test_id, btw_id, 
     end
     if ~exist('doperm', 'var')
         doperm = true;
+    end
+    if ~exist('mismatch_id', 'var')
+        mismatch_id = 1:3;
     end
     
     % SPM is required to write-out NIfTI images    
@@ -77,6 +80,7 @@ function meta_sim(redo, path_to_spm, task_id, within_id, k_id, test_id, btw_id, 
 
     % Study-specific bias due to units mismatch
     settings.unit_mismatches = {'nominal', 'datascl', 'contscl'};
+    settings.unit_mismatches = settings.unit_mismatches(mismatch_id);
 
     % Type of analysis: one-sample (1), two-sample(2), two-sample
     % unbalanced (3)

@@ -8,8 +8,8 @@ set -x
 #OAR -E OAR_%jobid%.err 
 #OAR -n meta_sim
 
-echo $OAR_ARRAY_INDEX,$OAR_ARRAY_ID,$1,$2,$3,$4,$5,$6 >> /home/$USER/logs/jobids.csv
-echo "params " $1 " " $2 " " $3 " " $4  " " $5 " " $6
+echo $OAR_ARRAY_INDEX,$OAR_ARRAY_ID,$1,$2,$3,$4,$5,$6,$7 >> /home/$USER/logs/jobids.csv
+echo "params " $1 " " $2 " " $3 " " $4  " " $5 " " $6 " " $7
 
 cwd=`pwd`
 cd $HOME/code/zmeta_buster
@@ -21,7 +21,7 @@ addpath(pwd);
 addpath(fullfile(pwd, 'lib'));
 pkg load statistics
 
-meta_sim(false,fullfile(pwd, '..', '..', '..', 'spm12-r7771'), task_id=$1, within_id=$2, k_id=$3, test_id=$4, btw_id=$5, avgn_id=$6)
+meta_sim(false,fullfile(pwd, '..', '..', '..', 'spm12-r7771'), task_id=$1, within_id=$2, k_id=$3, test_id=$4, btw_id=$5, avgn_id=$6, mismatch_id=$7)
 EOF
 
 cat $tempfile
