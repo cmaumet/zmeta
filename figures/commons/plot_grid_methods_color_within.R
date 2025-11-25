@@ -9,7 +9,7 @@ plot_grid_methods_color_within <- function(data, aes_main, aes_line, aes_ribbon,
         p <- p + 
             geom_ribbon(
                 aes_ribbon, 
-                fill="grey", alpha=.8, colour=NA) + 
+                fill="grey", alpha=.8, colour="grey") + 
             facet_grid(formula,  
                        labeller = labeller(
                            methods = method_labels, 
