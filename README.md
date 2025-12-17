@@ -62,6 +62,11 @@ Then in the R console, Fig.3 can be generated with:
 > source("plot_simulations.R"); plot_simulation(1)
 ```
 
+### Fig real data
+
+ - install R package ROCR 
+
+
 ## Reproducing full analysis
 
 <Instructions on how to (1) obtain raw data; (2) process it to create summary/derived data in the `results`>
@@ -146,3 +151,5 @@ cat `grep -l OAR_*.err -e error` | grep params | tr "' " " " | tr "+ echo params
  ```
 ./run_export.sh
  ```
+3. Copy from cluster to local machine
+ rsync -avR <output_simu_dir_on_hcp>/./*/*.csv <output_simu_dir_locally>
