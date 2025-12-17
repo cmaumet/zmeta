@@ -132,6 +132,7 @@ python compute_TPR.py
 
 
 ##### Simulations
+###### Launch job with simulations
 ```console
 cd src/simus
 ```
@@ -139,15 +140,18 @@ For each parameter file found in parameterarrays (can create a custom using crea
 ```console
 ./run_simulations.sh
 ```
-
-Check if some runs have errors
+###### Check for errors and re-run interupted jobs
+1. Check if some jobs have been interrupted because of an error:
+```console
 cat `grep -l OAR_*.err -e error`
-
-Retreive the corresponding parameter sets and rerun :
+```
+Retreive the corresponding parameter sets and rerun:
+```console
 cat `grep -l OAR_*.err -e error` | grep params | tr "' " " " | tr "+ echo params " " " | tr -s " " > paramtorerun
+```
 
- 2. Export p-values into csv file in Matlab
-
+###### Export p-values and copy locally
+2. Export p-values into csv file in Matlab
  ```
 ./run_export.sh
  ```
