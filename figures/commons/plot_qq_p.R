@@ -22,9 +22,9 @@ plot_qq_p <- function(data, formula, title, mult=FALSE, lim=NA, filename=NA, max
     }
 
     if (short){
-        ylab = "Observed P - Cumulative P"
+        ylab = "Observed P - Expected P"
     } else{
-        ylab = "Observed P - Cumulative P"
+        ylab = "Observed P - Expected P"
     }
 
 
@@ -34,7 +34,7 @@ plot_qq_p <- function(data, formula, title, mult=FALSE, lim=NA, filename=NA, max
     #     aes_line=aes(x=-log10(expectedP), y=0),
     #     aes_ribbon=aes(ymin=-log10(p_lower/expectedP), ymax=-log10(p_upper/expectedP), group=glm), 
     #     formula, title, mult, lim, filename, max_z,
-    #     xlabel=bquote("Cumulative P"), ylabel=ylab)
+    #     xlabel=bquote("Expected P"), ylabel=ylab)
 
     if (homoscedastic) {
         plot_grid_methods_color_within(data,
@@ -42,21 +42,21 @@ plot_qq_p <- function(data, formula, title, mult=FALSE, lim=NA, filename=NA, max
             aes_line=aes(x=-log10(expectedP), y=0),
             aes_ribbon=aes(ymin=-log10(p_lower/expectedP), ymax=-log10(p_upper/expectedP), group=glm), 
             formula, title, mult, lim, filename, max_z,
-            xlabel=bquote("Cumulative P"), ylabel=ylab)
+            xlabel=bquote("Expected P"), ylabel=ylab)
     } else if (heteroscedastic) {
         plot_grid_methods_color_within(data,
             aes_main=aes(x=-log10(expectedP), y=-log10(P/expectedP), group=allgroups, colour=factor(withinVariation)),
             aes_line=aes(x=-log10(expectedP), y=0),
             aes_ribbon=aes(ymin=-log10(p_lower/expectedP), ymax=-log10(p_upper/expectedP), group=glm), 
             formula, title, mult, lim, filename, max_z,
-            xlabel=bquote("Cumulative P"), ylabel=ylab)
+            xlabel=bquote("Expected P"), ylabel=ylab)
     } else {
         plot_grid_methods_color_within(data,
             aes_main=aes(x=-log10(expectedP), y=-log10(P/expectedP), group=allgroups, colour=factor(withinInfo)),
             aes_line=aes(x=-log10(expectedP), y=0),
             aes_ribbon=aes(ymin=-log10(p_lower/expectedP), ymax=-log10(p_upper/expectedP), group=glm), 
             formula, title, mult, lim, filename, max_z,
-            xlabel=bquote("Cumulative P"), ylabel=ylab)
+            xlabel=bquote("Expected P"), ylabel=ylab)
     }
     
 #     data <- prepare_data(data, max_z, min_z=0)
