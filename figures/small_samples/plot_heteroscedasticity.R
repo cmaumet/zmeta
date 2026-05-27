@@ -41,8 +41,6 @@ plot_heteroscedasticity <- function(test_type=1, allsimudat=NA) {
     #  B. heteroscedasticity (RFX and contrast permutation)
     #  C. heterogeneity (Fisher's, Stouffer's, FFX and Weighted Z)
     robutness_plot <- function(data){
-
-        data$homoscedasticity <- (data$withinVariation==1)
         
         # plot p-values smaller than 0.001
         data_positive_z <- subset(data, expectedz>3.090232 & (unitMism=="nominal"))

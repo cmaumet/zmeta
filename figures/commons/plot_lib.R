@@ -17,6 +17,12 @@ between_labels <- function(value){
     value
 }
 
+homosce_labels <- function(value){
+    value[value==TRUE] <- "Homoscedasticity"
+    value[value==FALSE] <- "Heteroscedasticity"
+    value
+}
+
 test_labels <- function(value){
     value[value==1] <- "One-sample"
     value[value==2] <- "Two-sample"
