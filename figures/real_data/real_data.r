@@ -3,7 +3,7 @@ library('cowplot')
 theme_set(theme_gray()) # switch to default ggplot2 theme for good
 theme_update(panel.background = element_rect(fill = "grey95"))
 
-realdata <- read.csv(file.path('..', 'results', 'realdata_TPR.csv'), header=T, sep=",")
+realdata <- read.csv(file.path('..', '..', 'results', 'realdata_TPR.csv'), header=T, sep=",")
 realdata$Method <- as.factor(realdata$Method)
 
 p <- ggplot(data=subset(realdata, p<0.1),aes(x=(p), y=TPR, group=Method, colour=factor(Method))) + 
@@ -11,7 +11,7 @@ geom_line() + ggtitle('real data: ROC curve using theoretical FPR') + theme(lege
 
 print(p)
 
-simufpr <- read.csv(file.path('..', 'results', 'allsimudat_test1_k025_n20_nominal_38.csv'))
+simufpr <- read.csv(file.path('..', '..', 'results', 'allsimudat_test1_k025_n20_nominal_38.csv'))
 
 # Only looking at nominal data under some heterogeneity
 simufpr <- subset(simufpr, Between==1 & unitMism=='nominal')
@@ -22,7 +22,13 @@ realdata_withsimuFPR = data.frame()
 
 for (within in unique(simufpr$Within)){
      print(within)
-for (variation in unique(simufpr$withinVariation)){
+
+     if (within==1) {
+        variation_values = unique(simufpr$withinVariation);
+     } else {
+        variation_values = 20;
+     }
+for (variation in variation_values){
      print(variation)
     currdat <- realdata
     currdat$withinVariation <- variation
@@ -31,6 +37,7 @@ for (variation in unique(simufpr$withinVariation)){
     currdat$FPR <- NA
 
     methods <- levels(realdata$Method)
+    methods = gsub("megaFFX", "megaFFX_FSL", methods)
     length(methods)
     
     for (meth in methods){
@@ -47,6 +54,13 @@ for (variation in unique(simufpr$withinVariation)){
             currdat[currdat$Method==meth,]$FPR <- approximated$y
         } else {
             print("sub_df no rows")
+            # print(head(subset(simufpr, Between==1)))
+            # print('1 ---')
+            # print(head(subset(simufpr, Within==within)))
+            # print('2 ---')
+            # print(head(subset(simufpr, withinVariation==variation)))
+            # print('3 ---')
+            # print(head(subset(simufpr, methods == meth)))
             return('stopping here')
         }
     }
@@ -160,7 +174,7 @@ roc_plot <- function(data, aes_line, ylim=c(0.5, 1), xlim=c(0, 0.1)) {
     } 
     
     data$TPR <- data$TPR*100
-    
+    head(data)
     p <- ggplot(data=data,aes(group=Method, colour=factor(Method))) + 
     geom_line(aes_line)   + coord_cartesian(xlim = xlim*100, ylim = ylim*100 ) + 
     scale_x_continuous(breaks=seq(0,100,5)) +
@@ -255,7 +269,7 @@ roc_plots <- function(data){
 
     return(p)
 }
-
+head(realdata_withsimuFPR)
 realdata_withsimuFPR = subset(realdata_withsimuFPR, Method=="megaFFX")
 p <- roc_plots(subset(realdata, Method=="megaFFX")); print(p)
 
@@ -277,6 +291,7 @@ simple_auc <- function(sens, spec){
     width = -diff(spec) # = diff(rev(omspec))
     sum(height*width)
 }
+
 
 my_dat <- (subset(realdata_withsimuFPR, Method=='megaRFX' & withinVariation==16))
 simple_auc(my_dat$TPR, 1-my_dat$FPR)
