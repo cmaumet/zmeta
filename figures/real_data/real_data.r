@@ -23,10 +23,10 @@ realdata_withsimuFPR = data.frame()
 for (within in unique(simufpr$Within)){
      print(within)
 
-     if (within==1) {
-        variation_values = unique(simufpr$withinVariation);
+     if (within!=20) {
+        variation_values = 1; 
      } else {
-        variation_values = 20;
+        variation_values = unique(simufpr$withinVariation);;
      }
 for (variation in variation_values){
      print(variation)
@@ -77,6 +77,8 @@ for (variation in variation_values){
     
 }
 }
+
+print('----- HERE 0 -----')
 
 # for (within in setdiff(unique(simufpr$Within), c(20, 40))){
 #     currdat <- realdata
@@ -129,7 +131,7 @@ head(subset(realdata_withsimuFPR, Method=='permutCon'))
 realdata_withsimuFPR$heterogeneity <- realdata_withsimuFPR$Between/realdata_withsimuFPR$Within*20
 
 
-
+print('----- HERE 1 -----')
 
 
 heterogeneity_labels <- function(value) {
@@ -175,7 +177,7 @@ roc_plot <- function(data, aes_line, ylim=c(0.5, 1), xlim=c(0, 0.1)) {
     
     data$TPR <- data$TPR*100
     head(data)
-    p <- ggplot(data=data,aes(group=Method, colour=factor(Method))) + 
+    p <- ggplot(data=data,aes(group=methods, colour=factor(methods))) + 
     geom_line(aes_line)   + coord_cartesian(xlim = xlim*100, ylim = ylim*100 ) + 
     scale_x_continuous(breaks=seq(0,100,5)) +
     scale_y_continuous(breaks=seq(0,100,10)) + 
@@ -184,6 +186,8 @@ roc_plot <- function(data, aes_line, ylim=c(0.5, 1), xlim=c(0, 0.1)) {
     
     return(p)
 }
+
+print('----- HERE 2 -----')
     
 
 roc_plots_with_zoom <- function(data, facet_formula, ttl=''){
@@ -220,6 +224,8 @@ roc_plots_with_zoom <- function(data, facet_formula, ttl=''){
     res <- list("p" = p2, "legend" = get_legend(p3 + theme(legend.position="bottom")))
     return(res)
 }
+
+print('----- HERE 3 -----')
 
 roc_plots <- function(data){
               
@@ -270,18 +276,20 @@ roc_plots <- function(data){
     return(p)
 }
 head(realdata_withsimuFPR)
-realdata_withsimuFPR = subset(realdata_withsimuFPR, Method=="megaFFX")
-p <- roc_plots(subset(realdata, Method=="megaFFX")); print(p)
+realdata_withsimuFPR = subset(realdata_withsimuFPR, Method=="megaFFX_FSL")
+p <- roc_plots(subset(realdata, Method=="megaFFX_FSL")); print(p)
 
 # print on screen
 print(p)
+
+print('----- HERE 4 -----')
 
 # Save to pdf
 pdf(paste("roc.pdf", sep=""))
 print(p)
 dev.off()
 
-
+print('----- HERE 5 -----')
 
 simple_auc <- function(sens, spec){
 #     Sources: https://stats.stackexchange.com/questions/145566/how-to-calculate-area-under-the-curve-auc-or-the-c-statistic-by-hand
@@ -326,6 +334,8 @@ head(auc_df)
 
 print(auc_df[(auc_df$auc)>1,])
 
+print('----- HERE 5 -----')
+
 # p <- ggplot(data=auc_df, aes=aes(x=Within, y=auc_value)) + geom_point()
 # print(p)
 
@@ -348,5 +358,7 @@ row <- plot_grid(p1, p2, labels = c('A', 'B'), ncol=1)
 
 
 print(p)
+
+print('----- HERE END -----')
 
 

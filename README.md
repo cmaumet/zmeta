@@ -62,6 +62,17 @@ Then in the R console, Fig.3 can be generated with:
 > source("plot_simulations.R"); plot_simulation(1)
 ```
 
+### Fig xx ROC curve for real data
+From a Terminal:
+```console
+$ cd figures/real_data
+$ R
+```
+Then in the R console, Fig.3 can be generated with:
+```R
+> source("plot_real_data.R"); plot_real_data()
+```
+
 ## Reproducing full analysis
 
 <Instructions on how to (1) obtain raw data; (2) process it to create summary/derived data in the `results`>
