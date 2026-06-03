@@ -4,6 +4,8 @@ library('gridExtra')
 theme_set(theme_gray()) # switch to default ggplot2 theme for good
 theme_update(panel.background = element_rect(fill = "grey95"))
 
+source(file.path('..','commons','plot_lib.R'))
+
 realdata <- read.csv(file.path('..', '..', 'results', 'realdata_TPR.csv'), header=T, sep=",")
 # Harmonize naming of method column
 names(realdata)[names(realdata) == 'Method'] <- 'methods'
@@ -168,13 +170,13 @@ roc_plot <- function(data, aes_line, ylim=c(0.5, 1), xlim=c(0, 0.1)) {
     
     data$TPR <- data$TPR*100
     
-    p <- ggplot(data=data,aes(group=methods, colour=factor(methods))) + 
+    p <- ggplot(data=data,aes(group=methods, colour=methods)) + 
     geom_line(aes_line)   + coord_cartesian(xlim = xlim*100, ylim = ylim*100 ) + 
     scale_x_continuous(breaks=seq(0,100,5)) +
     scale_y_continuous(breaks=seq(0,100,10)) + 
     scale_fill_manual(values=cbbPalette) + 
     scale_colour_manual(values=cbbPalette)
-    
+
     return(p)
 }
     
@@ -182,15 +184,29 @@ roc_plot <- function(data, aes_line, ylim=c(0.5, 1), xlim=c(0, 0.1)) {
 roc_plots_with_zoom <- function(data, facet_formula, ttl=''){
      # Panel B: Against simulated FPR & under varying levels of heterogenerity
     p2 <- roc_plot(data, aes(x=FPR, y=TPR)) + 
-            facet_grid(facet_formula, labeller = labeller(heterogeneity = heterogeneity_labels,
+            facet_grid(facet_formula, 
+                    labeller = labeller(
+                           methods = method_labels, 
+                           nStudies = nstudies_labels,
+                           nSubjects = nsubjects_labels,
+                           soft2 = soft2_labels,
+                           unitMism = units_labels,
+                           heterogeneity = heterogeneity_labels,
                            withinVariation = heteroscedasticity_labels)) + 
-        geom_rect(aes(xmin=0, xmax=2.5, ymin=85,ymax=95), alpha=0.2, color="grey", fill=NA, size=0.1) + theme(legend.position="bottom") +   
-                ggtitle(ttl)
+        geom_rect(aes(xmin=0, xmax=2.5, ymin=85,ymax=95), alpha=0.2, color="grey", fill=NA, size=0.1) + 
+        theme(legend.position="hidden") +   
+        ggtitle(ttl)
 #         geom_rect(mapping=aes(xmin=0, xmax=2.5, ymin=85, ymax=95), color="black", alpha=0.5, fill=NA)
     
     p3 <- roc_plot(data, aes(x=FPR, y=TPR), 
                    c(.85, .95), c(0, 0.025)) + 
-            facet_grid(facet_formula, labeller = labeller(heterogeneity = heterogeneity_labels,
+            facet_grid(facet_formula, labeller = labeller(
+                           methods = method_labels, 
+                           nStudies = nstudies_labels,
+                           nSubjects = nsubjects_labels,
+                           soft2 = soft2_labels,
+                           unitMism = units_labels,
+                           heterogeneity = heterogeneity_labels,
                            withinVariation = heteroscedasticity_labels)) + theme(legend.position="hidden") 
     
     rect <- data.frame(xmin=0, xmax=0.025, ymin=.85, ymax=.95)
@@ -207,7 +223,7 @@ roc_plots_with_zoom <- function(data, facet_formula, ttl=''){
         plot.background=element_blank(),
         axis.text=element_blank(),
         axis.ticks=element_blank(), panel.spacing.x=unit(2.5, "lines")) + 
-                theme(legend.justification = "top"),start+decalage , 0.26, 1-start-2*decalage, 0.40) 
+                theme(legend.justification = "top"),start+decalage , 0.20, 1-start-2*decalage, 0.40) 
 
     res <- list("p" = p2)
 
@@ -256,8 +272,6 @@ roc_plots <- function(data){
     title <- ggdraw() + draw_label('ROC plots')
 #     legend <- get_legend(p3 + theme(legend.position="bottom"))
 #     p <- plot_grid(p, p3$legend, ncol = 1, rel_heights = c(1, .2))
-    
-    print(p2$legend)
 
     p <- plot_grid(title, left_column, p2$legend, ncol=1, rel_heights=c(0.1, 1, 0.1)) + 
         theme(plot.title=element_text(size=12), text=element_text(size=10))
