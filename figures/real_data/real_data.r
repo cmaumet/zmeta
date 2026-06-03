@@ -4,12 +4,18 @@ theme_set(theme_gray()) # switch to default ggplot2 theme for good
 theme_update(panel.background = element_rect(fill = "grey95"))
 
 realdata <- read.csv(file.path('..', '..', 'results', 'realdata_TPR.csv'), header=T, sep=",")
+# Harmonize naming of method column
+names(realdata)[names(realdata) == 'Method'] <- 'methods'
+realdata[realdata$methods=="megaFFX",]$methods <- "megaFFX_FSL"
+realdata$methods <- factor(realdata$methods)
 
-p <- ggplot(data=subset(realdata, p<0.1),aes(x=(p), y=TPR, group=Method, colour=factor(Method))) + 
+# ROC curve using theoretical False positive rate
+p <- ggplot(data=subset(realdata, p<0.1),aes(x=(p), y=TPR, group=methods, colour=factor(methods))) + 
 geom_line() + ggtitle('real data: ROC curve using theoretical FPR') + theme(legend.position = 'bottom')
 
 print(p)
 
+# Get False positive rates from experiment with k=25 and n=20 (nominal)
 simufpr <- read.csv(file.path('..', '..', 'results', 'allsimudat_test1_k025_n20_nominal_38.csv'))
 
 # Only looking at nominal data under some heterogeneity
@@ -19,51 +25,49 @@ head(simufpr)
 
 realdata_withsimuFPR = data.frame()
 
+# Loop over values of within-study variance
 for (within in unique(simufpr$Within)){
-#     print(within)
-    if (within!=20) {
-        variation_values = 1; 
-     } else {
-        variation_values = unique(simufpr$withinVariation);;
-     }
+    # print(within)
+    # Corresponding variation values
+    variation_values = unique(simufpr[simufpr$Within==within,]$withinVariation)
 
-for (variation in variation_values){
-#     print(variation)
-    currdat <- realdata
-    currdat$withinVariation <- variation
-    currdat$Between <- 1
-    currdat$Within <- within
-    currdat$FPR <- NA
+    for (variation in variation_values){
+        # print(variation)
+        currdat <- realdata
+        currdat$withinVariation <- variation
+        currdat$Between <- 1
+        currdat$Within <- within
+        currdat$FPR <- NA
 
-    methods <- levels(realdata$Method)
-    length(methods)
-    
-    for (meth in methods){
-#         print(paste('Currently: ', meth))
-        th_p = currdat[currdat$Method==meth,]$p
-       
-        sub_df = subset(simufpr, Between==1 & Within==within & withinVariation==variation & methods == meth)
+        methods <- levels(realdata$methods)
+        length(methods)
         
-        if (nrow(sub_df)>0){
-            approximated = approx(x=sub_df$P, y=sub_df$expectedP, xout=th_p, yleft=0)
-    #         plot(sub_df$P, sub_df$expectedP, main = "approx")
-    #         points(approximated, col = 2, pch = "*")
-            currdat[currdat$Method==meth,]$FPR <- approximated$y
-        } else {
-            print("sub_df no rows")
-            return('stopping here')
+        for (meth in methods){
+            # print(paste('Currently: ', meth))
+            th_p = currdat[currdat$Method==meth,]$p
+           
+            sub_df = subset(simufpr, Between==1 & Within==within & withinVariation==variation & methods == meth)
+            
+            if (nrow(sub_df)>0){
+                approximated = approx(x=sub_df$P, y=sub_df$expectedP, xout=th_p, yleft=0)
+                # plot(sub_df$P, sub_df$expectedP, main = "approx")
+                # points(approximated, col = 2, pch = "*")
+                currdat[currdat$Method==meth,]$FPR <- approximated$y
+            } else {
+                print("sub_df no rows")
+                return('stopping here')
+            }
         }
-    }
-    
-#     currdat[currdat$p==0,]$FPR <- 0
-#     print(currdat[currdat$p==0,]$FPR) 
-    if (! all(is.na(currdat$FPR))){
-        currdat[currdat$p==1,]$FPR <- 1
-        realdata_withsimuFPR <- rbind(realdata_withsimuFPR, currdat)
+        
+    #     currdat[currdat$p==0,]$FPR <- 0
+    #     print(currdat[currdat$p==0,]$FPR) 
+        if (! all(is.na(currdat$FPR))){
+            currdat[currdat$p==1,]$FPR <- 1
+            realdata_withsimuFPR <- rbind(realdata_withsimuFPR, currdat)
 
+        }
+        
     }
-    
-}
 }
 
 # for (within in setdiff(unique(simufpr$Within), c(20, 40))){
