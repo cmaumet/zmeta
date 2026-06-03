@@ -1,5 +1,6 @@
 library('ggplot2')
 library('cowplot')
+library('gridExtra')
 theme_set(theme_gray()) # switch to default ggplot2 theme for good
 theme_update(panel.background = element_rect(fill = "grey95"))
 
@@ -11,7 +12,7 @@ realdata$methods <- factor(realdata$methods)
 
 # ROC curve using theoretical False positive rate
 p <- ggplot(data=subset(realdata, p<0.1),aes(x=(p), y=TPR, group=methods, colour=factor(methods))) + 
-geom_line() + ggtitle('real data: ROC curve using theoretical FPR') + theme(legend.position = 'bottom')
+geom_line() + ggtitle('real data: ROC curve using theoretical FPR') + theme(legend.position = 'right')
 
 print(p)
 
@@ -182,19 +183,18 @@ roc_plots_with_zoom <- function(data, facet_formula, ttl=''){
      # Panel B: Against simulated FPR & under varying levels of heterogenerity
     p2 <- roc_plot(data, aes(x=FPR, y=TPR)) + 
             facet_grid(facet_formula, labeller = labeller(heterogeneity = heterogeneity_labels,
-                           withinVariation = heteroscedasticity_labels)) + theme(legend.position="none") + 
-        geom_rect(aes(xmin=0, xmax=2.5, ymin=85,ymax=95), alpha=0.2, color="grey", fill=NA, size=0.1) +   
+                           withinVariation = heteroscedasticity_labels)) + 
+        geom_rect(aes(xmin=0, xmax=2.5, ymin=85,ymax=95), alpha=0.2, color="grey", fill=NA, size=0.1) + theme(legend.position="bottom") +   
                 ggtitle(ttl)
 #         geom_rect(mapping=aes(xmin=0, xmax=2.5, ymin=85, ymax=95), color="black", alpha=0.5, fill=NA)
     
     p3 <- roc_plot(data, aes(x=FPR, y=TPR), 
                    c(.85, .95), c(0, 0.025)) + 
             facet_grid(facet_formula, labeller = labeller(heterogeneity = heterogeneity_labels,
-                           withinVariation = heteroscedasticity_labels)) + theme(legend.position="none") 
+                           withinVariation = heteroscedasticity_labels)) + theme(legend.position="hidden") 
     
     rect <- data.frame(xmin=0, xmax=0.025, ymin=.85, ymax=.95)
 
-    
     
     start = 0.075
     decalage = 0.03
@@ -207,9 +207,10 @@ roc_plots_with_zoom <- function(data, facet_formula, ttl=''){
         plot.background=element_blank(),
         axis.text=element_blank(),
         axis.ticks=element_blank(), panel.spacing.x=unit(2.5, "lines")) + 
-                theme(legend.justification = "top"),start+decalage , 0.125, 1-start-2*decalage, 0.40) 
+                theme(legend.justification = "top"),start+decalage , 0.26, 1-start-2*decalage, 0.40) 
 
-    res <- list("p" = p2, "legend" = get_legend(p3 + theme(legend.position="bottom")))
+    res <- list("p" = p2)
+
     return(res)
 }
 
@@ -256,7 +257,9 @@ roc_plots <- function(data){
 #     legend <- get_legend(p3 + theme(legend.position="bottom"))
 #     p <- plot_grid(p, p3$legend, ncol = 1, rel_heights = c(1, .2))
     
-    p <- plot_grid(title, left_column, p3$legend, ncol=1, rel_heights=c(0.1, 1, 0.1)) + 
+    print(p2$legend)
+
+    p <- plot_grid(title, left_column, p2$legend, ncol=1, rel_heights=c(0.1, 1, 0.1)) + 
         theme(plot.title=element_text(size=12), text=element_text(size=10))
 
     return(p)
