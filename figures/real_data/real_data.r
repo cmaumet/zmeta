@@ -3,14 +3,14 @@ library('cowplot')
 theme_set(theme_gray()) # switch to default ggplot2 theme for good
 theme_update(panel.background = element_rect(fill = "grey95"))
 
-realdata <- read.csv(file.path('..', 'zmeta_rocs', 'results', 'realdata_TPR.csv'), header=T, sep=",")
+realdata <- read.csv(file.path('..', '..', 'results', 'realdata_TPR.csv'), header=T, sep=",")
 
 p <- ggplot(data=subset(realdata, p<0.1),aes(x=(p), y=TPR, group=Method, colour=factor(Method))) + 
 geom_line() + ggtitle('real data: ROC curve using theoretical FPR') + theme(legend.position = 'bottom')
 
 print(p)
 
-simufpr <- read.csv(file.path('data', 'allsimudat_test1_k025_n20_nominal.csv'))
+simufpr <- read.csv(file.path('..', '..', 'results', 'allsimudat_test1_k025_n20_nominal_38.csv'))
 
 # Only looking at nominal data under some heterogeneity
 simufpr <- subset(simufpr, Between==1 & unitMism=='nominal')
