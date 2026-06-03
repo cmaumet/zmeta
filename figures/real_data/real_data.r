@@ -263,6 +263,7 @@ roc_plots <- function(data){
 }
 
 p <- roc_plots(realdata)
+print("HERE 1")
 
 # print on screen
 print(p)
@@ -272,70 +273,68 @@ pdf(paste("roc.pdf", sep=""))
 print(p)
 dev.off()
 
-
-
-simple_auc <- function(sens, spec){
-#     Sources: https://stats.stackexchange.com/questions/145566/how-to-calculate-area-under-the-curve-auc-or-the-c-statistic-by-hand
-#     print(order(sens, spec))
+# simple_auc <- function(sens, spec){
+# #     Sources: https://stats.stackexchange.com/questions/145566/how-to-calculate-area-under-the-curve-auc-or-the-c-statistic-by-hand
+# #     print(order(sens, spec))
     
-    height = (sens[-1]+sens[-length(sens)])/2
-    width = -diff(spec) # = diff(rev(omspec))
-    sum(height*width)
-}
+#     height = (sens[-1]+sens[-length(sens)])/2
+#     width = -diff(spec) # = diff(rev(omspec))
+#     sum(height*width)
+# }
 
-my_dat <- (subset(realdata_withsimuFPR, methods=='megaRFX' & withinVariation==16))
-simple_auc(my_dat$TPR, 1-my_dat$FPR)
+# my_dat <- (subset(realdata_withsimuFPR, methods=='megaRFX' & withinVariation==16))
+# simple_auc(my_dat$TPR, 1-my_dat$FPR)
 
-auc_df <- data.frame()
+# auc_df <- data.frame()
 
-for (within in unique(realdata_withsimuFPR$Within)){
-    for (variation in unique(realdata_withsimuFPR$withinVariation)){
+# for (within in unique(realdata_withsimuFPR$Within)){
+#     for (variation in unique(realdata_withsimuFPR$withinVariation)){
 
-        methods <- levels(realdata_withsimuFPR$methods)
+#         methods <- levels(realdata_withsimuFPR$methods)
 
-        for (meth in methods){
+#         for (meth in methods){
 
-            sub_df = subset(realdata_withsimuFPR, Between==1 & Within==within & withinVariation==variation & methods == meth)
-            if (nrow(sub_df)>0){
-#                 print(head(sub_df))
-        #         print(length(sub_df$TPR))
-        #         print(unique(sub_df$methods))
-                auc_value = simple_auc(sub_df$TPR, 1-sub_df$FPR)
-                auc_df <- rbind(auc_df, data.frame(withinVariation = variation, 
-                                                   Within = within,
-                                                  Between=1,
-                                                  auc=auc_value,
-                                              methods=meth))
-            }
-    }
-    }
-}
+#             sub_df = subset(realdata_withsimuFPR, Between==1 & Within==within & withinVariation==variation & methods == meth)
+#             if (nrow(sub_df)>0){
+# #                 print(head(sub_df))
+#         #         print(length(sub_df$TPR))
+#         #         print(unique(sub_df$methods))
+#                 auc_value = simple_auc(sub_df$TPR, 1-sub_df$FPR)
+#                 auc_df <- rbind(auc_df, data.frame(withinVariation = variation, 
+#                                                    Within = within,
+#                                                   Between=1,
+#                                                   auc=auc_value,
+#                                               methods=meth))
+#             }
+#     }
+#     }
+# }
 
-head(auc_df)
+# head(auc_df)
 
-print(auc_df[(auc_df$auc)>1,])
+# print(auc_df[(auc_df$auc)>1,])
 
-# p <- ggplot(data=auc_df, aes=aes(x=Within, y=auc_value)) + geom_point()
+# # p <- ggplot(data=auc_df, aes=aes(x=Within, y=auc_value)) + geom_point()
+# # print(p)
+
+# p1 <- ggplot(data=subset(auc_df,withinVariation==1),aes(x=Within, y=auc, group=methods, colour=methods)) + 
+# geom_line() + ggtitle('heterogeneity') + theme(legend.position = 'none') + 
+# coord_cartesian(ylim = c(0.94, 0.96)) 
+
+# p2 <- ggplot(data=subset(auc_df,withinVariation>1),aes(x=withinVariation, y=auc, group=methods, colour=methods)) + 
+# geom_line() + ggtitle('heteroscedasticity') + theme(legend.position = 'none') + 
+# coord_cartesian(ylim = c(0.945, 0.9555)) 
+
+# row <- plot_grid(p1, p2, labels = c('A', 'B'), ncol=1)
+    
+# title <- ggdraw() + draw_label('AUC plots')
+# legend <- get_legend(p1 + theme(legend.position="bottom"))
+# #     p <- plot_grid(p, legend, ncol = 1, rel_heights = c(1, .2))
+    
+# p <- plot_grid(title, row, legend, ncol=1, rel_heights=c(0.1, 1, 0.1)) + 
+#         theme(plot.title=element_text(size=12), text=element_text(size=10))
+
+
 # print(p)
-
-p1 <- ggplot(data=subset(auc_df,withinVariation==1),aes(x=Within, y=auc, group=methods, colour=methods)) + 
-geom_line() + ggtitle('heterogeneity') + theme(legend.position = 'none') + 
-coord_cartesian(ylim = c(0.94, 0.96)) 
-
-p2 <- ggplot(data=subset(auc_df,withinVariation>1),aes(x=withinVariation, y=auc, group=methods, colour=methods)) + 
-geom_line() + ggtitle('heteroscedasticity') + theme(legend.position = 'none') + 
-coord_cartesian(ylim = c(0.945, 0.9555)) 
-
-row <- plot_grid(p1, p2, labels = c('A', 'B'), ncol=1)
-    
-title <- ggdraw() + draw_label('AUC plots')
-legend <- get_legend(p1 + theme(legend.position="bottom"))
-#     p <- plot_grid(p, legend, ncol = 1, rel_heights = c(1, .2))
-    
-p <- plot_grid(title, row, legend, ncol=1, rel_heights=c(0.1, 1, 0.1)) + 
-        theme(plot.title=element_text(size=12), text=element_text(size=10))
-
-
-print(p)
 
 
