@@ -70,7 +70,9 @@ for (variation in variation_values){
     if (! all(is.na(currdat$FPR))){
         print("not all nan")
         currdat[currdat$p==1,]$FPR <- 1
-        realdata_withsimuFPR <- rbind(realdata_withsimuFPR, currdat) } 
+        realdata_withsimuFPR <- rbind(realdata_withsimuFPR, currdat) 
+        print(head(realdata_withsimuFPR))
+    } 
     else {
         print("ALL nan")
     }
@@ -79,6 +81,7 @@ for (variation in variation_values){
 }
 
 print('----- HERE 0 -----')
+print(head(realdata_withsimuFPR))
 
 # for (within in setdiff(unique(simufpr$Within), c(20, 40))){
 #     currdat <- realdata
@@ -132,6 +135,7 @@ realdata_withsimuFPR$heterogeneity <- realdata_withsimuFPR$Between/realdata_with
 
 
 print('----- HERE 1 -----')
+print(head(realdata_withsimuFPR))
 
 
 heterogeneity_labels <- function(value) {
@@ -188,6 +192,7 @@ roc_plot <- function(data, aes_line, ylim=c(0.5, 1), xlim=c(0, 0.1)) {
 }
 
 print('----- HERE 2 -----')
+print(head(realdata_withsimuFPR))
     
 
 roc_plots_with_zoom <- function(data, facet_formula, ttl=''){
@@ -226,6 +231,7 @@ roc_plots_with_zoom <- function(data, facet_formula, ttl=''){
 }
 
 print('----- HERE 3 -----')
+print(head(realdata_withsimuFPR))
 
 roc_plots <- function(data){
               
@@ -275,14 +281,23 @@ roc_plots <- function(data){
 
     return(p)
 }
-head(realdata_withsimuFPR)
-realdata_withsimuFPR = subset(realdata_withsimuFPR, Method=="megaFFX_FSL")
-p <- roc_plots(subset(realdata, Method=="megaFFX_FSL")); print(p)
+print('----- HERE 3b -----')
+print(head(realdata_withsimuFPR))
+print('----- HERE 3c -----')
+print(head(realdata_withsimuFPR))
+
+
+# realdata_withsimuFPR = subset(realdata_withsimuFPR, Method=="megaFFX")
+
+print('----- HERE 3d -----')
+print(head(realdata_withsimuFPR))
+p <- roc_plots(realdata); print(p)
 
 # print on screen
 print(p)
 
 print('----- HERE 4 -----')
+print(head(realdata_withsimuFPR))
 
 # Save to pdf
 pdf(paste("roc.pdf", sep=""))
