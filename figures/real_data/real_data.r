@@ -44,7 +44,7 @@ for (within in unique(simufpr$Within)){
         
         for (meth in methods){
             # print(paste('Currently: ', meth))
-            th_p = currdat[currdat$Method==meth,]$p
+            th_p = currdat[currdat$methods==meth,]$p
            
             sub_df = subset(simufpr, Between==1 & Within==within & withinVariation==variation & methods == meth)
             
@@ -52,7 +52,7 @@ for (within in unique(simufpr$Within)){
                 approximated = approx(x=sub_df$P, y=sub_df$expectedP, xout=th_p, yleft=0)
                 # plot(sub_df$P, sub_df$expectedP, main = "approx")
                 # points(approximated, col = 2, pch = "*")
-                currdat[currdat$Method==meth,]$FPR <- approximated$y
+                currdat[currdat$methods==meth,]$FPR <- approximated$y
             } else {
                 print("sub_df no rows")
                 return('stopping here')
@@ -77,19 +77,19 @@ for (within in unique(simufpr$Within)){
 #     currdat$Within <- within
 #     currdat$FPR <- NA
 
-#     methods <- levels(realdata$Method)
+#     methods <- levels(realdata$methods)
 #     length(methods)
     
 #     for (meth in methods){
 # #         print(paste('Currently: ', meth))
-#         th_p = currdat[currdat$Method==meth,]$p
+#         th_p = currdat[currdat$methods==meth,]$p
        
 #         sub_df = subset(simufpr, Between==1 & Within==within & withinVariation==1 & methods == meth)
         
 #         approximated = approx(x=sub_df$P, y=sub_df$expectedP, xout=th_p, yleft=0)
 # #         plot(sub_df$P, sub_df$expectedP, main = "approx")
 # #         points(approximated, col = 2, pch = "*")
-#          currdat[currdat$Method==meth,]$FPR <- approximated$y
+#          currdat[currdat$methods==meth,]$FPR <- approximated$y
 
 #     }
     
@@ -106,7 +106,7 @@ for (within in unique(simufpr$Within)){
 
 # print(levels(simufpr_out16$methods))
 # print('--')
-# print(levels(realdata$Method))
+# print(levels(realdata$methods))
 
 
 
@@ -116,7 +116,7 @@ tail(realdata_withsimuFPR[is.na(realdata_withsimuFPR$FPR),])
 
 unique(simufpr$Within)
 
-head(subset(realdata_withsimuFPR, Method=='permutCon'))
+head(subset(realdata_withsimuFPR, methods=='permutCon'))
 
 realdata_withsimuFPR$heterogeneity <- realdata_withsimuFPR$Between/realdata_withsimuFPR$Within*20
 
@@ -167,7 +167,7 @@ roc_plot <- function(data, aes_line, ylim=c(0.5, 1), xlim=c(0, 0.1)) {
     
     data$TPR <- data$TPR*100
     
-    p <- ggplot(data=data,aes(group=Method, colour=factor(Method))) + 
+    p <- ggplot(data=data,aes(group=methods, colour=factor(methods))) + 
     geom_line(aes_line)   + coord_cartesian(xlim = xlim*100, ylim = ylim*100 ) + 
     scale_x_continuous(breaks=seq(0,100,5)) +
     scale_y_continuous(breaks=seq(0,100,10)) + 
@@ -227,7 +227,7 @@ roc_plots <- function(data){
    
     
 #     p2 <- ggplot(data=subset(realdata_withsimuFPR, FPR<=0.10 & TPR>0.75 & withinVariation==1),
-#             aes(x=FPR, y=TPR, group=Method, colour=factor(Method))) + geom_point(size=0.02) + geom_line() + 
+#             aes(x=FPR, y=TPR, group=methods, colour=factor(methods))) + geom_point(size=0.02) + geom_line() + 
     p2 <- roc_plots_with_zoom(subset(realdata_withsimuFPR, withinVariation==1 & Within!=20), .~heterogeneity, 'Heterogeneity')
     
 
@@ -241,7 +241,7 @@ roc_plots <- function(data){
 #                            withinVariation = heteroscedasticity_labels)) + ggtitle('Heteroscedasticity') + theme(legend.position="none")
 
 #     ggplot(data=subset(realdata_withsimuFPR, FPR<=0.10 & TPR>0.75 & withinVariation>1),
-#             aes(x=FPR, y=TPR, group=Method, colour=factor(Method))) + 
+#             aes(x=FPR, y=TPR, group=methods, colour=factor(methods))) + 
 #     geom_point(size=0.02) + geom_line() + 
 
     
@@ -283,7 +283,7 @@ simple_auc <- function(sens, spec){
     sum(height*width)
 }
 
-my_dat <- (subset(realdata_withsimuFPR, Method=='megaRFX' & withinVariation==16))
+my_dat <- (subset(realdata_withsimuFPR, methods=='megaRFX' & withinVariation==16))
 simple_auc(my_dat$TPR, 1-my_dat$FPR)
 
 auc_df <- data.frame()
@@ -291,15 +291,15 @@ auc_df <- data.frame()
 for (within in unique(realdata_withsimuFPR$Within)){
     for (variation in unique(realdata_withsimuFPR$withinVariation)){
 
-        methods <- levels(realdata_withsimuFPR$Method)
+        methods <- levels(realdata_withsimuFPR$methods)
 
         for (meth in methods){
 
-            sub_df = subset(realdata_withsimuFPR, Between==1 & Within==within & withinVariation==variation & Method == meth)
+            sub_df = subset(realdata_withsimuFPR, Between==1 & Within==within & withinVariation==variation & methods == meth)
             if (nrow(sub_df)>0){
 #                 print(head(sub_df))
         #         print(length(sub_df$TPR))
-        #         print(unique(sub_df$Method))
+        #         print(unique(sub_df$methods))
                 auc_value = simple_auc(sub_df$TPR, 1-sub_df$FPR)
                 auc_df <- rbind(auc_df, data.frame(withinVariation = variation, 
                                                    Within = within,
