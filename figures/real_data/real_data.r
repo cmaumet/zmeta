@@ -21,7 +21,13 @@ realdata_withsimuFPR = data.frame()
 
 for (within in unique(simufpr$Within)){
 #     print(within)
-for (variation in unique(simufpr$withinVariation)){
+    if (within!=20) {
+        variation_values = 1; 
+     } else {
+        variation_values = unique(simufpr$withinVariation);;
+     }
+
+for (variation in variation_values){
 #     print(variation)
     currdat <- realdata
     currdat$withinVariation <- variation
@@ -43,6 +49,9 @@ for (variation in unique(simufpr$withinVariation)){
     #         plot(sub_df$P, sub_df$expectedP, main = "approx")
     #         points(approximated, col = 2, pch = "*")
             currdat[currdat$Method==meth,]$FPR <- approximated$y
+        } else {
+            print("sub_df no rows")
+            return('stopping here')
         }
     }
     
