@@ -70,7 +70,7 @@ $ R
 ```
 Then in the R console, Fig.3 can be generated with:
 ```R
-> source("plot_real_data.R"); plot_real_data()
+> source("real_data.R")
 ```
 
 ## Reproducing full analysis
