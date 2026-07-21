@@ -75,3 +75,6 @@ src/simus/fsl_designs/*/*.ppm
 
 *.DS_Store
 
+results_seed2/*
+zmeta_env/*
+
