@@ -111,6 +111,7 @@ function export_real_data(realDataDir, redo, pattern, split_in, downs_to)
                     
                     statistic = spm_read_vols(spm_vol(stat_file));
                     
+                    pValueFile = fullfile(methodDir, methods(m).pValueFile)
                     copyfile(stat_file, pValueFile);
                     pValueImg = nifti(pValueFile);
                     pValueImg.dat(:) = -log10(normcdf(statistic(:), 'upper'));
