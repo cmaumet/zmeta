@@ -117,6 +117,7 @@ function export_real_data(realDataDir, redo, pattern, split_in, downs_to)
                     pValueImg.dat(:) = -log10(normcdf(statistic(:), 'upper'));
                 end
 
+                pValueFile
                 real_pvalues = spm_read_vols(spm_vol(pValueFile));
             else
                 this_warn = ["\tMissing " methods(m).name];
@@ -140,7 +141,7 @@ function export_real_data(realDataDir, redo, pattern, split_in, downs_to)
                 % downsample in log-space so that we keep more values 
                 % corresponding to smaller ranks/p-values                    
                 donws_pos = unique(round(...
-                    logspace(0,log10(bin_size), downs_tot)))
+                    logspace(0,log10(bin_size), downs_tot)));
             end
             
             start = 1;
@@ -194,7 +195,6 @@ function mystr = print_pvalues(mystr, methodName, minuslog10pvalues, donws_pos)
     mystr = [mystr sprintf([methodName ...
             ',%i,%i,%i,%i\n'], ...            
             data_to_export{:} )];
-%             ',' mat2str(info.nSimuOneDir^3) ',%i,%i,%i,%i,%i\n'], ...
           
       
     if isempty(mystr)
