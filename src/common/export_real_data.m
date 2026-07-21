@@ -197,9 +197,7 @@ function mystr = print_pvalues(mystr, methodName, minuslog10pvalues, donws_pos)
     mystr = [mystr sprintf([methodName ...
             ',%i,%i,%i,%i\n'], ...            
             data_to_export{:} )];
-
-    mystr
-          
+      
       
     if isempty(mystr)
         error('empty mystr')
