@@ -11,20 +11,24 @@ set -x
 echo "params " $1 
 
 cwd=`pwd`
-cd $HOME/code/zmeta
+cd $HOME/code/zmeta/src/simus
 
 tempfile=$(mktemp)
 
 cat > $tempfile <<EOF
+pwd
 addpath(pwd);
+addpath(fullfile(pwd, 'lib'));
 
-export_sim($1)
+which export_sim
+
+export_sim(fullfile(pwd, '..', '..', '..', 'spm12-r7771'), $1)
 EOF
 
 cat $tempfile
 
 export PATH=/home/cmaumet/fsl/share/fsl/bin:$PATH
-guix shell octave -- octave $tempfile
+guix time-machine -C ~/.config/guix/channels_octave_9.2.0.scm -- shell octave -- octave $tempfile
 
 # rm $tempfile
 

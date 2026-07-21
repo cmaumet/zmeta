@@ -8,6 +8,7 @@ import nibabel as nib
 import os
 from nibabel.processing import resample_from_to
 import numpy as np
+from sklearn.metrics import roc_auc_score
 # out = resample_from_to(img, img)
 
 
@@ -54,13 +55,17 @@ def save_TPR_to_csv(meth, csv_file, GT, p_log10_file=None, z_file=None, mask_fil
         p_img = nib.load(p_log10_file)
         minuslog10p_values = p_img.get_fdata()
 
-       
-    # Mask out NaN values    
+    # Mask using mask
     mask_img = nib.load(mask_file)
     in_mask = np.nonzero(mask_img.get_fdata()) #np.nonzero(np.logical_not(np.isnan(minuslog10p_values)))
     minuslog10p_values = minuslog10p_values[in_mask]
     GT = GT[in_mask]
-    
+
+    # Remove Nan values
+    is_nan = np.isnan(minuslog10p_values);
+    minuslog10p_values = minuslog10p_values[~is_nan]
+    GT = GT[~is_nan]
+
     Positives = np.sum(GT)
     
     with open(csv_file,'a') as csvfile:
@@ -74,6 +79,14 @@ def save_TPR_to_csv(meth, csv_file, GT, p_log10_file=None, z_file=None, mask_fil
             if p<=1:
                 spamwriter.writerow([meth, p, TruePositives/Positives])
 
+    # auc_file = csv_file.replace("_TPR", "_AUC");
+    # auc = roc_auc_score(GT, minuslog10p_values);
+
+    # with open(auc_file,'a') as aucfile:
+    #     aucwriter = csv.writer(aucfile)
+    #     aucwriter.writerow([meth, auc])
+    
+
 real_data_resdir = os.path.join(rootDir, 'data', 'derived', 'real_data')
 
 csv_file=os.path.join(rootDir, 'results', 'realdata_TPR.csv')
@@ -82,12 +95,18 @@ csv_file=os.path.join(rootDir, 'results', 'realdata_TPR.csv')
 with open(csv_file,'w') as csvf:
     spamwriter = csv.writer(csvf)
     spamwriter.writerow(['Method', 'p', 'TPR'])   
+
+# auc_file = csv_file.replace("_TPR", "_AUC");
+# with open(auc_file,'w') as aucfile:
+#     aucwriter = csv.writer(aucfile)
+#     aucwriter.writerow(['Method', 'AUC'])
     
 mask_file = os.path.join(real_data_resdir, 'mask.nii');
 
 save_TPR_to_csv('fishers', csv_file, GT, 
                 p_log10_file=os.path.join(real_data_resdir, 'fishers', 'fishers_ffx_minus_log10_p.nii'),
                 mask_file=mask_file)
+
 save_TPR_to_csv('stouffers', csv_file, GT, 
                 p_log10_file=os.path.join(real_data_resdir, 'stouffers', 'stouffers_ffx_minus_log10_p.nii'),
                 mask_file=mask_file)
