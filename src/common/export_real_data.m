@@ -87,7 +87,7 @@ function export_real_data(realDataDir, redo, pattern, split_in, downs_to)
     % if redo || ~exist(csv_file, 'file')
         mystr = '';            
         fid = fopen(csv_file, 'w');
-        fprintf(fid, ['methods, minuslog10P, P, rankP, expectedP, stat \n']);     
+        fprintf(fid, ['methods, minuslog10P, P, rankP, expectedP \n']);     
    
         methods = all_methods;
         
