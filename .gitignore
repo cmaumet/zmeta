@@ -2,6 +2,9 @@
 logoctave.txt
 logs/*
 
+octave-workspace
+*/*/octave-workspace/*/*
+
 src/simus/config_path.m
 
 # notebooks checkpoints
