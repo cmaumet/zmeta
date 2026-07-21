@@ -192,6 +192,8 @@ function mystr = print_pvalues(mystr, methodName, minuslog10pvalues, donws_pos)
     data_to_export = num2cell([downs_minuslog10pvalues, downs_pvalues, downs_pvalues_rank, downs_expected_p], 2);
 %     data_to_export = num2cell([minuslog10pvalues, pvalues, pvalues_rank expected_p], 2);
      
+
+    data_to_export 
     mystr = [mystr sprintf([methodName ...
             ',%i,%i,%i,%i\n'], ...            
             data_to_export{:} )];
