@@ -62,6 +62,7 @@ Then in the R console, Fig.3 can be generated with:
 > source("plot_simulations.R"); plot_simulation(1)
 ```
 
+
 ### Fig xx ROC curve for real data
 From a Terminal:
 ```console
@@ -72,6 +73,12 @@ Then in the R console, Fig.3 can be generated with:
 ```R
 > source("real_data.R")
 ```
+
+### Fig real data
+
+ - install R package ROCR 
+
+
 
 ## Reproducing full analysis
 
@@ -138,6 +145,7 @@ python compute_TPR.py
 
 
 ##### Simulations
+###### Launch job with simulations
 ```console
 cd src/simus
 ```
@@ -145,15 +153,20 @@ For each parameter file found in parameterarrays (can create a custom using crea
 ```console
 ./run_simulations.sh
 ```
-
-Check if some runs have errors
+###### Check for errors and re-run interupted jobs
+1. Check if some jobs have been interrupted because of an error:
+```console
 cat `grep -l OAR_*.err -e error`
-
-Retreive the corresponding parameter sets and rerun :
+```
+Retreive the corresponding parameter sets and rerun:
+```console
 cat `grep -l OAR_*.err -e error` | grep params | tr "' " " " | tr "+ echo params " " " | tr -s " " > paramtorerun
+```
 
- 2. Export p-values into csv file in Matlab
-
+###### Export p-values and copy locally
+2. Export p-values into csv file in Matlab
  ```
 ./run_export.sh
  ```
+3. Copy from cluster to local machine
+ rsync -avR <output_simu_dir_on_hcp>/./*/*.csv <output_simu_dir_locally>
