@@ -25,7 +25,10 @@ load_data_from_files <- function(simu_dir, iter, test_type=1) {
 
     allsimudat$methods <- factor(allsimudat$methods, levels=c("fishers",
         "stouffers", "weightedZ", "megaRFX", "permutCon", 
-        "stouffersMFX", "permutZ", "megaMFX", "megaFFX_FSL"))
+        "stouffersMFX", "permutZ", "megaFFX_FSL", "megaMFX"))
+    allsimudat$methods <- factor(allsimudat$methods)
+
+    allsimudat$homoscedasticity <- (allsimudat$withinVariation==1)
 
     return(allsimudat)
 }

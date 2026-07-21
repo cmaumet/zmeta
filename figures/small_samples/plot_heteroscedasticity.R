@@ -44,8 +44,9 @@ plot_heteroscedasticity <- function(test_type=1, allsimudat=NA) {
         
         # plot p-values smaller than 0.001
         data_positive_z <- subset(data, expectedz>3.090232 & (unitMism=="nominal"))
+        data_positive_z <- subset(data, expectedz>0 & (unitMism=="nominal"))
 
-        homoscedasticity_methods <- c("megaRFX","permutCon","stouffersMFX","permutZ")
+        homoscedasticity_methods <- c("megaRFX","permutCon") #,"stouffersMFX","permutZ")
         homogeneity_methods <- c("megaFFX_FSL","fishers", "stouffers", "weightedZ","stouffersMFX","permutZ")
 
         # # Data verifying random/fixed-effect assumption for each method    
@@ -62,8 +63,8 @@ plot_heteroscedasticity <- function(test_type=1, allsimudat=NA) {
         p1 <- plot_qq_p(
                  subset(data_positive_z, methods %in% homoscedasticity_methods &
                                              nSubjects==20 & nStudies==25+25*(data$glm[1] > 1) &
-                                             withinVariation!=1),
-                formula=Between~methods, "Heteroscedasticity", short=TRUE) + 
+                                             Between==0),
+                formula=methods~homoscedasticity, "Homogeneity", short=TRUE) + 
             theme(legend.position="right") + 
             scale_fill_manual(values=cbfPalette) + 
             scale_colour_manual(values=cbfPalette, name = expression(alpha))
@@ -72,8 +73,8 @@ plot_heteroscedasticity <- function(test_type=1, allsimudat=NA) {
         p2 <- plot_qq_p(
                 subset(data_positive_z, methods %in% homoscedasticity_methods &
                                              nSubjects==20 & nStudies==25+25*(data$glm[1] > 1) &
-                                             withinVariation==1),
-                formula=Between~methods, "Homoscedasticity", short=TRUE) + 
+                                             Between==1),
+                formula=methods~homoscedasticity, "Heterogeneity", short=TRUE) + 
             theme(legend.position="right") + 
             scale_fill_manual(values=cbfPalette) + 
             scale_colour_manual(values=cbfPalette, name = expression(sigma[i]^2))
@@ -90,7 +91,7 @@ plot_heteroscedasticity <- function(test_type=1, allsimudat=NA) {
         #     scale_colour_manual(values=cbfPalette)
         
         # Organise the figure: title, panel A at the top, panel B and C in a second row
-        top_row <- plot_grid(p1, labels = 'A', ncol=1)
+        # top_row <- plot_grid(p2, labels = 'A', ncol=1)
        
         if (data$glm[1] == 1){
             # For one-sample tests we have many methods to check under heterogeneity        
@@ -101,9 +102,9 @@ plot_heteroscedasticity <- function(test_type=1, allsimudat=NA) {
         }
         
         # bottom_row <- plot_grid(p2, p3, labels = c('B', 'C'), ncol=2, rel_widths=widths)
-        bottom_row <- plot_grid(p2, labels = c('B'), ncol=1)
+        # bottom_row <- plot_grid(p1, labels = c('B'), ncol=1)
         
-        p <- plot_grid(top_row, bottom_row, labels = ' ', ncol=1)
+        p <- plot_grid(p1, p2, labels = c('A', 'B'), ncol=2)
         title <- ggdraw() + draw_label(
             'Robustness to Heteroscedasticity')
         p <- plot_grid(title, p, ncol=1, rel_heights=c(0.1, 1)) + 

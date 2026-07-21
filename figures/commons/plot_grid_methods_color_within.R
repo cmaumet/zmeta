@@ -12,6 +12,7 @@ plot_grid_methods_color_within <- function(data, aes_main, aes_line, aes_ribbon,
                 fill="grey", alpha=.8, colour="grey") + 
             facet_grid(formula,  
                        labeller = labeller(
+                           homoscedasticity= homosce_labels, 
                            methods = method_labels, 
                            nStudies = nstudies_labels,
                            nSubjects = nsubjects_labels,
@@ -57,6 +58,7 @@ plot_grid_methods_color_within <- function(data, aes_main, aes_line, aes_ribbon,
                 fill="grey", alpha=.8, colour=NA) + 
             facet_grid(formula,  
                        labeller = labeller(
+                           homoscedasticity= homosce_labels,
                            methods = method_labels, 
                            nStudies = nstudies_labels,
                            nSubjects = nsubjects_labels,
