@@ -104,18 +104,16 @@ function export_real_data(realDataDir, redo, pattern, split_in, downs_to)
                 regpval = ['^' regexptranslate('escape', methods(m).pValueFile) '(\.gz)?$'];
                 pValueFile = spm_select('FPList', methodDir, regpval);
                 if isempty(pValueFile)
-                    regstat = ['^' regexptranslate('escape', methods(m).statFile) '(\.gz)?$'];
-                    statFile = spm_select('FPList', fullfile(methodDir, 'stats'), regstat);
-                    disp(regstat)
-                    if ~isempty(statFile)
-                        zstat = spm_read_vols(spm_vol(statFile));
 
-                        copyfile(statFile, pValueFile);
-                        pValueImg = nifti(pValueFile);
-                        pValueImg.dat(:) = -log10(normcdf(zstat(:), 'upper'));
-                    else
-                        error(["\tpValueFile not found for " methods(m).name]);
-                    end
+                    stat_file = fullfile(methodDir, 'stats', methods(m).statFile);
+                    gunzip(stat_file);
+                    stat_file = strrep(stat_file, '.gz', '');
+                    
+                    statistic = spm_read_vols(spm_vol(stat_file));
+                    
+                    copyfile(stat_file, pValueFile);
+                    pValueImg = nifti(pValueFile);
+                    pValueImg.dat(:) = -log10(normcdf(statistic(:), 'upper'));
                 end
 
                 real_pvalues = spm_read_vols(spm_vol(pValueFile));
