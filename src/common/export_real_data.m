@@ -93,7 +93,7 @@ function export_real_data(realDataDir, redo, pattern, split_in, downs_to)
         % For each method we combine all iterations
         for m = 1:numel(methods)  
             statistic = [];
-            pvalues = [];
+            real_pvalues = [];
 
             disp(['    ... ' methods(m).name ])
                
@@ -142,7 +142,7 @@ function export_real_data(realDataDir, redo, pattern, split_in, downs_to)
             for spl = 1:split_in
                 ending = start + bin_size -1; 
                 mystr = print_pvalues(mystr, methods(m).name, ...
-                    pvalues(start:ending), info, donws_pos);
+                    real_pvalues(start:ending), info, donws_pos);
                 start = ending + 1;
             end
         end
