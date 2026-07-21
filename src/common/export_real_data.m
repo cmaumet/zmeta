@@ -56,10 +56,10 @@ function export_real_data(realDataDir, redo, pattern, split_in, downs_to)
                     'statFile', 'weightedz_ffx_statistic.nii');                      
     other_methods(4) = struct( 'name', 'megaMFX', ...
                     'pValueFile', fullfile('stats', 'mega_mfx_minus_log10_p.nii'),...
-                    'statFile', fullfile('stats', 'zstat1.nii'));                      
+                    'statFile', 'zstat1.nii');                      
     other_methods(5) = struct( 'name', 'megaFFX', ...
                     'pValueFile', 'mega_ffx_minus_log10_p.nii',...
-                    'statFile', fullfile('stats', 'zstat1.nii'));             
+                    'statFile', 'zstat1.nii');             
 %     other_methods(6) = struct( 'name', 'megaMFX2', ...
 %                     'pValueFile', 'mega_mfx_minus_log10_p.nii',...
 %                     'statFile', 'zstat1.nii');       
@@ -105,7 +105,7 @@ function export_real_data(realDataDir, redo, pattern, split_in, downs_to)
                 pValueFile = spm_select('FPList', methodDir, regpval);
                 if isempty(pValueFile)
                     regstat = ['^' regexptranslate('escape', methods(m).statFile) '(\.gz)?$'];
-                    statFile = spm_select('FPList', methodDir, regstat);
+                    statFile = spm_select('FPList', fullfile(methodDir, 'stats'), regstat);
                     disp(regstat)
                     if ~isempty(statFile)
                         zstat = spm_read_vols(spm_vol(statFile));
