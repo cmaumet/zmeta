@@ -124,10 +124,10 @@ function export_real_data(realDataDir, redo, pattern, split_in, downs_to)
             end
         
             % Combine all iterations of this method for this simulation
-            sample_size = numel(real_pvalues(:));
+            sample_size = numel(real_pvalues(:))
         
             % Split in equal folds
-            bin_size = sample_size/split_in;
+            bin_size = sample_size/split_in
             
             % We want to keep the same downsampling for all simulations
             % and methods
