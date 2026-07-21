@@ -140,7 +140,7 @@ function export_real_data(realDataDir, redo, pattern, split_in, downs_to)
                 % downsample in log-space so that we keep more values 
                 % corresponding to smaller ranks/p-values                    
                 donws_pos = unique(round(...
-                    logspace(0,log10(bin_size), downs_tot)));
+                    logspace(0,log10(bin_size), downs_tot)))
             end
             
             start = 1;
