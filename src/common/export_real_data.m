@@ -67,6 +67,7 @@ function export_real_data(realDataDir, redo, pattern, split_in, downs_to)
     all_methods = [one_sample_only_methods other_methods];
     
     disp(' Exporting ')
+    warning_msg = '';
     
     if split_in == 10
         csv_suffix = '_wrep';
