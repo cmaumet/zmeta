@@ -67,7 +67,6 @@ function export_real_data(realDataDir, redo, pattern, split_in, downs_to)
     all_methods = [one_sample_only_methods other_methods];
     
     disp(' Exporting ')
-    warning_msg = '';
     
     if split_in == 10
         csv_suffix = '_wrep';
@@ -105,7 +104,7 @@ function export_real_data(realDataDir, redo, pattern, split_in, downs_to)
                 pValueFile = spm_select('FPList', methodDir, regpval);
                 if isempty(pValueFile)
                     this_warn = ["\tpValueFile not found for " methods(m).name];
-                    warning_msg = [warning_msg "\n" this_warn];
+                    warning(this_warn);
                     
                     if exist(csv_file, 'file')
                         delete(csv_file)
@@ -116,7 +115,7 @@ function export_real_data(realDataDir, redo, pattern, split_in, downs_to)
                 real_pvalues = spm_read_vols(spm_vol(pValueFile));
             else
                 this_warn = ["\tMissing " methods(m).name];
-                warning_msg = [warning_msg "\n" this_warn];
+                warning(this_warn);
             end
         
             % Combine all iterations of this method for this simulation
