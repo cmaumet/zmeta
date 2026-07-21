@@ -55,17 +55,18 @@ function export_real_data(realDataDir, redo, pattern, split_in, downs_to)
                     'pValueFile', 'weightedz_ffx_minus_log10_p.nii',...
                     'statFile', 'weightedz_ffx_statistic.nii');                      
     other_methods(4) = struct( 'name', 'megaMFX', ...
-                    'pValueFile', 'mega_mfx_minus_log10_p.nii',...
-                    'statFile', 'zstat1.nii');                      
-    other_methods(5) = struct( 'name', 'megaFFX_FSL', ...
+                    'pValueFile', 'stas/mega_mfx_minus_log10_p.nii',...
+                    'zstatFile', 'stats/zstat1.nii.gz');                      
+    other_methods(5) = struct( 'name', 'megaFFX', ...
                     'pValueFile', 'mega_ffx_minus_log10_p.nii',...
-                    'statFile', 'zstat1.nii');             
+                    'zstatFile', 'stats/zstat1.nii');             
 %     other_methods(6) = struct( 'name', 'megaMFX2', ...
 %                     'pValueFile', 'mega_mfx_minus_log10_p.nii',...
 %                     'statFile', 'zstat1.nii');       
                 
     all_methods = [one_sample_only_methods other_methods];
-    
+
+
     disp(' Exporting ')
     
     if split_in == 10
@@ -103,13 +104,17 @@ function export_real_data(realDataDir, redo, pattern, split_in, downs_to)
                 regpval = ['^' regexptranslate('escape', methods(m).pValueFile) '(\.gz)?$'];
                 pValueFile = spm_select('FPList', methodDir, regpval);
                 if isempty(pValueFile)
-                    this_warn = ["\tpValueFile not found for " methods(m).name];
-                    error(this_warn);
-                    
-                    if exist(csv_file, 'file')
-                        delete(csv_file)
+                    regstat = ['^' regexptranslate('escape', methods(m).statFile) '(\.gz)?$'];
+                    statFile = spm_select('FPList', methodDir, regpval);
+                    if ~isempty(zstatFile)
+                        zstat = spm_read_vols(spm_vol(zstatFile));
+
+                        copyfile(zstatFile, pValueFile);
+                        pValueImg = nifti(pValueFile);
+                        pValueImg.dat(:) = -log10(normcdf(zstat(:), 'upper'));
+                    else
+                        error(["\tpValueFile not found for " methods(m).name]);
                     end
-                    continue;
                 end
 
                 real_pvalues = spm_read_vols(spm_vol(pValueFile));
@@ -177,7 +182,6 @@ function mystr = print_pvalues(mystr, methodName, minuslog10pvalues, donws_pos)
      
     % Downsampling pvalues_rank so that we keep more precision for smaller
     % p-values
-       
     downs_pvalues_rank = pvalues_rank(donws_pos);
     downs_expected_p = expected_p(donws_pos);
     downs_pvalues = pvalues(donws_pos);
@@ -188,7 +192,7 @@ function mystr = print_pvalues(mystr, methodName, minuslog10pvalues, donws_pos)
 %     data_to_export = num2cell([minuslog10pvalues, pvalues, pvalues_rank expected_p], 2);
      
     mystr = [mystr sprintf([methodName ...
-            ',%i,%i,%i,%i\n'], ...            
+            ,%i,%i,%i,%i\n'], ...            
             data_to_export{:} )];
 %             ',' mat2str(info.nSimuOneDir^3) ',%i,%i,%i,%i,%i\n'], ...
           
